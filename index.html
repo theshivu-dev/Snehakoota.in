@@ -32,6 +32,60 @@
     font-family:'Work Sans', sans-serif;
     overflow-x:hidden;
   }
+  body{ padding-left:22px; }
+
+  .edge-strip{
+    position:fixed; left:0; top:0; bottom:0; width:22px;
+    background:#F5D9AE;
+    border-right:1px solid var(--line-idle);
+    display:flex; flex-direction:column; align-items:center; justify-content:space-evenly;
+    z-index:20; cursor:pointer;
+  }
+  .edge-strip .ring{ width:8px; height:8px; border-radius:50%; background:rgba(181,80,46,0.4); transition:background .2s; }
+  .edge-strip:hover .ring{ background:rgba(181,80,46,0.65); }
+
+  .topbar{
+    position:absolute; top:0; left:22px; right:0; z-index:10;
+    display:flex; align-items:center; justify-content:flex-start;
+    padding:1rem 5vw;
+  }
+  .topbar .opener{
+    width:34px; height:34px; border-radius:50%; border:none;
+    background:rgba(181,80,46,0.08);
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+  }
+  .topbar .opener svg{ width:16px; height:16px; }
+
+  .backdrop{
+    position:fixed; inset:0; background:rgba(43,33,24,0.38);
+    opacity:0; pointer-events:none; transition:opacity .25s ease; z-index:30;
+  }
+  body.nav-open .backdrop{ opacity:1; pointer-events:auto; }
+
+  .side-panel{
+    position:fixed; left:0; top:0; bottom:0; width:76%; max-width:300px;
+    display:flex; z-index:31;
+    transform:translateX(-100%); transition:transform .28s ease;
+    box-shadow:2px 0 18px rgba(0,0,0,0.18);
+  }
+  body.nav-open .side-panel{ transform:translateX(0); }
+  .side-panel .binding{
+    width:22px; background:#F5D9AE; border-right:1px solid var(--line-idle);
+    display:flex; flex-direction:column; align-items:center; justify-content:space-evenly;
+  }
+  .side-panel .binding .ring{ width:8px; height:8px; border-radius:50%; background:var(--rust); }
+  .side-panel .panel-body{ flex:1; background:var(--sky-bottom); padding:1.4rem 1.1rem; }
+  .side-panel .panel-top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:1.6rem; }
+  .side-panel .panel-top .brand{ font-family:'Fraunces', serif; font-weight:600; font-size:.95rem; }
+  .side-panel .closer{ background:none; border:none; font-size:1.1rem; color:var(--ink-soft); cursor:pointer; line-height:1; padding:.3rem; }
+  .panel-links{ display:flex; flex-direction:column; gap:.3rem; }
+  .panel-links a{
+    display:block; padding:.75rem .85rem; border-radius:10px; text-decoration:none;
+    color:var(--ink); font-size:.95rem; font-family:'Work Sans', sans-serif;
+  }
+  .panel-links a.active{ background:rgba(181,80,46,0.1); color:var(--rust); font-weight:600; }
+  .panel-links a.disabled{ color:var(--ink-soft); opacity:.55; pointer-events:none; }
+  .panel-links a .tag{ font-size:.72rem; margin-left:.4em; }
 
   .stage{
     position:relative;
@@ -200,6 +254,38 @@
 </head>
 <body>
 
+<div class="edge-strip" id="edgeStrip" role="button" aria-label="Open menu" tabindex="0">
+  <span class="ring"></span><span class="ring"></span><span class="ring"></span>
+  <span class="ring"></span><span class="ring"></span><span class="ring"></span><span class="ring"></span>
+</div>
+
+<div class="backdrop" id="backdrop"></div>
+
+<nav class="side-panel" aria-hidden="true">
+  <div class="binding">
+    <span class="ring"></span><span class="ring"></span><span class="ring"></span>
+    <span class="ring"></span><span class="ring"></span><span class="ring"></span><span class="ring"></span>
+  </div>
+  <div class="panel-body">
+    <div class="panel-top">
+      <span class="brand" style="font-family:'Fraunces',serif;"><span style="color:var(--rust);">Sneha</span><span style="color:var(--banyan);">Koota</span></span>
+      <button class="closer" id="closer" aria-label="Close menu">&#10005;</button>
+    </div>
+    <div class="panel-links">
+      <a href="index.html" class="active">Home</a>
+      <a href="story.html">Story</a>
+      <a href="#" class="disabled">Gallery <span class="tag">(soon)</span></a>
+      <a href="#" class="disabled">Contact <span class="tag">(soon)</span></a>
+    </div>
+  </div>
+</nav>
+
+<header class="topbar">
+  <button class="opener" id="opener" aria-label="Open menu">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#B5502E" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+  </button>
+</header>
+
 <div class="stage">
   <div class="sun" aria-hidden="true"></div>
 
@@ -232,6 +318,15 @@
 
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
+
+  const body = document.body;
+  const openNav = () => body.classList.add('nav-open');
+  const closeNav = () => body.classList.remove('nav-open');
+  document.getElementById('edgeStrip').addEventListener('click', openNav);
+  document.getElementById('edgeStrip').addEventListener('keypress', (e) => { if(e.key === 'Enter') openNav(); });
+  document.getElementById('opener').addEventListener('click', openNav);
+  document.getElementById('closer').addEventListener('click', closeNav);
+  document.getElementById('backdrop').addEventListener('click', closeNav);
 </script>
 
 </body>

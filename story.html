@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ಸ್ನೇಹಕೂಟ — Story</title>
+<meta name="description" content="ಸ್ನೇಹಕೂಟದ ಕಥೆ — friends beyond friends, on a shared journey.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600&family=Noto+Sans+Kannada:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sky-top:    #FFF6E8;
+    --sky-bottom: #FDE7C8;
+    --marigold:   #E29B3F;
+    --rust:       #B5502E;
+    --banyan:     #2F5233;
+    --ink:        #2B2118;
+    --ink-soft:   #6B5C4C;
+    --card-line:  rgba(43,33,24,0.10);
+    --panel-bg:   #FDE7C8;
+    --edge-bg:    #F5D9AE;
+  }
+  *{ box-sizing:border-box; }
+  html,body{
+    margin:0; padding:0;
+    background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-bottom) 55%, var(--sky-bottom) 100%);
+    color:var(--ink);
+    font-family:'Noto Sans Kannada','Work Sans', sans-serif;
+    overflow-x:hidden;
+  }
+  body{ padding-left:22px; }
+  a{ color:var(--rust); }
+
+  .edge-strip{
+    position:fixed; left:0; top:0; bottom:0; width:22px;
+    background:var(--edge-bg);
+    border-right:1px solid var(--card-line);
+    display:flex; flex-direction:column; align-items:center; justify-content:space-evenly;
+    z-index:20;
+  }
+  .edge-strip .dot-btn{
+    width:22px; height:22px;
+    display:flex; align-items:center; justify-content:center;
+    background:none; border:none; padding:0; cursor:pointer;
+  }
+  .edge-strip .ring{
+    width:8px; height:8px; border-radius:50%;
+    background:rgba(181,80,46,0.4);
+    transition:background .2s, transform .2s;
+  }
+  .edge-strip .dot-btn:hover .ring{ background:rgba(181,80,46,0.7); }
+  .edge-strip .dot-btn.active .ring{
+    background:var(--rust);
+    transform:scale(1.35);
+  }
+
+  .topbar{
+    position:sticky; top:0; z-index:10;
+    display:flex; align-items:center; justify-content:center;
+    padding:.9rem 5vw;
+    backdrop-filter:blur(10px);
+    background:rgba(255,246,232,0.75);
+    border-bottom:1px solid var(--card-line);
+  }
+  .topbar .brand{ font-family:'Fraunces', serif; font-weight:600; font-size:1rem; text-decoration:none; }
+  .topbar .brand .sneha{ color:var(--rust); }
+  .topbar .brand .koota{ color:var(--banyan); }
+  .topbar .opener{
+    position:absolute; left:5vw; top:50%; transform:translateY(-50%);
+    width:34px; height:34px; border-radius:50%; border:none;
+    background:rgba(181,80,46,0.08);
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+  }
+  .topbar .opener svg{ width:16px; height:16px; }
+
+  .backdrop{
+    position:fixed; inset:0; background:rgba(43,33,24,0.38);
+    opacity:0; pointer-events:none; transition:opacity .25s ease; z-index:30;
+  }
+  body.nav-open .backdrop{ opacity:1; pointer-events:auto; }
+
+  .side-panel{
+    position:fixed; left:0; top:0; bottom:0; width:76%; max-width:300px;
+    display:flex; z-index:31;
+    transform:translateX(-100%); transition:transform .28s ease;
+    box-shadow:2px 0 18px rgba(0,0,0,0.18);
+  }
+  body.nav-open .side-panel{ transform:translateX(0); }
+  .side-panel .binding{
+    width:22px; background:var(--edge-bg); border-right:1px solid var(--card-line);
+    display:flex; flex-direction:column; align-items:center; justify-content:space-evenly;
+  }
+  .side-panel .binding .ring{ width:8px; height:8px; border-radius:50%; background:var(--rust); }
+  .side-panel .panel-body{ flex:1; background:var(--panel-bg); padding:1.4rem 1.1rem; }
+  .side-panel .panel-top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:1.6rem; }
+  .side-panel .panel-top .brand{ font-family:'Fraunces', serif; font-weight:600; font-size:.95rem; }
+  .side-panel .closer{ background:none; border:none; font-size:1.1rem; color:var(--ink-soft); cursor:pointer; line-height:1; padding:.3rem; }
+  .panel-links{ display:flex; flex-direction:column; gap:.3rem; }
+  .panel-links a{
+    display:block; padding:.75rem .85rem; border-radius:10px; text-decoration:none;
+    color:var(--ink); font-size:.95rem; font-family:'Work Sans', sans-serif;
+  }
+  .panel-links a.active{ background:rgba(181,80,46,0.1); color:var(--rust); font-weight:600; }
+  .panel-links a.disabled{ color:var(--ink-soft); opacity:.55; pointer-events:none; }
+  .panel-links a .tag{ font-size:.72rem; margin-left:.4em; }
+
+  .chapter{ position:relative; max-width:640px; margin:0 auto; padding:6vh 6vw; }
+  .chapter + .chapter{ border-top:1px solid var(--card-line); }
+  .chapter:first-of-type{ padding-top:7vh; }
+  .chapter-label{
+    font-family:'Work Sans', sans-serif; font-size:.7rem; font-weight:600;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--banyan); margin-bottom:.6rem;
+  }
+  .chapter h2{ font-family:'Fraunces', serif; font-weight:600; font-size:clamp(1.5rem, 6vw, 2.1rem); margin:0 0 1.3rem; line-height:1.25; }
+  .chapter p{ font-size:1.05rem; line-height:1.9; color:var(--ink-soft); margin:0 0 1.1rem; }
+  .chapter p.lede{ color:var(--ink); font-weight:500; }
+
+  .steps-list{ list-style:none; margin:1.6rem 0 0; padding:0; }
+  .steps-list li{ position:relative; padding-left:1.3rem; margin-bottom:.7rem; font-size:.98rem; color:var(--ink-soft); line-height:1.6; }
+  .steps-list li::before{ content:'—'; position:absolute; left:0; color:var(--marigold); }
+  .steps-list li:last-child{ color:var(--ink); font-weight:500; }
+
+  .way-list{ list-style:none; margin:1.6rem 0 0; padding:0; display:grid; grid-template-columns:1fr 1fr; gap:.6rem; }
+  .way-list li{ background:rgba(255,255,255,0.4); border:1px solid var(--card-line); border-radius:10px; padding:.7rem .85rem; font-size:.92rem; color:var(--ink); text-align:center; }
+
+  .closing{ text-align:center; background:linear-gradient(180deg, transparent 0%, rgba(226,155,63,0.08) 100%); }
+  .closing p{ color:var(--ink); }
+  .cta-wrap{ margin-top:1.6rem; }
+  .cta{
+    display:inline-block; padding:.85em 2.1em; background:var(--rust); color:#FFF6E8;
+    text-decoration:none; font-weight:600; font-size:.92rem; border-radius:999px;
+    border:none; cursor:pointer; font-family:'Work Sans', sans-serif;
+  }
+  .cta-note{ margin-top:.9rem; font-size:.85rem; color:var(--ink-soft); font-style:italic; min-height:1.2em; opacity:0; transition:opacity .3s ease; }
+  .cta-note.show{ opacity:1; }
+
+  footer{ text-align:center; padding:5vh 6vw 6vh; font-size:.8rem; color:var(--ink-soft); opacity:.75; }
+</style>
+</head>
+<body>
+
+<div class="edge-strip" id="edgeStrip" aria-label="Jump to chapter">
+  <button class="dot-btn" data-target="ch1" aria-label="ಅಧ್ಯಾಯ ೧"><span class="ring"></span></button>
+  <button class="dot-btn" data-target="ch2" aria-label="ಅಧ್ಯಾಯ ೨"><span class="ring"></span></button>
+  <button class="dot-btn" data-target="ch3" aria-label="ಅಧ್ಯಾಯ ೩"><span class="ring"></span></button>
+  <button class="dot-btn" data-target="ch4" aria-label="ಅಧ್ಯಾಯ ೪"><span class="ring"></span></button>
+</div>
+
+<div class="backdrop" id="backdrop"></div>
+
+<nav class="side-panel" aria-hidden="true">
+  <div class="binding">
+    <span class="ring"></span><span class="ring"></span><span class="ring"></span>
+    <span class="ring"></span><span class="ring"></span><span class="ring"></span><span class="ring"></span>
+  </div>
+  <div class="panel-body">
+    <div class="panel-top">
+      <span class="brand"><span class="sneha">Sneha</span><span class="koota">Koota</span></span>
+      <button class="closer" id="closer" aria-label="Close menu">&#10005;</button>
+    </div>
+    <div class="panel-links">
+      <a href="index.html">Home</a>
+      <a href="story.html" class="active">Story</a>
+      <a href="#" class="disabled">Gallery <span class="tag">(soon)</span></a>
+      <a href="#" class="disabled">Contact <span class="tag">(soon)</span></a>
+    </div>
+  </div>
+</nav>
+
+<header class="topbar">
+  <button class="opener" id="opener" aria-label="Open menu">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#B5502E" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+  </button>
+  <a href="index.html" class="brand"><span class="sneha">Sneha</span><span class="koota">Koota</span></a>
+</header>
+
+<section class="chapter" id="ch1">
+  <div class="chapter-label">ಅಧ್ಯಾಯ ೧</div>
+  <h2>ಆರಂಭ</h2>
+  <p>ಕೆಲವು ಕಥೆಗಳು ಒಂದೇ ದಿನದಲ್ಲಿ ಹುಟ್ಟುವುದಿಲ್ಲ — ವರ್ಷಗಳ ನೆನಪುಗಳಲ್ಲಿ ನಿಧಾನವಾಗಿ ರೂಪುಗೊಳ್ಳುತ್ತವೆ.</p>
+  <p>ಶಾಲೆಯ ಕೊನೆಯ ಗಂಟೆ ಮೊಳಗಿದ ನಂತರ, ಜೀವನ ನಮ್ಮನ್ನೆಲ್ಲ ಬೇರೆ ಬೇರೆ ದಾರಿಗಳಲ್ಲಿ ನಡೆಸಿತು. ಯಾರೋ ಉದ್ಯಮಿಗಳಾದರು, ಯಾರೋ ಶಿಕ್ಷಕರಾದರು, ಯಾರೋ ಊರಲ್ಲೇ ಉಳಿದರು, ಯಾರೋ ಊರು-ರಾಜ್ಯ-ದೇಶಗಳನ್ನೇ ದಾಟಿದರು.</p>
+  <p>ಕಾಲ ಮುಂದೆ ಸಾಗಿತು. ಆದರೆ ಕೆಲವು ನೆನಪುಗಳು ಅಲ್ಲಿಯೇ ನಮ್ಮನ್ನು ಕಾಯುತ್ತ ನಿಂತಿದ್ದವು.</p>
+  <p>ಒಂದು ದಿನ, "ಮತ್ತೊಮ್ಮೆ ಭೇಟಿಯಾಗೋಣವೇ?" ಎಂಬ ಸರಳ ಆಲೋಚನೆ ಮೂಡಿತು. ಆ ಆಲೋಚನೆ ಮಾತುಗಳಾಯಿತು, ಆ ಮಾತುಗಳು ಒಬ್ಬರಿಂದ ಮತ್ತೊಬ್ಬರಿಗೆ ಸಾಗಿದವು — ಹೆಸರುಗಳಿಗಿಂತ ಮೊದಲು ನೆನಪುಗಳೇ ಮತ್ತೆ ಸಿಕ್ಕವು.</p>
+  <p>ಹೀಗೆ ಸ್ನೇಹಕೂಟ ಹುಟ್ಟಿತು. ಮೊದಲ ಸ್ನೇಹಕೂಟ ಒಂದು ಕಾರ್ಯಕ್ರಮದ ಅಂತ್ಯವಾಗಲಿಲ್ಲ — ಅದು ಒಂದು ಹೊಸ ಯೋಚನೆಯ ಆರಂಭವಾಯಿತು.</p>
+  <p>ಸ್ನೇಹ ಒಂದು ದಿನದ ಭೇಟಿಯಲ್ಲ, ಒಂದು ನೆನಪಿನ ಆಚರಣೆಯೂ ಅಲ್ಲ. ಅದು ಕಾಲದ ಜೊತೆಗೂ ಮುಂದುವರಿಯುವ ಪಯಣ.</p>
+
+  <ul class="steps-list">
+    <li>ಸ್ನೇಹಿತರ ಮರುಸಂಪರ್ಕ</li>
+    <li>ಒಂದು ವಲಯ ಮತ್ತೆ ಜೀವ ಪಡೆಯಿತು</li>
+    <li>ಮೊದಲ ಸ್ನೇಹಕೂಟ</li>
+    <li>ಹುಟ್ಟುಹಬ್ಬಗಳ ಆಚರಣೆ</li>
+    <li>ಹೊಸ ಕನಸುಗಳ ಆರಂಭ</li>
+  </ul>
+
+  <p style="margin-top:1.4rem;">ಮೊದಲ ಅಧ್ಯಾಯ ಮುಗಿದಿದೆ. ಪಯಣ ಈಗಷ್ಟೇ ಆರಂಭವಾಗಿದೆ.</p>
+</section>
+
+<section class="chapter" id="ch2">
+  <div class="chapter-label">ಅಧ್ಯಾಯ ೨</div>
+  <h2>ಬಂಧಗಳ ಅರ್ಥ</h2>
+  <p class="lede">ಒಂದು ಪಯಣ ಮುಂದುವರಿಯಬೇಕಾದರೆ, ಅದಕ್ಕೊಂದು ಕಾರಣ ಇರಬೇಕು.</p>
+  <p>ಶಾಲೆ ನಮಗೆ ಅಕ್ಷರ ಕಲಿಸಿತು. ಸ್ನೇಹ ಜೀವನವನ್ನು ಕಲಿಸಿತು.</p>
+  <p>ಶಾಲೆಯ ದಿನಗಳು ಮುಗಿದವು. ಆದರೆ ಅವು ಕೊಟ್ಟ ಕೆಲವು ಬಂಧಗಳು ಅಲ್ಲಿಯೇ ಮುಗಿಯಬೇಕಿತ್ತೇ? ಬಹುಶಃ ಇಲ್ಲ.</p>
+  <p>ಕೆಲವು ಪರಿಚಯಗಳು ಕೇವಲ ನೆನಪಾಗಿಬಿಡುತ್ತವೆ. ಇನ್ನೂ ಕೆಲವು, ಕಾಲ ಕಳೆದಂತೆ ಮೌಲ್ಯವಾಗುತ್ತವೆ. ಸ್ನೇಹ ಅಂತಹ ಮೌಲ್ಯಗಳಲ್ಲಿ ಒಂದು.</p>
+  <p>ಸ್ನೇಹಕೂಟ ಮತ್ತೆ ಭೇಟಿಯಾಗುವುದಕ್ಕಷ್ಟೇ ಅಲ್ಲ — ಮತ್ತೆ ಸಂಪರ್ಕದಲ್ಲಿರಲು, ಒಬ್ಬರನ್ನೊಬ್ಬರು ಅರಿಯಲು, ಸಂತೋಷ ಹಂಚಿಕೊಳ್ಳಲು, ಅಗತ್ಯವಿದ್ದಾಗ ಜೊತೆ ನಿಲ್ಲಲು, ಜೀವನದ ಹೊಸ ದಾರಿಗಳಲ್ಲಿ ಒಬ್ಬರಿಗೊಬ್ಬರು ಸೇತುವೆಯಾಗಲು.</p>
+  <p>ಹೂಗುಚ್ಛದಲ್ಲಿ ಒಂದೇ ಬಣ್ಣದ ಹೂಗಳಿರಬೇಕೆಂದಿಲ್ಲ — ಬೇರೆ ಬೇರೆ ಬಣ್ಣಗಳು ಒಟ್ಟಾಗಿ ಅರಳಿದಾಗಲೇ ಅದರ ಸೌಂದರ್ಯ ಹೆಚ್ಚುತ್ತದೆ. ನಮ್ಮ ಬಳಗವೂ ಹಾಗೆಯೇ — ವೃತ್ತಿಗಳು ಬೇರೆ, ಅಭಿಪ್ರಾಯಗಳು ಬೇರೆ, ಜೀವನದ ದಾರಿಗಳು ಬೇರೆ. ಆದರೆ ಸ್ನೇಹ ನಮ್ಮೆಲ್ಲರನ್ನು ಒಂದೇ ವಲಯದಲ್ಲಿ ಜೋಡಿಸುವ ನಂಟು.</p>
+  <p>ಬಂಧಗಳು ಒಂದೇ ರೀತಿಯವರಿಂದ ಉಳಿಯುವುದಿಲ್ಲ — ಬೇರೆ ಬೇರೆ ಆಗಿದ್ದರೂ, ಜೊತೆಯಾಗಿರಬೇಕೆಂಬ ಮನಸ್ಸಿನಿಂದ ಉಳಿಯುತ್ತವೆ.</p>
+</section>
+
+<section class="chapter" id="ch3">
+  <div class="chapter-label">ಅಧ್ಯಾಯ ೩</div>
+  <h2>ಮುಂದಿನ ಹೆಜ್ಜೆ</h2>
+  <p class="lede">ಪ್ರತಿ ಪಯಣಕ್ಕೂ ಒಂದು ನಿಗದಿತ ಗಮ್ಯ ಇರಬೇಕೆಂದಿಲ್ಲ — ಒಟ್ಟಾಗಿ ಸಾಗುವ ದಿಕ್ಕು ಇದ್ದರೆ ಸಾಕು.</p>
+  <p>ಮೊದಲ ಸ್ನೇಹಕೂಟ ನಮ್ಮನ್ನು ಮತ್ತೆ ಒಂದಾಗಿಸಿತು. ಆದರೆ ಅದು ಅಂತಿಮ ಗುರಿಯಲ್ಲ — ಒಂದು ಆರಂಭ ಮಾತ್ರ. ಮುಂದಿನ ದಿನಗಳಲ್ಲಿ ವಾರ್ಷಿಕ ಸ್ನೇಹಕೂಟ, ಕುಟುಂಬ ಸಮೇತ ಭೇಟಿಗಳು, ವೃತ್ತಿ ಮತ್ತು ವ್ಯವಹಾರಗಳ ಪರಿಚಯ, ಸಮಾಜಮುಖಿ ಚಟುವಟಿಕೆಗಳು, ರಕ್ತದಾನ, ವೃಕ್ಷಾರೋಪಣ, ಅಗತ್ಯವಿದ್ದಾಗ ಒಬ್ಬರಿಗೊಬ್ಬರು ಬೆಂಬಲವಾಗಿ ನಿಲ್ಲುವಂತಹ ಅನೇಕ ಸಾಧ್ಯತೆಗಳು ನಮ್ಮ ಮುಂದೆ ತೆರೆದ ಬಾಗಿಲಿನಂತಿವೆ.</p>
+  <p>ಆದರೆ ಇವುಗಳಲ್ಲಿ ಯಾವುದೂ ಇಂದು ನಿಶ್ಚಯವಾದ ಯೋಜನೆಗಳಲ್ಲ. ನಾವು ಏನಾಗಬೇಕು, ಏನು ಮಾಡಬೇಕು ಎನ್ನುವುದನ್ನು ಕೆಲವರು ನಿರ್ಧರಿಸುವುದಿಲ್ಲ. ನಮ್ಮ ಸ್ನೇಹಿತರು ಯಾವ ಕನಸುಗಳನ್ನು ಕಾಣುತ್ತಾರೋ, ಯಾವ ದಿಕ್ಕಿನಲ್ಲಿ ಕೈಜೋಡಿಸಲು ಬಯಸುತ್ತಾರೋ, ಹಾವೇರಿ, ಸುತ್ತಮುತ್ತಲಿನ ಊರುಗಳು ಅಥವಾ ಜಗತ್ತಿನ ಯಾವ ಮೂಲೆಯಲ್ಲಿದ್ದರೂ — ಅದೇ ನಮ್ಮ ಮುಂದಿನ ಪಯಣವನ್ನು ರೂಪಿಸಲಿದೆ.</p>
+  <p>ಇಂದು ನಮ್ಮ ಬಳಿ ಎಲ್ಲ ಉತ್ತರಗಳಿಲ್ಲ... ಆದರೆ ಒಟ್ಟಾಗಿ ಹುಡುಕುವ ಮನಸ್ಸಿದೆ. ಬಹುಶಃ... ಅದೇ ಪ್ರತಿಯೊಂದು ಒಳ್ಳೆಯ ಬದಲಾವಣೆಯ ಮೊದಲ ಹೆಜ್ಜೆ.</p>
+</section>
+
+<section class="chapter" id="ch4">
+  <div class="chapter-label">ಅಧ್ಯಾಯ ೪</div>
+  <h2>ಜೊತೆ ನಡೆಯೋಣ</h2>
+  <p class="lede">ಗುರಿಗಿಂತ, ನಮ್ಮ ನಡೆ ಮುಖ್ಯವಾಗುತ್ತದೆ.</p>
+  <p>ಸ್ನೇಹ ಎಂದರೆ ಕೇವಲ ಭೇಟಿಯಾಗುವುದಲ್ಲ — ಒಬ್ಬರನ್ನೊಬ್ಬರು ಗೌರವಿಸುವುದು, ಭಿನ್ನಾಭಿಪ್ರಾಯಗಳ ನಡುವೆಯೂ ಸಂಬಂಧವನ್ನು ಕಾಪಾಡುವುದು, ಸಂತೋಷದಲ್ಲಿ ಜೊತೆಯಾಗುವುದು, ಅಗತ್ಯವಿದ್ದಾಗ ಹೆಗಲಾಗಿ ನಿಲ್ಲುವುದು.</p>
+  <p>ಈ ಬಳಗದ ಶಕ್ತಿ ಇರುವುದು ಎಲ್ಲರೂ ಒಂದೇ ರೀತಿ ಯೋಚಿಸುವುದರಲ್ಲಲ್ಲ — ಬೇರೆ ಬೇರೆ ಅನುಭವ, ಅಭಿಪ್ರಾಯ ಮತ್ತು ಬದುಕಿನ ದಾರಿಗಳನ್ನು ಪರಸ್ಪರ ಗೌರವಿಸುವ ಮನಸ್ಸಿನಲ್ಲಿದೆ.</p>
+
+  <ul class="way-list">
+    <li>ಸ್ನೇಹ ಮೊದಲಿಗೆ</li>
+    <li>ಗೌರವ ಎಲ್ಲರಿಗೂ</li>
+    <li>ಜವಾಬ್ದಾರಿ ನಮ್ಮೆಲ್ಲರದು</li>
+    <li>ಒಗ್ಗಟ್ಟು ನಮ್ಮ ಶಕ್ತಿ</li>
+  </ul>
+
+  <p style="margin-top:1.6rem;">ಈ ಪಯಣಕ್ಕೆ ಯಾವುದೇ ನಿಯಮಗಳ ಪುಸ್ತಕವಿಲ್ಲ. ಆದರೆ ಒಂದು ಸರಳ ನಂಬಿಕೆ ಇದೆ — ಸ್ನೇಹ ಮೊದಲು, ಮನುಷ್ಯತ್ವ ಅದರೊಂದಿಗೆ.</p>
+  <p>ಸ್ನೇಹ ಉಳಿಯುವುದು ಎಲ್ಲರೂ ಒಂದೇ ರೀತಿಯಾಗಿದ್ದರಿಂದಲ್ಲ — ಒಬ್ಬರನ್ನೊಬ್ಬರು ಹಾಗೆಯೇ ಸ್ವೀಕರಿಸುವ ಮನಸ್ಸಿನಿಂದ.</p>
+</section>
+
+<section class="chapter closing">
+  <p class="lede">SnehaKoota ಒಂದು ದಿನದ ಕಾರ್ಯಕ್ರಮವಾಗಿ ಮಾತ್ರ ನೆನಪಾಗಬಾರದು... ವರ್ಷಗಳ ನಂತರವೂ, "ನಮ್ಮವರಿದ್ದಾರೆ" ಎನ್ನುವ ಭರವಸೆಯಾಗಿ ಉಳಿಯಬೇಕು.</p>
+  <p>ಮುಂದಿನ ಅಧ್ಯಾಯಗಳನ್ನು ಕಾಲ ಬರೆಯುವುದಿಲ್ಲ... ನಮ್ಮೆಲ್ಲರು ಸೇರಿ ಬರೆಯುತ್ತೇವೆ.</p>
+
+  <div class="cta-wrap">
+    <button class="cta" id="interestBtn">I'm Interested</button>
+    <div class="cta-note" id="interestNote">ಆಸಕ್ತಿ ನೋಂದಣಿ ನಮೂನೆ ಶೀಘ್ರದಲ್ಲೇ ಬರಲಿದೆ — ಸ್ವಲ್ಪ ಕಾಯಿರಿ</div>
+  </div>
+</section>
+
+<footer>
+  &copy; <span id="year"></span> SnehaKoota &middot; snehakoota.in
+</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  const body = document.body;
+  const openNav = () => body.classList.add('nav-open');
+  const closeNav = () => body.classList.remove('nav-open');
+
+  document.getElementById('opener').addEventListener('click', openNav);
+  document.getElementById('closer').addEventListener('click', closeNav);
+  document.getElementById('backdrop').addEventListener('click', closeNav);
+
+  const dotBtns = document.querySelectorAll('.dot-btn');
+  dotBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = document.getElementById(btn.dataset.target);
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  const chapters = ['ch1','ch2','ch3','ch4'].map(id => document.getElementById(id));
+  const setActive = (id) => {
+    dotBtns.forEach(b => b.classList.toggle('active', b.dataset.target === id));
+  };
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) setActive(entry.target.id);
+    });
+  }, { rootMargin: '-40% 0px -50% 0px', threshold: 0 });
+  chapters.forEach(ch => { if (ch) observer.observe(ch); });
+
+  const interestBtn = document.getElementById('interestBtn');
+  const interestNote = document.getElementById('interestNote');
+  interestBtn.addEventListener('click', () => {
+    interestNote.classList.add('show');
+  });
+</script>
+
+</body>
+</html>
