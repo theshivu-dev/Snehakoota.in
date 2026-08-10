@@ -49,12 +49,40 @@
     display:flex; align-items:center; justify-content:flex-start;
     padding:1rem 5vw;
   }
-  .topbar .opener{
-    width:34px; height:34px; border-radius:50%; border:none;
-    background:rgba(181,80,46,0.08);
-    display:flex; align-items:center; justify-content:center; cursor:pointer;
+
+  .bookmark-tab{
+    position:fixed; left:22px; top:58vh; width:20px; height:48px; margin-top:-24px;
+    background:var(--rust); border-radius:0 8px 8px 0;
+    box-shadow:2px 2px 6px rgba(43,33,24,0.18);
+    z-index:32; cursor:pointer; border:none; padding:0;
+    display:flex; align-items:center; justify-content:center;
+    animation:tabNudge 2.4s ease-in-out 1s 3;
   }
-  .topbar .opener svg{ width:16px; height:16px; }
+  .bookmark-tab::after{
+    content:''; width:6px; height:6px; border-radius:50%;
+    background:rgba(255,246,232,0.85);
+  }
+  .bookmark-tab.pulsing::before{
+    content:''; position:absolute; inset:0; border-radius:0 8px 8px 0;
+    box-shadow:0 0 0 0 rgba(181,80,46,0.5);
+    animation:tabPulse 2.2s ease-out infinite;
+  }
+  @keyframes tabPulse{
+    0%{ box-shadow:0 0 0 0 rgba(181,80,46,0.45); }
+    70%{ box-shadow:0 0 0 10px rgba(181,80,46,0); }
+    100%{ box-shadow:0 0 0 0 rgba(181,80,46,0); }
+  }
+  @keyframes tabNudge{
+    0%, 100%{ transform:translateX(0); }
+    10%{ transform:translateX(4px); }
+    20%{ transform:translateX(0); }
+    30%{ transform:translateX(4px); }
+    40%{ transform:translateX(0); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .bookmark-tab{ animation:none; }
+    .bookmark-tab.pulsing::before{ animation:none; }
+  }
 
   .backdrop{
     position:fixed; inset:0; background:rgba(43,33,24,0.38);
@@ -280,11 +308,9 @@
   </div>
 </nav>
 
-<header class="topbar">
-  <button class="opener" id="opener" aria-label="Open menu">
-    <svg viewBox="0 0 24 24" fill="none" stroke="#B5502E" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
-  </button>
-</header>
+<button class="bookmark-tab pulsing" id="opener" aria-label="Open menu" role="button" tabindex="0"></button>
+
+<header class="topbar"></header>
 
 <div class="stage">
   <div class="sun" aria-hidden="true"></div>
@@ -322,9 +348,12 @@
   const body = document.body;
   const openNav = () => body.classList.add('nav-open');
   const closeNav = () => body.classList.remove('nav-open');
-  document.getElementById('edgeStrip').addEventListener('click', openNav);
-  document.getElementById('edgeStrip').addEventListener('keypress', (e) => { if(e.key === 'Enter') openNav(); });
-  document.getElementById('opener').addEventListener('click', openNav);
+  const toggleNav = () => body.classList.toggle('nav-open');
+  document.getElementById('edgeStrip').addEventListener('click', toggleNav);
+  document.getElementById('edgeStrip').addEventListener('keypress', (e) => { if(e.key === 'Enter') toggleNav(); });
+  const openerBtn = document.getElementById('opener');
+  openerBtn.addEventListener('click', () => { toggleNav(); openerBtn.classList.remove('pulsing'); });
+  openerBtn.addEventListener('keypress', (e) => { if (e.key === 'Enter') { toggleNav(); openerBtn.classList.remove('pulsing'); } });
   document.getElementById('closer').addEventListener('click', closeNav);
   document.getElementById('backdrop').addEventListener('click', closeNav);
 </script>
