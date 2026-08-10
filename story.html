@@ -119,11 +119,11 @@
     display:flex; flex-direction:column; align-items:center; justify-content:space-evenly;
   }
   .side-panel .binding .ring{ width:8px; height:8px; border-radius:50%; background:var(--rust); }
-  .side-panel .panel-body{ flex:1; background:var(--panel-bg); padding:1.4rem 1.1rem; }
-  .side-panel .panel-top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:1.6rem; }
+  .side-panel .panel-body{ flex:1; background:var(--panel-bg); padding:1.4rem 1.1rem; display:flex; flex-direction:column; height:100%; }
+  .side-panel .panel-top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:1.6rem; flex-shrink:0; }
   .side-panel .panel-top .brand{ font-family:'Fraunces', serif; font-weight:600; font-size:.95rem; }
   .side-panel .closer{ background:none; border:none; font-size:1.1rem; color:var(--ink-soft); cursor:pointer; line-height:1; padding:.3rem; }
-  .panel-links{ display:flex; flex-direction:column; gap:.3rem; }
+  .panel-links{ display:flex; flex-direction:column; gap:.3rem; flex:1; justify-content:center; margin-bottom:8vh; }
   .panel-links a{
     display:block; padding:.75rem .85rem; border-radius:10px; text-decoration:none;
     color:var(--ink); font-size:.95rem; font-family:'Work Sans', sans-serif;
