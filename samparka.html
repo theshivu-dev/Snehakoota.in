@@ -559,8 +559,15 @@ function openNav(){
   openerBtn.classList.remove('pulsing');
 }
 function closeNav(){ body.classList.remove('nav-open'); }
+function toggleNav(){
+  if(body.classList.contains('nav-open')){
+    closeNav();
+  } else {
+    openNav();
+  }
+}
 
-openerBtn.addEventListener('click', openNav);
+openerBtn.addEventListener('click', toggleNav);
 closerBtn.addEventListener('click', closeNav);
 backdrop.addEventListener('click', closeNav);
 
