@@ -33,6 +33,10 @@ Before modifying a page:
 
 **Never assume that a visually similar redesign is acceptable if it changes established behaviour or layout without being requested.**
 
+### Mandatory write/commit confirmation
+
+**Before creating, modifying, deleting, or committing any file in the repository, the AI must first show the proposed change and obtain explicit confirmation from the user in chat. A question such as “Can you do this?” does not constitute permission to write or commit.**
+
 ---
 
 ## 3. Current development approach
