@@ -489,7 +489,7 @@
   }
   .skg-panel.skg-show{ transform:translateY(0); visibility:visible; pointer-events:auto; }
   @media (min-width:701px){
-    .skg-panel{ left:auto; width:380px; border-radius:20px; bottom:18px; }
+    .skg-panel{ left:auto; width:380px; height:420px; max-height:420px; border-radius:20px; bottom:18px; }
     .skg-panel.skg-hand-right{ right:18px; }
     .skg-panel.skg-hand-left{ left:18px; }
     .skg-panel.skg-show{ transform:translateY(0); }
@@ -499,7 +499,7 @@
   .skg-panel-top .skg-title{ font-family:'Fraunces', serif; font-weight:600; font-size:.9rem; color:var(--skg-ink); }
   .skg-panel-close{ width:28px; height:28px; border-radius:50%; border:none; background:rgba(181,80,46,0.1); cursor:pointer; font-size:.9rem; color:var(--skg-ink-soft); }
 
-  .skg-game-area{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:0 1rem 1rem; gap:.7rem; }
+  .skg-game-area{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:0 1rem .7rem; gap:.5rem; overflow-y:auto; }
   .skg-scores{ display:flex; gap:1.4rem; font-size:.78rem; color:var(--skg-ink-soft); }
   .skg-scores b{ color:var(--skg-rust); font-size:.95rem; }
 
@@ -515,6 +515,30 @@
   .skg-tap-btn:active{ transform:scale(.97); }
   .skg-feedback{ font-size:.8rem; font-weight:600; height:1.1em; color:var(--skg-banyan); }
   .skg-feedback.skg-miss{ color:var(--skg-rust); }
+
+  /* ---- Game module: tile-merge (word chain) ----
+       Scoped under skg-tm- ; lives inside the same generic #skgGameArea
+       slot as the reflex-tap game, so it never affects launcher/popover
+       positioning above. Safe to lift alongside the rest of the widget. */
+  .skg-tm-grid{
+    display:grid; grid-template-columns:repeat(4,1fr); grid-template-rows:repeat(4,1fr);
+    gap:5px; width:100%; max-width:210px; aspect-ratio:1/1; touch-action:none; flex-shrink:0;
+  }
+  .skg-tm-cell{
+    background:rgba(43,33,24,0.06); border-radius:7px;
+    display:flex; align-items:center; justify-content:center; text-align:center;
+    font-family:'Fraunces', serif; font-weight:600; color:var(--skg-ink);
+    padding:2px; line-height:1.05; overflow:hidden; transition:background .15s ease;
+  }
+  .skg-tm-t1{ background:rgba(226,155,63,0.20); }
+  .skg-tm-t2{ background:rgba(226,155,63,0.38); }
+  .skg-tm-t3{ background:rgba(181,80,46,0.30); color:var(--skg-sky-top); }
+  .skg-tm-t4{ background:rgba(181,80,46,0.48); color:var(--skg-sky-top); }
+  .skg-tm-t5{ background:rgba(47,82,51,0.38); color:var(--skg-sky-top); }
+  .skg-tm-t6{ background:rgba(47,82,51,0.6); color:var(--skg-sky-top); }
+  .skg-tm-t7{ background:rgba(181,80,46,0.8); color:var(--skg-sky-top); }
+  .skg-tm-t8{ background:var(--skg-rust); color:var(--skg-sky-top); box-shadow:0 0 10px rgba(181,80,46,0.5); }
+  .skg-tm-hint{ font-size:.7rem; color:var(--skg-ink-soft); opacity:.75; }
 </style>
 
 <div id="sk-game-root">
@@ -547,19 +571,265 @@
 
   <div class="skg-panel" id="skgPanel">
     <div class="skg-panel-top">
-      <span class="skg-title">⏱ ಸರಿಯಾದ ಸಮಯಕ್ಕೆ ಒತ್ತಿ</span>
+      <span class="skg-title" id="skgPanelTitle">⏱ ಸರಿಯಾದ ಸಮಯಕ್ಕೆ ಒತ್ತಿ</span>
       <button class="skg-panel-close" id="skgClose" aria-label="Close game">&#10005;</button>
     </div>
-    <div class="skg-game-area">
-      <div class="skg-scores">ಸ್ಕೋರ್ <b id="skgScore">0</b> &nbsp; ಬೆಸ್ಟ್ <b id="skgBest">0</b></div>
-      <div class="skg-track"><div class="skg-zone"></div><div class="skg-needle" id="skgNeedle"></div></div>
-      <div class="skg-feedback" id="skgFeedback"></div>
-      <button class="skg-tap-btn" id="skgTapBtn">ಒತ್ತಿ!</button>
-    </div>
+    <div class="skg-game-area" id="skgGameArea"></div>
   </div>
 </div>
 
 <script>
+/* ===================================================================
+   SNEHAKOOTA GAME MODULES
+   Each module is a self-contained object: { title, init(container), destroy() }.
+   init() renders itself into whatever DOM node it's given and wires its
+   own listeners; destroy() tears those down. Registered under
+   window.SKG.games so the whole widget (styles + markup + this script)
+   can be lifted onto another page as one block and still work — the
+   launcher picks a random registered game with zero other changes.
+   =================================================================== */
+window.SKG = window.SKG || {};
+SKG.games = {};
+
+/* --- Module 1: reflex-tap (the original game, unchanged behaviour) --- */
+SKG.games.reflexTap = (function(){
+  "use strict";
+  var pos = 0, dir = 1, speed = 1.6, rafId = null;
+  var needle, tapBtn, scoreEl, bestEl, feedbackEl, clickHandler;
+  var score = 0, best = 0;
+
+  function loop(){
+    pos += dir * speed;
+    if (pos >= 100) { pos = 100; dir = -1; }
+    if (pos <= 0) { pos = 0; dir = 1; }
+    needle.style.left = pos + '%';
+    rafId = requestAnimationFrame(loop);
+  }
+
+  return {
+    title: '⏱ ಸರಿಯಾದ ಸಮಯಕ್ಕೆ ಒತ್ತಿ',
+    init: function(container){
+      try { best = parseInt(localStorage.getItem('skg_best') || '0', 10) || 0; } catch(e){ best = 0; }
+      score = 0; pos = 0; dir = 1; speed = 1.6;
+
+      container.innerHTML =
+        '<div class="skg-scores">ಸ್ಕೋರ್ <b id="skgScore">0</b> &nbsp; ಬೆಸ್ಟ್ <b id="skgBest">' + best + '</b></div>' +
+        '<div class="skg-track"><div class="skg-zone"></div><div class="skg-needle" id="skgNeedle"></div></div>' +
+        '<div class="skg-feedback" id="skgFeedback"></div>' +
+        '<button class="skg-tap-btn" id="skgTapBtn">ಒತ್ತಿ!</button>';
+
+      needle = container.querySelector('#skgNeedle');
+      tapBtn = container.querySelector('#skgTapBtn');
+      scoreEl = container.querySelector('#skgScore');
+      bestEl = container.querySelector('#skgBest');
+      feedbackEl = container.querySelector('#skgFeedback');
+
+      clickHandler = function(){
+        var inZone = pos >= 39 && pos <= 61;
+        if (inZone) {
+          score += 1;
+          scoreEl.textContent = score;
+          feedbackEl.textContent = 'ಸೂಪರ್!';
+          feedbackEl.className = 'skg-feedback';
+          speed = Math.min(speed + 0.15, 4);
+          if (score > best) {
+            best = score;
+            bestEl.textContent = best;
+            try { localStorage.setItem('skg_best', String(best)); } catch(e){}
+          }
+        } else {
+          feedbackEl.textContent = 'ಮತ್ತೊಮ್ಮೆ ಪ್ರಯತ್ನಿಸಿ';
+          feedbackEl.className = 'skg-feedback skg-miss';
+          speed = 1.6;
+          score = 0;
+          scoreEl.textContent = score;
+        }
+      };
+      tapBtn.addEventListener('click', clickHandler);
+
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(loop);
+    },
+    destroy: function(){
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = null;
+      if (tapBtn && clickHandler) tapBtn.removeEventListener('click', clickHandler);
+      needle = tapBtn = scoreEl = bestEl = feedbackEl = null;
+    }
+  };
+})();
+
+/* --- Module 2: tile-merge — 2048-style word chain, story-chapter words --- */
+SKG.games.tileMerge = (function(){
+  "use strict";
+  var WORDS = ['ಸ್ನೇಹ','ಬಳಗ','ನಂಟು','ಪಯಣ','ವಿಶ್ವಾಸ','ಒಗ್ಗಟ್ಟು','ಭರವಸೆ','ಸ್ನೇಹಕೂಟ'];
+  var SIZE = 4;
+  var board, gridEl, scoreEl, bestEl, feedbackEl;
+  var score = 0, best = 0;
+  var keyHandler, touchStartHandler, touchEndHandler, touchStartX = 0, touchStartY = 0;
+
+  function emptyCells(){
+    var cells = [];
+    for (var r = 0; r < SIZE; r++) for (var c = 0; c < SIZE; c++) if (!board[r][c]) cells.push([r, c]);
+    return cells;
+  }
+  function spawn(){
+    var cells = emptyCells();
+    if (!cells.length) return;
+    var cell = cells[Math.floor(Math.random() * cells.length)];
+    board[cell[0]][cell[1]] = Math.random() < 0.85 ? 1 : 2;
+  }
+  function fontFor(word){
+    var len = word.length;
+    return len <= 3 ? '.8rem' : (len <= 5 ? '.68rem' : (len <= 7 ? '.58rem' : '.46rem'));
+  }
+  function render(){
+    var html = '';
+    for (var r = 0; r < SIZE; r++){
+      for (var c = 0; c < SIZE; c++){
+        var v = board[r][c];
+        if (v){
+          var word = WORDS[v - 1];
+          html += '<div class="skg-tm-cell skg-tm-t' + v + '" style="font-size:' + fontFor(word) + '">' + word + '</div>';
+        } else {
+          html += '<div class="skg-tm-cell"></div>';
+        }
+      }
+    }
+    gridEl.innerHTML = html;
+    scoreEl.textContent = score;
+  }
+  function slideRow(row){
+    var arr = row.filter(function(v){ return v; });
+    var merged = [], gained = 0;
+    for (var i = 0; i < arr.length; i++){
+      if (i < arr.length - 1 && arr[i] === arr[i + 1] && arr[i] < WORDS.length){
+        var nv = arr[i] + 1;
+        merged.push(nv);
+        gained += nv;
+        i++;
+        if (nv === WORDS.length){
+          feedbackEl.textContent = 'ಗೆದ್ದಿರಿ! 🎉 ' + WORDS[nv - 1];
+          feedbackEl.className = 'skg-feedback';
+        }
+      } else {
+        merged.push(arr[i]);
+      }
+    }
+    while (merged.length < SIZE) merged.push(0);
+    return { row: merged, gained: gained, moved: JSON.stringify(row) !== JSON.stringify(merged) };
+  }
+  function transpose(b){
+    var nb = [];
+    for (var c = 0; c < SIZE; c++){
+      var row = [];
+      for (var r = 0; r < SIZE; r++) row.push(b[r][c]);
+      nb.push(row);
+    }
+    return nb;
+  }
+  function hasMoves(){
+    for (var r = 0; r < SIZE; r++){
+      for (var c = 0; c < SIZE; c++){
+        var v = board[r][c];
+        if (!v) return true;
+        if (c < SIZE - 1 && board[r][c + 1] === v) return true;
+        if (r < SIZE - 1 && board[r + 1][c] === v) return true;
+      }
+    }
+    return false;
+  }
+  function move(dir){
+    var moved = false, gained = 0;
+    var vertical = (dir === 'up' || dir === 'down');
+    var reverseNeeded = (dir === 'right' || dir === 'down');
+    var b = vertical ? transpose(board) : board.map(function(row){ return row.slice(); });
+
+    var newBoard = [];
+    for (var r = 0; r < SIZE; r++){
+      var row = b[r].slice();
+      if (reverseNeeded) row.reverse();
+      var res = slideRow(row);
+      if (reverseNeeded) res.row.reverse();
+      newBoard.push(res.row);
+      if (res.moved) moved = true;
+      gained += res.gained;
+    }
+    board = vertical ? transpose(newBoard) : newBoard;
+
+    if (moved){
+      score += gained;
+      if (score > best){
+        best = score;
+        bestEl.textContent = best;
+        try { localStorage.setItem('skg_merge_best', String(best)); } catch(e){}
+      }
+      spawn();
+      render();
+      if (!emptyCells().length && !hasMoves()){
+        feedbackEl.textContent = 'ಆಟ ಮುಗಿಯಿತು — ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ';
+        feedbackEl.className = 'skg-feedback skg-miss';
+      }
+    }
+  }
+
+  return {
+    title: '🔀 ಪದ ಸೇರಿಸಿ',
+    init: function(container){
+      try { best = parseInt(localStorage.getItem('skg_merge_best') || '0', 10) || 0; } catch(e){ best = 0; }
+      score = 0;
+      board = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
+
+      container.innerHTML =
+        '<div class="skg-scores">ಸ್ಕೋರ್ <b id="skgTmScore">0</b> &nbsp; ಬೆಸ್ಟ್ <b id="skgTmBest">' + best + '</b></div>' +
+        '<div class="skg-tm-grid" id="skgTmGrid"></div>' +
+        '<div class="skg-feedback" id="skgTmFeedback"></div>' +
+        '<div class="skg-tm-hint">ಸ್ವೈಪ್ ಮಾಡಿ ಅಥವಾ ಬಾಣದ ಕೀ ಒತ್ತಿ</div>';
+
+      gridEl = container.querySelector('#skgTmGrid');
+      scoreEl = container.querySelector('#skgTmScore');
+      bestEl = container.querySelector('#skgTmBest');
+      feedbackEl = container.querySelector('#skgTmFeedback');
+
+      spawn(); spawn();
+      render();
+
+      keyHandler = function(e){
+        var map = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down' };
+        if (map[e.key]){ e.preventDefault(); move(map[e.key]); }
+      };
+      document.addEventListener('keydown', keyHandler);
+
+      touchStartHandler = function(e){
+        var t = e.touches[0];
+        touchStartX = t.clientX; touchStartY = t.clientY;
+      };
+      touchEndHandler = function(e){
+        var t = e.changedTouches[0];
+        var dx = t.clientX - touchStartX, dy = t.clientY - touchStartY;
+        if (Math.max(Math.abs(dx), Math.abs(dy)) < 20) return;
+        if (Math.abs(dx) > Math.abs(dy)) move(dx > 0 ? 'right' : 'left');
+        else move(dy > 0 ? 'down' : 'up');
+      };
+      gridEl.addEventListener('touchstart', touchStartHandler, { passive: true });
+      gridEl.addEventListener('touchend', touchEndHandler, { passive: true });
+    },
+    destroy: function(){
+      if (keyHandler) document.removeEventListener('keydown', keyHandler);
+      if (gridEl){
+        if (touchStartHandler) gridEl.removeEventListener('touchstart', touchStartHandler);
+        if (touchEndHandler) gridEl.removeEventListener('touchend', touchEndHandler);
+      }
+      gridEl = scoreEl = bestEl = feedbackEl = null;
+    }
+  };
+})();
+
+/* ===================================================================
+   WIDGET WIRING — launcher / confirm bubble / hand-picker / panel shell.
+   Identical flow and DOM to before; only change is that opening the
+   panel now hands off to a randomly-picked module from SKG.games.
+   =================================================================== */
 (function(){
   "use strict";
   var launcher = document.getElementById('skgLauncher');
@@ -569,17 +839,11 @@
   var noBtn = document.getElementById('skgNo');
   var handpick = document.getElementById('skgHandpick');
   var panel = document.getElementById('skgPanel');
+  var panelTitle = document.getElementById('skgPanelTitle');
+  var gameArea = document.getElementById('skgGameArea');
   var closeBtn = document.getElementById('skgClose');
-  var needle = document.getElementById('skgNeedle');
-  var tapBtn = document.getElementById('skgTapBtn');
-  var scoreEl = document.getElementById('skgScore');
-  var bestEl = document.getElementById('skgBest');
-  var feedbackEl = document.getElementById('skgFeedback');
 
-  var score = 0;
-  var best = 0;
-  try { best = parseInt(localStorage.getItem('skg_best') || '0', 10) || 0; } catch(e){ best = 0; }
-  bestEl.textContent = best;
+  var activeGame = null;
 
   function showVeil(){ veil.classList.add('skg-show'); }
   function hideVeil(){ veil.classList.remove('skg-show'); }
@@ -616,61 +880,30 @@
     });
   }
 
+  function pickRandomGame(){
+    var keys = Object.keys(SKG.games);
+    return SKG.games[keys[Math.floor(Math.random() * keys.length)]];
+  }
+
   function openPanel(hand){
     panel.classList.remove('skg-hand-left', 'skg-hand-right');
     panel.classList.add(hand === 'left' ? 'skg-hand-left' : 'skg-hand-right');
     panel.classList.add('skg-show');
-    score = 0;
-    scoreEl.textContent = score;
-    feedbackEl.textContent = '';
-    feedbackEl.className = 'skg-feedback';
-    startGame();
+
+    stopGame();
+    activeGame = pickRandomGame();
+    panelTitle.textContent = activeGame.title;
+    gameArea.innerHTML = '';
+    activeGame.init(gameArea);
   }
   closeBtn.addEventListener('click', function(){
     panel.classList.remove('skg-show');
     stopGame();
   });
 
-  /* --- tiny reflex-tap game loop --- */
-  var pos = 0, dir = 1, speed = 1.6, rafId = null;
-  function loop(){
-    pos += dir * speed;
-    if (pos >= 100) { pos = 100; dir = -1; }
-    if (pos <= 0) { pos = 0; dir = 1; }
-    needle.style.left = pos + '%';
-    rafId = requestAnimationFrame(loop);
-  }
-  function startGame(){
-    pos = 0; dir = 1; speed = 1.6;
-    if (rafId) cancelAnimationFrame(rafId);
-    rafId = requestAnimationFrame(loop);
-  }
   function stopGame(){
-    if (rafId) cancelAnimationFrame(rafId);
-    rafId = null;
+    if (activeGame){ activeGame.destroy(); activeGame = null; }
   }
-
-  tapBtn.addEventListener('click', function(){
-    var inZone = pos >= 39 && pos <= 61;
-    if (inZone) {
-      score += 1;
-      scoreEl.textContent = score;
-      feedbackEl.textContent = 'ಸೂಪರ್!';
-      feedbackEl.className = 'skg-feedback';
-      speed = Math.min(speed + 0.15, 4);
-      if (score > best) {
-        best = score;
-        bestEl.textContent = best;
-        try { localStorage.setItem('skg_best', String(best)); } catch(e){}
-      }
-    } else {
-      feedbackEl.textContent = 'ಮತ್ತೊಮ್ಮೆ ಪ್ರಯತ್ನಿಸಿ';
-      feedbackEl.className = 'skg-feedback skg-miss';
-      speed = 1.6;
-      score = 0;
-      scoreEl.textContent = score;
-    }
-  });
 })();
 </script>
 </body>
