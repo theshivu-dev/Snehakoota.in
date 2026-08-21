@@ -296,7 +296,7 @@
   </div>
   <div class="panel-body">
     <div class="panel-top">
-      <span class="brand" style="font-family:'Fraunces',serif;"><span style="color:var(--rust);">ಸ್ನೇಹ</span><span style="color:var(--banyan);">ಕೂಟ</span></span>
+      <span class="brand" style="font-family:'Fraunces',serif;"><span style="color:var(--rust);">ಸ್ನೇಹ</span><span style="color:var(--banyan);">ಸ್ನೇಹಕೂಟ</span></span>
       <button class="closer" id="closer" aria-label="Close menu">&#10005;</button>
     </div>
     <div class="panel-links">
@@ -359,5 +359,319 @@
   document.getElementById('backdrop').addEventListener('click', closeNav);
 </script>
 
+<!-- ===================================================================
+     SNEHAKOOTA MINI-GAME WIDGET (self-contained, droppable into any page)
+     - Scoped under #sk-game-root and .skg- prefixed classes to avoid
+       colliding with host-page CSS.
+     - All JS wrapped in an IIFE — no globals leaked.
+     - To reuse on another page: copy this whole block (style + markup +
+       script) and paste before </body>. Nothing else required, as long
+       as the host page already defines the same --rust/--banyan/etc.
+       CSS variables (falls back to sensible defaults if not).
+     =================================================================== -->
+<style>
+  #sk-game-root{
+    --skg-rust: var(--rust, #B5502E);
+    --skg-banyan: var(--banyan, #2F5233);
+    --skg-marigold: var(--marigold, #E29B3F);
+    --skg-ink: var(--ink, #2B2118);
+    --skg-ink-soft: var(--ink-soft, #6B5C4C);
+    --skg-sky-top: var(--sky-top, #FFF6E8);
+    --skg-sky-bottom: var(--sky-bottom, #FDE7C8);
+    font-family: 'Work Sans', sans-serif;
+  }
+
+  /* ---- Launcher ---- */
+  .skg-launcher{
+    position:fixed; right:18px; bottom:18px; width:34px; height:34px;
+    border-radius:50%; background:var(--skg-rust); border:none;
+    box-shadow:0 3px 8px rgba(43,33,24,0.22);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; z-index:60;
+    opacity:.62; transition:opacity .2s ease, transform .2s ease;
+    animation:skgNudge 3s ease-in-out 2s 2;
+  }
+  .skg-launcher:hover, .skg-launcher:focus-visible{ opacity:1; transform:scale(1.08); }
+  .skg-launcher svg{ width:15px; height:15px; }
+  @media (max-width:600px){
+    .skg-launcher{ right:50%; transform:translateX(50%); bottom:16px; }
+  }
+  .skg-launcher.skg-pulsing::before{
+    content:''; position:absolute; inset:-4px; border-radius:50%;
+    box-shadow:0 0 0 0 rgba(181,80,46,0.5);
+    animation:skgPulse 2.4s ease-out infinite;
+  }
+  @keyframes skgPulse{
+    0%{ box-shadow:0 0 0 0 rgba(181,80,46,0.45); }
+    70%{ box-shadow:0 0 0 12px rgba(181,80,46,0); }
+    100%{ box-shadow:0 0 0 0 rgba(181,80,46,0); }
+  }
+  @keyframes skgNudge{
+    0%,100%{ transform:scale(1); } 50%{ transform:scale(1.08); }
+  }
+  @media (max-width:600px){
+    @keyframes skgNudge{
+      0%,100%{ transform:translateX(50%) scale(1); } 50%{ transform:translateX(50%) scale(1.08); }
+    }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .skg-launcher{ animation:none; }
+    .skg-launcher.skg-pulsing::before{ animation:none; }
+  }
+
+  /* Hover hint (desktop) */
+  .skg-hint{
+    position:fixed; right:18px; bottom:58px;
+    background:var(--skg-ink); color:var(--skg-sky-top);
+    font-size:.78rem; padding:.5em .9em; border-radius:10px;
+    white-space:nowrap; opacity:0; pointer-events:none;
+    transition:opacity .18s ease; z-index:60;
+  }
+  .skg-launcher:hover + .skg-hint{ opacity:1; }
+  @media (max-width:600px){
+    .skg-hint{ display:none; }
+  }
+
+  /* ---- Backdrop for popover steps ---- */
+  .skg-veil{
+    position:fixed; inset:0; background:rgba(43,33,24,0.28);
+    opacity:0; pointer-events:none; transition:opacity .2s ease; z-index:58;
+  }
+  .skg-veil.skg-show{ opacity:1; pointer-events:auto; }
+
+  /* ---- Step 1: "wanna play?" confirm bubble ---- */
+  .skg-confirm{
+    position:fixed; right:18px; bottom:62px; z-index:61;
+    background:var(--skg-sky-bottom); border:1px solid rgba(43,33,24,0.12);
+    border-radius:14px; padding:.9rem 1rem; width:220px;
+    box-shadow:0 10px 30px rgba(43,33,24,0.22);
+    transform:translateY(8px) scale(.96); opacity:0; pointer-events:none;
+    transition:transform .2s ease, opacity .2s ease;
+  }
+  .skg-confirm.skg-show{ transform:translateY(0) scale(1); opacity:1; pointer-events:auto; }
+  @media (max-width:600px){
+    .skg-confirm{ right:50%; transform:translateX(50%) translateY(8px) scale(.96); bottom:62px; }
+    .skg-confirm.skg-show{ transform:translateX(50%) translateY(0) scale(1); }
+  }
+  .skg-confirm p{ margin:0 0 .7rem; font-size:.86rem; color:var(--skg-ink); line-height:1.4; }
+  .skg-confirm .skg-row{ display:flex; gap:.5rem; }
+  .skg-confirm button{ font-family:inherit; font-size:.78rem; font-weight:600; border-radius:8px; padding:.5rem .7rem; cursor:pointer; border:none; }
+  .skg-yes{ background:var(--skg-rust); color:var(--skg-sky-top); flex:1; }
+  .skg-no{ background:none; color:var(--skg-ink-soft); border:1px solid rgba(43,33,24,0.16) !important; }
+
+  /* ---- Step 2: hand-choice popover ---- */
+  .skg-handpick{
+    position:fixed; left:50%; top:50%; transform:translate(-50%,-50%) scale(.96); z-index:62;
+    background:var(--skg-sky-bottom); border-radius:16px; padding:1.3rem 1.2rem;
+    width:min(300px, 84vw); text-align:center;
+    box-shadow:0 20px 50px rgba(43,33,24,0.3);
+    opacity:0; pointer-events:none; transition:transform .2s ease, opacity .2s ease;
+  }
+  .skg-handpick.skg-show{ transform:translate(-50%,-50%) scale(1); opacity:1; pointer-events:auto; }
+  .skg-handpick p{ margin:0 0 1rem; font-size:.92rem; color:var(--skg-ink); font-weight:600; }
+  .skg-handpick .skg-row{ display:flex; gap:.7rem; justify-content:center; }
+  .skg-hand-btn{
+    font-family:inherit; flex:1; background:rgba(181,80,46,0.08); border:1px solid rgba(181,80,46,0.25);
+    color:var(--skg-rust); font-size:.85rem; font-weight:600; border-radius:10px;
+    padding:.8rem .5rem; cursor:pointer;
+  }
+  .skg-hand-btn:active{ background:var(--skg-rust); color:var(--skg-sky-top); }
+
+  /* ---- Game panel ---- */
+  .skg-panel{
+    position:fixed; left:0; right:0; bottom:0; z-index:63;
+    background:var(--skg-sky-top); border-top:1px solid rgba(43,33,24,0.14);
+    border-radius:20px 20px 0 0; box-shadow:0 -10px 30px rgba(43,33,24,0.22);
+    height:34vh; max-height:320px;
+    transform:translateY(100%); transition:transform .3s ease, visibility .3s;
+    visibility:hidden; pointer-events:none;
+    display:flex; flex-direction:column;
+  }
+  .skg-panel.skg-show{ transform:translateY(0); visibility:visible; pointer-events:auto; }
+  @media (min-width:701px){
+    .skg-panel{ left:auto; width:380px; border-radius:20px; bottom:18px; }
+    .skg-panel.skg-hand-right{ right:18px; }
+    .skg-panel.skg-hand-left{ left:18px; }
+    .skg-panel.skg-show{ transform:translateY(0); }
+  }
+
+  .skg-panel-top{ display:flex; align-items:center; justify-content:space-between; padding:.7rem .9rem; flex-shrink:0; }
+  .skg-panel-top .skg-title{ font-family:'Fraunces', serif; font-weight:600; font-size:.9rem; color:var(--skg-ink); }
+  .skg-panel-close{ width:28px; height:28px; border-radius:50%; border:none; background:rgba(181,80,46,0.1); cursor:pointer; font-size:.9rem; color:var(--skg-ink-soft); }
+
+  .skg-game-area{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:0 1rem 1rem; gap:.7rem; }
+  .skg-scores{ display:flex; gap:1.4rem; font-size:.78rem; color:var(--skg-ink-soft); }
+  .skg-scores b{ color:var(--skg-rust); font-size:.95rem; }
+
+  .skg-track{ position:relative; width:100%; max-width:280px; height:14px; background:rgba(43,33,24,0.08); border-radius:999px; overflow:hidden; }
+  .skg-zone{ position:absolute; top:0; bottom:0; left:39%; width:22%; background:rgba(47,82,51,0.35); border-left:2px solid var(--skg-banyan); border-right:2px solid var(--skg-banyan); }
+  .skg-needle{ position:absolute; top:-3px; bottom:-3px; width:4px; background:var(--skg-rust); border-radius:2px; }
+
+  .skg-tap-btn{
+    font-family:inherit; width:100%; max-width:280px; background:var(--skg-rust); color:var(--skg-sky-top);
+    border:none; border-radius:999px; padding:.85rem; font-size:.95rem; font-weight:600; cursor:pointer;
+    -webkit-tap-highlight-color: transparent; user-select:none;
+  }
+  .skg-tap-btn:active{ transform:scale(.97); }
+  .skg-feedback{ font-size:.8rem; font-weight:600; height:1.1em; color:var(--skg-banyan); }
+  .skg-feedback.skg-miss{ color:var(--skg-rust); }
+</style>
+
+<div id="sk-game-root">
+  <button class="skg-launcher skg-pulsing" id="skgLauncher" aria-label="Play a quick game">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#FFF6E8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="2" y="7" width="20" height="11" rx="4"/>
+      <path d="M7 11v3M5.5 12.5h3"/>
+      <circle cx="16" cy="11.5" r="1"/><circle cx="18.5" cy="14" r="1"/>
+    </svg>
+  </button>
+  <span class="skg-hint">ಸ್ವಲ್ಪ ಆಟ ಆಡೋಣವಾ?</span>
+
+  <div class="skg-veil" id="skgVeil"></div>
+
+  <div class="skg-confirm" id="skgConfirm">
+    <p>ಸ್ವಲ್ಪ ಆಟ ಆಡೋಣವಾ?</p>
+    <div class="skg-row">
+      <button class="skg-no" id="skgNo">ಬೇಡ</button>
+      <button class="skg-yes" id="skgYes">ಹೌದು ▶</button>
+    </div>
+  </div>
+
+  <div class="skg-handpick" id="skgHandpick">
+    <p>ಯಾವ ಕೈಯಲ್ಲಿ ಮೊಬೈಲ್ ಹಿಡಿದಿದ್ದೀರಿ?</p>
+    <div class="skg-row">
+      <button class="skg-hand-btn" data-hand="left">⟵ ಎಡಗೈ</button>
+      <button class="skg-hand-btn" data-hand="right">ಬಲಗೈ ⟶</button>
+    </div>
+  </div>
+
+  <div class="skg-panel" id="skgPanel">
+    <div class="skg-panel-top">
+      <span class="skg-title">⏱ ಸರಿಯಾದ ಸಮಯಕ್ಕೆ ಒತ್ತಿ</span>
+      <button class="skg-panel-close" id="skgClose" aria-label="Close game">&#10005;</button>
+    </div>
+    <div class="skg-game-area">
+      <div class="skg-scores">ಸ್ಕೋರ್ <b id="skgScore">0</b> &nbsp; ಬೆಸ್ಟ್ <b id="skgBest">0</b></div>
+      <div class="skg-track"><div class="skg-zone"></div><div class="skg-needle" id="skgNeedle"></div></div>
+      <div class="skg-feedback" id="skgFeedback"></div>
+      <button class="skg-tap-btn" id="skgTapBtn">ಒತ್ತಿ!</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var launcher = document.getElementById('skgLauncher');
+  var veil = document.getElementById('skgVeil');
+  var confirmBox = document.getElementById('skgConfirm');
+  var yesBtn = document.getElementById('skgYes');
+  var noBtn = document.getElementById('skgNo');
+  var handpick = document.getElementById('skgHandpick');
+  var panel = document.getElementById('skgPanel');
+  var closeBtn = document.getElementById('skgClose');
+  var needle = document.getElementById('skgNeedle');
+  var tapBtn = document.getElementById('skgTapBtn');
+  var scoreEl = document.getElementById('skgScore');
+  var bestEl = document.getElementById('skgBest');
+  var feedbackEl = document.getElementById('skgFeedback');
+
+  var score = 0;
+  var best = 0;
+  try { best = parseInt(localStorage.getItem('skg_best') || '0', 10) || 0; } catch(e){ best = 0; }
+  bestEl.textContent = best;
+
+  function showVeil(){ veil.classList.add('skg-show'); }
+  function hideVeil(){ veil.classList.remove('skg-show'); }
+
+  function openConfirm(){
+    launcher.classList.remove('skg-pulsing');
+    confirmBox.classList.add('skg-show');
+    showVeil();
+  }
+  function closeConfirm(){
+    confirmBox.classList.remove('skg-show');
+    hideVeil();
+  }
+  launcher.addEventListener('click', openConfirm);
+  noBtn.addEventListener('click', closeConfirm);
+  veil.addEventListener('click', function(){
+    closeConfirm();
+    handpick.classList.remove('skg-show');
+    stopGame();
+  });
+
+  yesBtn.addEventListener('click', function(){
+    confirmBox.classList.remove('skg-show');
+    handpick.classList.add('skg-show');
+  });
+
+  var handButtons = handpick.querySelectorAll('.skg-hand-btn');
+  for (var i = 0; i < handButtons.length; i++) {
+    handButtons[i].addEventListener('click', function(e){
+      var hand = e.currentTarget.getAttribute('data-hand');
+      handpick.classList.remove('skg-show');
+      hideVeil();
+      openPanel(hand);
+    });
+  }
+
+  function openPanel(hand){
+    panel.classList.remove('skg-hand-left', 'skg-hand-right');
+    panel.classList.add(hand === 'left' ? 'skg-hand-left' : 'skg-hand-right');
+    panel.classList.add('skg-show');
+    score = 0;
+    scoreEl.textContent = score;
+    feedbackEl.textContent = '';
+    feedbackEl.className = 'skg-feedback';
+    startGame();
+  }
+  closeBtn.addEventListener('click', function(){
+    panel.classList.remove('skg-show');
+    stopGame();
+  });
+
+  /* --- tiny reflex-tap game loop --- */
+  var pos = 0, dir = 1, speed = 1.6, rafId = null;
+  function loop(){
+    pos += dir * speed;
+    if (pos >= 100) { pos = 100; dir = -1; }
+    if (pos <= 0) { pos = 0; dir = 1; }
+    needle.style.left = pos + '%';
+    rafId = requestAnimationFrame(loop);
+  }
+  function startGame(){
+    pos = 0; dir = 1; speed = 1.6;
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(loop);
+  }
+  function stopGame(){
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = null;
+  }
+
+  tapBtn.addEventListener('click', function(){
+    var inZone = pos >= 39 && pos <= 61;
+    if (inZone) {
+      score += 1;
+      scoreEl.textContent = score;
+      feedbackEl.textContent = 'ಸೂಪರ್!';
+      feedbackEl.className = 'skg-feedback';
+      speed = Math.min(speed + 0.15, 4);
+      if (score > best) {
+        best = score;
+        bestEl.textContent = best;
+        try { localStorage.setItem('skg_best', String(best)); } catch(e){}
+      }
+    } else {
+      feedbackEl.textContent = 'ಮತ್ತೊಮ್ಮೆ ಪ್ರಯತ್ನಿಸಿ';
+      feedbackEl.className = 'skg-feedback skg-miss';
+      speed = 1.6;
+      score = 0;
+      scoreEl.textContent = score;
+    }
+  });
+})();
+</script>
 </body>
 </html>
