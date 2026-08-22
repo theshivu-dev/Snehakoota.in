@@ -271,24 +271,141 @@ English may be used where it is part of a real business name, technical term, UR
 
 ## 14. Future authenticated/community features
 
-The current site is static and does **not** yet require user login/database functionality.
+The current site may remain static during the early development phase, but the long-term architecture is intended to support authenticated, database-backed community features without requiring the frontend to be moved away from GitHub unnecessarily.
 
 A future phase may introduce:
 
 - Invitation-based membership.
 - User accounts/login.
-- Invitation codes/links that allow existing members to invite others.
+- Multiple authentication methods such as Google, email/password, magic link/OTP, Apple, or other methods supported in the future.
+- Account/profile settings.
 - Public viewing of approved posts.
-- Authenticated posting/commenting.
+- Authenticated posting/editing/deletion.
 - Blogs, poems and community posts.
-- Gallery uploads.
+- Gallery uploads and media storage.
 - Database-backed member/content records.
+- Project/batch-specific access and content.
+- Community chat/realtime features.
 
-A service such as Supabase may be considered for authentication/database/storage when that phase begins.
+Supabase is the planned candidate for authentication, database, storage and realtime functionality when this phase begins.
 
-**Do not prematurely add authentication, database code, invitation systems or backend dependencies to the current static pages.**
+### Authentication foundation principles
 
-When this phase begins, design public access and authenticated access as separate permissions while keeping public content viewable where intended.
+When authentication is introduced:
+
+1. **Supabase Auth should provide the permanent authentication identity.**
+2. The Supabase Auth user UUID (`auth.users.id`) should be treated as the durable identity key for a person.
+3. Our application profile/user table should reference that UUID rather than creating a separate authentication identity.
+4. A person's authentication method (Google, email/password, Apple, etc.) must not be treated as the person's identity itself.
+5. The architecture should allow multiple authentication identities/methods to be associated with the same underlying user where supported.
+6. A user who signs in with Google or Apple should not be required to create a separate Snehakoota password unless they later choose to add one.
+7. Invitation/onboarding should be treated as an access or membership mechanism, not as a separate type of user.
+8. Authentication should remain independent of the device/platform. The same underlying user should be able to authenticate through supported browser/mobile clients.
+9. Account settings should eventually provide user-facing controls for supported authentication/security operations such as password setup/change, linked identities, password recovery and MFA where enabled.
+10. Secrets, service-role keys and other privileged credentials must never be placed in GitHub-hosted frontend code.
+
+### Application roles and project membership
+
+Snehakoota application roles are **not the same thing as Supabase Dashboard/project administrators**.
+
+The long-term application model should allow a user to have a project-specific relationship such as:
+
+`user → project → role`
+
+For example:
+
+- `member`
+- `admin`
+
+A user may eventually be an admin in one project and only a member in another project.
+
+Application roles should be represented by application authorization data and enforced by database security policies, rather than by trusting frontend JavaScript.
+
+### Row Level Security (RLS)
+
+Supabase/PostgreSQL Row Level Security is part of the planned database security model.
+
+RLS should be enabled and policies should define what authenticated users can do. The application should not rely only on hiding or showing buttons in HTML.
+
+For the future post system, the intended baseline is:
+
+- Anyone/appropriate public users → read published content where intended.
+- Authenticated user → create a post.
+- Author → edit/delete their own post.
+- Snehakoota admin → moderate other users' posts where explicitly permitted.
+- Similar rules should apply to future community features such as chat.
+
+A Snehakoota admin does **not** automatically become a Supabase infrastructure/Dashboard administrator.
+
+### Project and content model
+
+The database should be designed around durable concepts rather than today's page layout.
+
+The intended long-term separation is:
+
+- **User** → who the person is.
+- **Project** → where the content/community belongs.
+- **Project membership/role** → what the user can do in that project.
+- **Post** → the common content entity.
+- **Post category** → how a project classifies/presents a post.
+
+For Snehakoota, `ಬರಹಗಳು` is the user-facing umbrella for posts. Initial categories are:
+
+- `ಲೇಖನಗಳು`
+- `ಕವಿತೆಗಳು`
+- `ನೆನಪುಗಳು`
+- `ಚಿಂತನೆಗಳು`
+
+These are categories/metadata of a common `Post` entity, not separate database systems.
+
+The same underlying post model should remain reusable for other projects such as OneHaveri, where the categories and presentation may be completely different.
+
+### Schema evolution and data preservation
+
+The database should be designed so future changes can be made through migrations/version-controlled schema changes rather than manual rebuilding.
+
+The project should aim for:
+
+**upgrade → migrate → preserve existing users/data → continue**
+
+rather than:
+
+**replace → recreate users/data → manually repair content**
+
+When Supabase/database development begins:
+
+- Track important schema changes through migration files/version control.
+- Avoid designing tables around temporary UI labels or today's HTML structure.
+- Use stable IDs/relationships for users, projects, categories and posts.
+- Keep authentication identity separate from application profile data.
+- Keep database records separate from uploaded files/storage objects.
+- Plan backups/export strategy before real community data becomes significant.
+- Do not add tables or infrastructure merely because a future feature might someday need them; introduce them when the requirement becomes real.
+
+### Frontend/backend separation
+
+The website frontend may continue to be hosted from GitHub/Cloudflare or another suitable static frontend host.
+
+Introducing Supabase does **not** by itself require moving HTML/CSS/JavaScript away from GitHub.
+
+The intended separation is:
+
+- **GitHub** → source code/version control.
+- **Frontend hosting (for example Cloudflare/GitHub Pages)** → serves the website.
+- **Supabase Auth** → authentication and sessions.
+- **Supabase Database/PostgreSQL** → application data.
+- **Supabase Storage** → uploaded files/media where appropriate.
+- **Supabase Realtime** → future live features such as chat where appropriate.
+
+Privileged server-side operations, when eventually required, may use a secure backend/Edge Function. Privileged keys must never be exposed in browser code.
+
+### Development principle
+
+Do not prematurely add authentication, database code, invitation systems or backend dependencies to today's static pages merely because they are planned.
+
+However, once the authenticated phase begins, **do not take shortcuts that make future invitation, multiple-login-method, mobile, project/batch, role or permission support difficult**.
+
+The foundation should be deliberately small, but transformation-ready.
 
 ---
 
