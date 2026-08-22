@@ -2,7 +2,814 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SnehaKoota — Coming Soon</title>
+<meta name="description" content="SnehaKoota — friends beyond friends. A community, on its way.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sky-top:    #FFF6E8;
+    --sky-bottom: #FDE7C8;
+    --marigold:   #E29B3F;
+    --rust:       #B5502E;
+    --banyan:     #2F5233;
+    --ink:        #2B2118;
+    --ink-soft:   #6B5C4C;
+    --rose:       #E07A66;
+    --line-idle:  rgba(43,33,24,0.16);
+  }
+
+  *{ box-sizing:border-box; }
+
+  html,body{
+    margin:0;
+    padding:0;
+    height:100%;
+    background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-bottom) 100%);
+    color:var(--ink);
+    font-family:'Work Sans', sans-serif;
+    overflow-x:hidden;
+  }
+  body{ padding-left:22px; }
+
+  .edge-strip{
+    position:fixed; left:0; top:0; bottom:0; width:22px;
+    background:#F5D9AE;
+    border-right:1px solid var(--line-idle);
+    display:flex; flex-direction:column; align-items:center; justify-content:space-evenly;
+    z-index:20; cursor:pointer;
+  }
+  .edge-strip .ring{ width:8px; height:8px; border-radius:50%; background:rgba(181,80,46,0.4); transition:background .2s; }
+  .edge-strip:hover .ring{ background:rgba(181,80,46,0.65); }
+
+  .topbar{
+    position:absolute; top:0; left:22px; right:0; z-index:10;
+    display:flex; align-items:center; justify-content:flex-start;
+    padding:1rem 5vw;
+  }
+
+  .bookmark-tab{
+    position:fixed; left:22px; top:58vh; width:20px; height:48px; margin-top:-24px;
+    background:var(--rust); border-radius:0 8px 8px 0;
+    box-shadow:2px 2px 6px rgba(43,33,24,0.18);
+    z-index:32; cursor:pointer; border:none; padding:0;
+    display:flex; align-items:center; justify-content:center;
+    animation:tabNudge 2.4s ease-in-out 1s 3;
+  }
+  .bookmark-tab::after{
+    content:''; width:6px; height:6px; border-radius:50%;
+    background:rgba(255,246,232,0.85);
+  }
+  .bookmark-tab.pulsing::before{
+    content:''; position:absolute; inset:0; border-radius:0 8px 8px 0;
+    box-shadow:0 0 0 0 rgba(181,80,46,0.5);
+    animation:tabPulse 2.2s ease-out infinite;
+  }
+  @keyframes tabPulse{
+    0%{ box-shadow:0 0 0 0 rgba(181,80,46,0.45); }
+    70%{ box-shadow:0 0 0 10px rgba(181,80,46,0); }
+    100%{ box-shadow:0 0 0 0 rgba(181,80,46,0); }
+  }
+  @keyframes tabNudge{
+    0%, 100%{ transform:translateX(0); }
+    10%{ transform:translateX(4px); }
+    20%{ transform:translateX(0); }
+    30%{ transform:translateX(4px); }
+    40%{ transform:translateX(0); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .bookmark-tab{ animation:none; }
+    .bookmark-tab.pulsing::before{ animation:none; }
+  }
+
+  .backdrop{
+    position:fixed; inset:0; background:rgba(43,33,24,0.38);
+    opacity:0; pointer-events:none; transition:opacity .25s ease; z-index:30;
+  }
+  body.nav-open .backdrop{ opacity:1; pointer-events:auto; }
+
+  .side-panel{
+    position:fixed; left:0; top:0; bottom:0; width:76%; max-width:300px;
+    display:flex; z-index:31;
+    transform:translateX(-100%); transition:transform .28s ease;
+    box-shadow:2px 0 18px rgba(0,0,0,0.18);
+  }
+  body.nav-open .side-panel{ transform:translateX(0); }
+  .side-panel .binding{
+    width:22px; background:#F5D9AE; border-right:1px solid var(--line-idle);
+    display:flex; flex-direction:column; align-items:center; justify-content:space-evenly;
+  }
+  .side-panel .binding .ring{ width:8px; height:8px; border-radius:50%; background:var(--rust); }
+  .side-panel .panel-body{ flex:1; background:var(--sky-bottom); padding:1.4rem 1.1rem; display:flex; flex-direction:column; height:100%; }
+  .side-panel .panel-top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:1.6rem; flex-shrink:0; }
+  .side-panel .panel-top .brand{ font-family:'Fraunces', serif; font-weight:600; font-size:.95rem; }
+  .side-panel .closer{ background:none; border:none; font-size:1.1rem; color:var(--ink-soft); cursor:pointer; line-height:1; padding:.3rem; }
+  .panel-links{ display:flex; flex-direction:column; gap:.3rem; flex:1; justify-content:center; margin-bottom:8vh; }
+  .panel-links a{
+    display:block; padding:.75rem .85rem; border-radius:10px; text-decoration:none;
+    color:var(--ink); font-size:.95rem; font-family:'Work Sans', sans-serif;
+  }
+  .panel-links a.active{ background:rgba(181,80,46,0.1); color:var(--rust); font-weight:600; }
+  .panel-links a.disabled{ color:var(--ink-soft); opacity:.55; pointer-events:none; }
+  .panel-links a .tag{ font-size:.72rem; margin-left:.4em; }
+
+  .stage{
+    position:relative;
+    min-height:100vh;
+    min-height:100svh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:8vh 6vw;
+    text-align:center;
+  }
+
+  /* ---- Signature: converging paths ---- */
+  .paths{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    z-index:0;
+  }
+  .paths path{
+    fill:none;
+    stroke-linecap:round;
+  }
+  .thread{
+    stroke:var(--line-idle);
+    stroke-width:1.4;
+    stroke-dasharray:1400;
+    stroke-dashoffset:1400;
+    animation:draw 2.6s ease-out forwards;
+  }
+  .mainline{
+    stroke:var(--marigold);
+    stroke-width:2.6;
+    stroke-dasharray:2000;
+    stroke-dashoffset:2000;
+    animation:draw 2.4s 1.1s ease-out forwards;
+    filter:drop-shadow(0 0 6px rgba(226,155,63,0.35));
+  }
+  .thread:nth-child(1){ animation-delay:.05s; }
+  .thread:nth-child(2){ animation-delay:.25s; }
+  .thread:nth-child(3){ animation-delay:.15s; }
+  .thread:nth-child(4){ animation-delay:.35s; }
+  .thread:nth-child(5){ animation-delay:.2s; }
+  .thread:nth-child(6){ animation-delay:.4s; }
+
+  @keyframes draw{
+    to{ stroke-dashoffset:0; }
+  }
+
+  .sun{
+    position:absolute;
+    left:82%;
+    top:9%;
+    transform:translate(-50%,-50%);
+    width:220px;
+    height:220px;
+    border-radius:50%;
+    background:radial-gradient(circle, rgba(226,155,63,0.55) 0%, rgba(226,155,63,0) 70%);
+    z-index:0;
+    animation:glow 4s ease-in-out infinite;
+  }
+  @keyframes glow{
+    0%,100%{ opacity:.55; }
+    50%{ opacity:.9; }
+  }
+
+  /* ---- Content ---- */
+  .content{
+    position:relative;
+    z-index:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    max-width:640px;
+  }
+
+  .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:.5em;
+    font-family:'Work Sans', sans-serif;
+    font-size:.72rem;
+    font-weight:600;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--rust);
+    background:rgba(181,80,46,0.08);
+    border:1px solid rgba(181,80,46,0.25);
+    padding:.5em 1.1em;
+    border-radius:999px;
+    margin-bottom:2.1rem;
+  }
+  .eyebrow .dot{
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    background:var(--marigold);
+    animation:pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse{
+    0%,100%{ opacity:1; transform:scale(1); }
+    50%{ opacity:.4; transform:scale(.7); }
+  }
+
+  .wordmark{
+    font-family:'Fraunces', serif;
+    font-optical-sizing:auto;
+    font-weight:600;
+    font-size:clamp(2.6rem, 7vw, 4.6rem);
+    line-height:1;
+    margin:0;
+    color:var(--ink);
+  }
+  .wordmark .sneha{ color:var(--rust); }
+  .wordmark .koota{ color:var(--banyan); }
+
+  .tagline{
+    font-family:'Fraunces', serif;
+    font-weight:300;
+    font-style:italic;
+    font-size:clamp(1.15rem, 2.6vw, 1.55rem);
+    color:var(--ink-soft);
+    margin:1.3rem 0 0;
+    line-height:1.5;
+  }
+
+  .desc{
+    font-size:1.02rem;
+    line-height:1.7;
+    color:var(--ink-soft);
+    margin:1.8rem 0 0;
+    max-width:480px;
+  }
+
+  .kannada{
+    font-size:.95rem;
+    color:var(--ink-soft);
+    opacity:.8;
+    margin-top:.6rem;
+  }
+
+  footer{
+    position:relative;
+    z-index:1;
+    padding-bottom:5vh;
+    font-size:.82rem;
+    color:var(--ink-soft);
+    opacity:.75;
+    letter-spacing:.02em;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .thread, .mainline, .sun, .eyebrow .dot{
+      animation:none !important;
+      stroke-dashoffset:0 !important;
+      opacity:1 !important;
+    }
+  }
+
+  @media (max-width:480px){
+    .stage{ padding:10vh 7vw; }
+  }
+</style>
+</head>
+<body>
+
+<div class="edge-strip" id="edgeStrip" role="button" aria-label="Open menu" tabindex="0">
+  <span class="ring"></span><span class="ring"></span><span class="ring"></span>
+  <span class="ring"></span><span class="ring"></span><span class="ring"></span><span class="ring"></span>
+</div>
+
+<div class="backdrop" id="backdrop"></div>
+
+<nav class="side-panel" aria-hidden="true">
+  <div class="binding">
+    <span class="ring"></span><span class="ring"></span><span class="ring"></span>
+    <span class="ring"></span><span class="ring"></span><span class="ring"></span><span class="ring"></span>
+  </div>
+  <div class="panel-body">
+    <div class="panel-top">
+      <span class="brand" style="font-family:'Fraunces',serif;"><span style="color:var(--rust);">ಸ್ನೇಹ</span><span style="color:var(--banyan);">ಸ್ನೇಹಕೂಟ</span></span>
+      <button class="closer" id="closer" aria-label="Close menu">&#10005;</button>
+    </div>
+    <div class="panel-links">
+      <a href="index.html" class="active">ಸ್ನೇಹಕೂಟ</a>
+      <a href="story.html">ಪಯಣ</a>
+      <a href="samparka.html">ಸ್ನೇಹಸಂಪರ್ಕ</a>
+      <a href="#" class="disabled">Gallery <span class="tag">(soon)</span></a>
+      <a href="#" class="disabled">Contact <span class="tag">(soon)</span></a>
+    </div>
+  </div>
+</nav>
+
+<button class="bookmark-tab pulsing" id="opener" aria-label="Open menu" role="button" tabindex="0"></button>
+
+<header class="topbar"></header>
+
+<div class="stage">
+  <div class="sun" aria-hidden="true"></div>
+
+  <svg class="paths" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <g transform="translate(340,0)">
+      <path class="thread" d="M 40 800 C 180 700, 340 640, 470 590 S 580 545, 610 520" />
+      <path class="thread" d="M 260 800 C 350 700, 460 630, 540 585 S 595 545, 610 520" />
+      <path class="thread" d="M 960 800 C 860 700, 760 630, 680 585 S 625 545, 610 520" />
+      <path class="thread" d="M 1170 800 C 1010 700, 850 640, 720 590 S 635 545, 610 520" />
+      <path class="mainline" d="M 610 520 C 620 400, 650 260, 720 90" />
+    </g>
+  </svg>
+
+  <div class="content">
+    <span class="eyebrow"><span class="dot"></span>Coming Soon</span>
+
+    <h1 class="wordmark"><span class="sneha">Sneha</span><span class="koota">Koota</span></h1>
+    <p class="tagline">Friends beyond friends — a way ahead, together.</p>
+
+    <p class="desc">
+      A home for everyone who calls Haveri their own. Old friends, new ones, and everyone still to arrive — this is where our roads start meeting again.
+    </p>
+    <p class="kannada">ನಮ್ಮ ಬಳಗ, ಒಂದಾಗುತಿದೆ.</p>
+  </div>
+</div>
+
+<footer>
+  &copy; <span id="year"></span> SnehaKoota &middot; snehakoota.in
+</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  const body = document.body;
+  const openNav = () => body.classList.add('nav-open');
+  const closeNav = () => body.classList.remove('nav-open');
+  const toggleNav = () => body.classList.toggle('nav-open');
+  document.getElementById('edgeStrip').addEventListener('click', toggleNav);
+  document.getElementById('edgeStrip').addEventListener('keypress', (e) => { if(e.key === 'Enter') toggleNav(); });
+  const openerBtn = document.getElementById('opener');
+  openerBtn.addEventListener('click', () => { toggleNav(); openerBtn.classList.remove('pulsing'); });
+  openerBtn.addEventListener('keypress', (e) => { if (e.key === 'Enter') { toggleNav(); openerBtn.classList.remove('pulsing'); } });
+  document.getElementById('closer').addEventListener('click', closeNav);
+  document.getElementById('backdrop').addEventListener('click', closeNav);
+</script>
+
+<!-- ===================================================================
+     SNEHAKOOTA MINI-GAME WIDGET (self-contained, droppable into any page)
+     - Scoped under #sk-game-root and .skg- prefixed classes to avoid
+       colliding with host-page CSS.
+     - All JS wrapped in an IIFE — no globals leaked.
+     - To reuse on another page: copy this whole block (style + markup +
+       script) and paste before </body>. Nothing else required, as long
+       as the host page already defines the same --rust/--banyan/etc.
+       CSS variables (falls back to sensible defaults if not).
+     =================================================================== -->
+<style>
+  #sk-game-root{
+    --skg-rust: var(--rust, #B5502E);
+    --skg-banyan: var(--banyan, #2F5233);
+    --skg-marigold: var(--marigold, #E29B3F);
+    --skg-ink: var(--ink, #2B2118);
+    --skg-ink-soft: var(--ink-soft, #6B5C4C);
+    --skg-sky-top: var(--sky-top, #FFF6E8);
+    --skg-sky-bottom: var(--sky-bottom, #FDE7C8);
+    font-family: 'Work Sans', sans-serif;
+  }
+
+  /* ---- Launcher ---- */
+  .skg-launcher{
+    position:fixed; right:18px; bottom:18px; width:34px; height:34px;
+    border-radius:50%; background:var(--skg-rust); border:none;
+    box-shadow:0 3px 8px rgba(43,33,24,0.22);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; z-index:60;
+    opacity:.62; transition:opacity .2s ease, transform .2s ease;
+    animation:skgNudge 3s ease-in-out 2s 2;
+  }
+  .skg-launcher:hover, .skg-launcher:focus-visible{ opacity:1; transform:scale(1.08); }
+  .skg-launcher svg{ width:15px; height:15px; }
+  @media (max-width:600px){
+    .skg-launcher{ right:50%; transform:translateX(50%); bottom:16px; }
+  }
+  .skg-launcher.skg-pulsing::before{
+    content:''; position:absolute; inset:-4px; border-radius:50%;
+    box-shadow:0 0 0 0 rgba(181,80,46,0.5);
+    animation:skgPulse 2.4s ease-out infinite;
+  }
+  @keyframes skgPulse{
+    0%{ box-shadow:0 0 0 0 rgba(181,80,46,0.45); }
+    70%{ box-shadow:0 0 0 12px rgba(181,80,46,0); }
+    100%{ box-shadow:0 0 0 0 rgba(181,80,46,0); }
+  }
+  @keyframes skgNudge{
+    0%,100%{ transform:scale(1); } 50%{ transform:scale(1.08); }
+  }
+  @media (max-width:600px){
+    @keyframes skgNudge{
+      0%,100%{ transform:translateX(50%) scale(1); } 50%{ transform:translateX(50%) scale(1.08); }
+    }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .skg-launcher{ animation:none; }
+    .skg-launcher.skg-pulsing::before{ animation:none; }
+  }
+
+  /* Hover hint (desktop) */
+  .skg-hint{
+    position:fixed; right:18px; bottom:58px;
+    background:var(--skg-ink); color:var(--skg-sky-top);
+    font-size:.78rem; padding:.5em .9em; border-radius:10px;
+    white-space:nowrap; opacity:0; pointer-events:none;
+    transition:opacity .18s ease; z-index:60;
+  }
+  .skg-launcher:hover + .skg-hint{ opacity:1; }
+  @media (max-width:600px){
+    .skg-hint{ display:none; }
+  }
+
+  /* ---- Backdrop for popover steps ---- */
+  .skg-veil{
+    position:fixed; inset:0; background:rgba(43,33,24,0.28);
+    opacity:0; pointer-events:none; transition:opacity .2s ease; z-index:58;
+  }
+  .skg-veil.skg-show{ opacity:1; pointer-events:auto; }
+
+  /* ---- Step 1: "wanna play?" confirm bubble ---- */
+  .skg-confirm{
+    position:fixed; right:18px; bottom:62px; z-index:61;
+    background:var(--skg-sky-bottom); border:1px solid rgba(43,33,24,0.12);
+    border-radius:14px; padding:.9rem 1rem; width:220px;
+    box-shadow:0 10px 30px rgba(43,33,24,0.22);
+    transform:translateY(8px) scale(.96); opacity:0; pointer-events:none;
+    transition:transform .2s ease, opacity .2s ease;
+  }
+  .skg-confirm.skg-show{ transform:translateY(0) scale(1); opacity:1; pointer-events:auto; }
+  @media (max-width:600px){
+    .skg-confirm{ right:50%; transform:translateX(50%) translateY(8px) scale(.96); bottom:62px; }
+    .skg-confirm.skg-show{ transform:translateX(50%) translateY(0) scale(1); }
+  }
+  .skg-confirm p{ margin:0 0 .7rem; font-size:.86rem; color:var(--skg-ink); line-height:1.4; }
+  .skg-confirm .skg-row{ display:flex; gap:.5rem; }
+  .skg-confirm button{ font-family:inherit; font-size:.78rem; font-weight:600; border-radius:8px; padding:.5rem .7rem; cursor:pointer; border:none; }
+  .skg-yes{ background:var(--skg-rust); color:var(--skg-sky-top); flex:1; }
+  .skg-no{ background:none; color:var(--skg-ink-soft); border:1px solid rgba(43,33,24,0.16) !important; }
+
+  /* ---- Game panel ---- */
+  .skg-panel{
+    position:fixed; left:0; right:0; bottom:0; z-index:63;
+    background:var(--skg-sky-top); border-top:1px solid rgba(43,33,24,0.14);
+    border-radius:20px 20px 0 0; box-shadow:0 -10px 30px rgba(43,33,24,0.22);
+    height:34vh; max-height:320px;
+    transform:translateY(100%); transition:transform .3s ease, visibility .3s;
+    visibility:hidden; pointer-events:none;
+    display:flex; flex-direction:column;
+  }
+  .skg-panel.skg-show{ transform:translateY(0); visibility:visible; pointer-events:auto; }
+  @media (min-width:701px){
+    .skg-panel{ left:auto; right:18px; width:380px; height:420px; max-height:420px; border-radius:20px; bottom:18px; }
+    .skg-panel.skg-show{ transform:translateY(0); }
+  }
+
+  .skg-panel-top{ display:flex; align-items:center; justify-content:space-between; padding:.7rem .9rem; flex-shrink:0; }
+  .skg-panel-top .skg-title{ font-family:'Fraunces', serif; font-weight:600; font-size:.9rem; color:var(--skg-ink); }
+  .skg-panel-close{ width:28px; height:28px; border-radius:50%; border:none; background:rgba(181,80,46,0.1); cursor:pointer; font-size:.9rem; color:var(--skg-ink-soft); }
+
+  .skg-game-area{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:0 1rem .7rem; gap:.5rem; overflow-y:auto; }
+  .skg-scores{ display:flex; gap:1.4rem; font-size:.78rem; color:var(--skg-ink-soft); }
+  .skg-scores b{ color:var(--skg-rust); font-size:.95rem; }
+
+  .skg-feedback{ font-size:.8rem; font-weight:600; height:1.1em; color:var(--skg-banyan); }
+  .skg-feedback.skg-miss{ color:var(--skg-rust); }
+
+  /* ---- Game module: tile-merge (word chain) ----
+       Scoped under skg-tm- ; lives inside the same generic #skgGameArea
+       slot as the reflex-tap game, so it never affects launcher/popover
+       positioning above. Safe to lift alongside the rest of the widget. */
+  .skg-tm-grid{
+    display:grid; grid-template-columns:repeat(4,1fr); grid-template-rows:repeat(4,1fr);
+    gap:5px; width:100%; max-width:210px; aspect-ratio:1/1; touch-action:none; flex-shrink:0;
+  }
+  .skg-tm-cell{
+    background:rgba(43,33,24,0.06); border-radius:7px;
+    display:flex; align-items:center; justify-content:center; text-align:center;
+    font-family:'Fraunces', serif; font-weight:600; color:var(--skg-ink);
+    padding:2px; line-height:1.05; overflow:hidden; transition:background .15s ease;
+  }
+  .skg-tm-t1{ background:rgba(226,155,63,0.20); }
+  .skg-tm-t2{ background:rgba(226,155,63,0.38); }
+  .skg-tm-t3{ background:rgba(181,80,46,0.30); color:var(--skg-sky-top); }
+  .skg-tm-t4{ background:rgba(181,80,46,0.48); color:var(--skg-sky-top); }
+  .skg-tm-t5{ background:rgba(47,82,51,0.38); color:var(--skg-sky-top); }
+  .skg-tm-t6{ background:rgba(47,82,51,0.6); color:var(--skg-sky-top); }
+  .skg-tm-t7{ background:rgba(181,80,46,0.8); color:var(--skg-sky-top); }
+  .skg-tm-t8{ background:var(--skg-rust); color:var(--skg-sky-top); box-shadow:0 0 10px rgba(181,80,46,0.5); }
+  .skg-tm-hint{ font-size:.7rem; color:var(--skg-ink-soft); opacity:.75; }
+  .skg-tm-restart{
+    font-family:inherit; background:var(--skg-rust); color:var(--skg-sky-top);
+    border:none; border-radius:999px; padding:.55rem 1.1rem; font-size:.82rem; font-weight:600;
+    cursor:pointer; -webkit-tap-highlight-color:transparent;
+  }
+  .skg-tm-restart:active{ transform:scale(.97); }
+</style>
+
+<div id="sk-game-root">
+  <button class="skg-launcher skg-pulsing" id="skgLauncher" aria-label="Play a quick game">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#FFF6E8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="2" y="7" width="20" height="11" rx="4"/>
+      <path d="M7 11v3M5.5 12.5h3"/>
+      <circle cx="16" cy="11.5" r="1"/><circle cx="18.5" cy="14" r="1"/>
+    </svg>
+  </button>
+  <span class="skg-hint">ಸ್ವಲ್ಪ ಆಟ ಆಡೋಣವಾ?</span>
+
+  <div class="skg-veil" id="skgVeil"></div>
+
+  <div class="skg-confirm" id="skgConfirm">
+    <p>ಸ್ವಲ್ಪ ಆಟ ಆಡೋಣವಾ?</p>
+    <div class="skg-row">
+      <button class="skg-no" id="skgNo">ಬೇಡ</button>
+      <button class="skg-yes" id="skgYes">ಹೌದು ▶</button>
+    </div>
+  </div>
+
+  <div class="skg-panel" id="skgPanel">
+    <div class="skg-panel-top">
+      <span class="skg-title" id="skgPanelTitle">⏱ ಸರಿಯಾದ ಸಮಯಕ್ಕೆ ಒತ್ತಿ</span>
+      <button class="skg-panel-close" id="skgClose" aria-label="Close game">&#10005;</button>
+    </div>
+    <div class="skg-game-area" id="skgGameArea"></div>
+  </div>
+</div>
+
+<script>
+/* ===================================================================
+   SNEHAKOOTA GAME MODULES
+   Each module is a self-contained object: { title, init(container), destroy() }.
+   init() renders itself into whatever DOM node it's given and wires its
+   own listeners; destroy() tears those down. Registered under
+   window.SKG.games so the whole widget (styles + markup + this script)
+   can be lifted onto another page as one block and still work — the
+   launcher picks a random registered game with zero other changes.
+   =================================================================== */
+window.SKG = window.SKG || {};
+SKG.games = {};
+
+/* --- tile-merge — 2048-style word chain, story-chapter words --- */
+SKG.games.tileMerge = (function(){
+  "use strict";
+  var WORDS = ['ಸ್ನೇಹ','ಬಳಗ','ನಂಟು','ಪಯಣ','ವಿಶ್ವಾಸ','ಒಗ್ಗಟ್ಟು','ಭರವಸೆ','ಸ್ನೇಹಕೂಟ'];
+  var SIZE = 4;
+  var board, gridEl, scoreEl, bestEl, feedbackEl, restartBtn;
+  var score = 0, best = 0;
+  var keyHandler, touchStartHandler, touchEndHandler, restartHandler, touchStartX = 0, touchStartY = 0;
+
+  function emptyCells(){
+    var cells = [];
+    for (var r = 0; r < SIZE; r++) for (var c = 0; c < SIZE; c++) if (!board[r][c]) cells.push([r, c]);
+    return cells;
+  }
+  function spawn(){
+    var cells = emptyCells();
+    if (!cells.length) return;
+    var cell = cells[Math.floor(Math.random() * cells.length)];
+    board[cell[0]][cell[1]] = Math.random() < 0.85 ? 1 : 2;
+  }
+  function fontFor(word){
+    var len = word.length;
+    return len <= 3 ? '.8rem' : (len <= 5 ? '.68rem' : (len <= 7 ? '.58rem' : '.46rem'));
+  }
+  function render(){
+    var html = '';
+    for (var r = 0; r < SIZE; r++){
+      for (var c = 0; c < SIZE; c++){
+        var v = board[r][c];
+        if (v){
+          var word = WORDS[v - 1];
+          html += '<div class="skg-tm-cell skg-tm-t' + v + '" style="font-size:' + fontFor(word) + '">' + word + '</div>';
+        } else {
+          html += '<div class="skg-tm-cell"></div>';
+        }
+      }
+    }
+    gridEl.innerHTML = html;
+    scoreEl.textContent = score;
+  }
+  function slideRow(row){
+    var arr = row.filter(function(v){ return v; });
+    var merged = [], gained = 0;
+    for (var i = 0; i < arr.length; i++){
+      if (i < arr.length - 1 && arr[i] === arr[i + 1] && arr[i] < WORDS.length){
+        var nv = arr[i] + 1;
+        merged.push(nv);
+        gained += nv;
+        i++;
+        if (nv === WORDS.length){
+          feedbackEl.textContent = 'ಗೆದ್ದಿರಿ! 🎉 ' + WORDS[nv - 1];
+          feedbackEl.className = 'skg-feedback';
+        }
+      } else {
+        merged.push(arr[i]);
+      }
+    }
+    while (merged.length < SIZE) merged.push(0);
+    return { row: merged, gained: gained, moved: JSON.stringify(row) !== JSON.stringify(merged) };
+  }
+  function transpose(b){
+    var nb = [];
+    for (var c = 0; c < SIZE; c++){
+      var row = [];
+      for (var r = 0; r < SIZE; r++) row.push(b[r][c]);
+      nb.push(row);
+    }
+    return nb;
+  }
+  function hasMoves(){
+    for (var r = 0; r < SIZE; r++){
+      for (var c = 0; c < SIZE; c++){
+        var v = board[r][c];
+        if (!v) return true;
+        if (c < SIZE - 1 && board[r][c + 1] === v) return true;
+        if (r < SIZE - 1 && board[r + 1][c] === v) return true;
+      }
+    }
+    return false;
+  }
+  function restart(){
+    score = 0;
+    board = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
+    feedbackEl.textContent = '';
+    feedbackEl.className = 'skg-feedback';
+    restartBtn.style.display = 'none';
+    spawn(); spawn();
+    render();
+  }
+  function move(dir){
+    var moved = false, gained = 0;
+    var vertical = (dir === 'up' || dir === 'down');
+    var reverseNeeded = (dir === 'right' || dir === 'down');
+    var b = vertical ? transpose(board) : board.map(function(row){ return row.slice(); });
+
+    var newBoard = [];
+    for (var r = 0; r < SIZE; r++){
+      var row = b[r].slice();
+      if (reverseNeeded) row.reverse();
+      var res = slideRow(row);
+      if (reverseNeeded) res.row.reverse();
+      newBoard.push(res.row);
+      if (res.moved) moved = true;
+      gained += res.gained;
+    }
+    board = vertical ? transpose(newBoard) : newBoard;
+
+    if (moved){
+      score += gained;
+      if (score > best){
+        best = score;
+        bestEl.textContent = best;
+        try { localStorage.setItem('skg_merge_best', String(best)); } catch(e){}
+      }
+      spawn();
+      render();
+      if (!emptyCells().length && !hasMoves()){
+        feedbackEl.textContent = 'ಆಟ ಮುಗಿಯಿತು';
+        feedbackEl.className = 'skg-feedback skg-miss';
+        restartBtn.style.display = 'block';
+      }
+    }
+  }
+
+  return {
+    title: '🔀 ಪದ ಸೇರಿಸಿ',
+    init: function(container){
+      try { best = parseInt(localStorage.getItem('skg_merge_best') || '0', 10) || 0; } catch(e){ best = 0; }
+      score = 0;
+      board = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
+
+      container.innerHTML =
+        '<div class="skg-scores">ಸ್ಕೋರ್ <b id="skgTmScore">0</b> &nbsp; ಬೆಸ್ಟ್ <b id="skgTmBest">' + best + '</b></div>' +
+        '<div class="skg-tm-grid" id="skgTmGrid"></div>' +
+        '<div class="skg-feedback" id="skgTmFeedback"></div>' +
+        '<button class="skg-tm-restart" id="skgTmRestart" style="display:none;">ಮತ್ತೆ ಆಡಿ ↺</button>' +
+        '<div class="skg-tm-hint">ಸ್ವೈಪ್ ಮಾಡಿ ಅಥವಾ ಬಾಣದ ಕೀ ಒತ್ತಿ</div>';
+
+      gridEl = container.querySelector('#skgTmGrid');
+      scoreEl = container.querySelector('#skgTmScore');
+      bestEl = container.querySelector('#skgTmBest');
+      feedbackEl = container.querySelector('#skgTmFeedback');
+      restartBtn = container.querySelector('#skgTmRestart');
+
+      spawn(); spawn();
+      render();
+
+      keyHandler = function(e){
+        var map = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down' };
+        if (map[e.key]){ e.preventDefault(); move(map[e.key]); }
+      };
+      document.addEventListener('keydown', keyHandler);
+
+      touchStartHandler = function(e){
+        var t = e.touches[0];
+        touchStartX = t.clientX; touchStartY = t.clientY;
+      };
+      touchEndHandler = function(e){
+        var t = e.changedTouches[0];
+        var dx = t.clientX - touchStartX, dy = t.clientY - touchStartY;
+        if (Math.max(Math.abs(dx), Math.abs(dy)) < 20) return;
+        if (Math.abs(dx) > Math.abs(dy)) move(dx > 0 ? 'right' : 'left');
+        else move(dy > 0 ? 'down' : 'up');
+      };
+      gridEl.addEventListener('touchstart', touchStartHandler, { passive: true });
+      gridEl.addEventListener('touchend', touchEndHandler, { passive: true });
+
+      restartHandler = function(){ restart(); };
+      restartBtn.addEventListener('click', restartHandler);
+    },
+    destroy: function(){
+      if (keyHandler) document.removeEventListener('keydown', keyHandler);
+      if (gridEl){
+        if (touchStartHandler) gridEl.removeEventListener('touchstart', touchStartHandler);
+        if (touchEndHandler) gridEl.removeEventListener('touchend', touchEndHandler);
+      }
+      if (restartBtn && restartHandler) restartBtn.removeEventListener('click', restartHandler);
+      gridEl = scoreEl = bestEl = feedbackEl = restartBtn = null;
+    }
+  };
+})();
+
+/* ===================================================================
+   WIDGET WIRING — launcher / confirm bubble / panel shell.
+   Same launcher + confirm bubble as before; "ಹೌದು" now opens the
+   panel directly with the tile-merge game (the only game left).
+   =================================================================== */
+(function(){
+  "use strict";
+  var launcher = document.getElementById('skgLauncher');
+  var veil = document.getElementById('skgVeil');
+  var confirmBox = document.getElementById('skgConfirm');
+  var yesBtn = document.getElementById('skgYes');
+  var noBtn = document.getElementById('skgNo');
+  var panel = document.getElementById('skgPanel');
+  var panelTitle = document.getElementById('skgPanelTitle');
+  var gameArea = document.getElementById('skgGameArea');
+  var closeBtn = document.getElementById('skgClose');
+
+  var activeGame = null;
+
+  function showVeil(){ veil.classList.add('skg-show'); }
+  function hideVeil(){ veil.classList.remove('skg-show'); }
+
+  function openConfirm(){
+    launcher.classList.remove('skg-pulsing');
+    confirmBox.classList.add('skg-show');
+    showVeil();
+  }
+  function closeConfirm(){
+    confirmBox.classList.remove('skg-show');
+    hideVeil();
+  }
+  launcher.addEventListener('click', openConfirm);
+  noBtn.addEventListener('click', closeConfirm);
+  veil.addEventListener('click', function(){
+    closeConfirm();
+    stopGame();
+  });
+
+  yesBtn.addEventListener('click', function(){
+    confirmBox.classList.remove('skg-show');
+    hideVeil();
+    openPanel();
+  });
+
+  function openPanel(){
+    panel.classList.add('skg-show');
+    stopGame();
+    activeGame = SKG.games.tileMerge;
+    panelTitle.textContent = activeGame.title;
+    gameArea.innerHTML = '';
+    activeGame.init(gameArea);
+  }
+  closeBtn.addEventListener('click', function(){
+    panel.classList.remove('skg-show');
+    stopGame();
+  });
+
+  function stopGame(){
+    if (activeGame){ activeGame.destroy(); activeGame = null; }
+  }
+})();
+</script>
+</body>
+</html>
+
 <title>SnehaKoota — Coming Soon</title>
 <meta name="description" content="SnehaKoota — friends beyond friends. A community, on its way.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
