@@ -16,6 +16,10 @@
    (Apple, passkey, etc.) needs a direct in-sheet OAuth call instead
    of a page link, add an `action` function to that provider's entry
    below instead of an `href` — the render loop already supports both.
+   This is the current temporary login-options flow.
+For now, the Login options button reuses the tested signin.html
+OAuth flow. Additional providers (Apple, passkey, etc.) can later
+be added directly to the provider list below.
    =================================================================== */
 (function(){
   "use strict";
@@ -54,7 +58,7 @@
   var providers = [
     {
       id: 'google',
-      label: 'Continue with Google',
+      label: 'Login options',
       style: 'ska-primary',
       icon: GOOGLE_ICON,
       href: function(){ return 'signin.html?return=' + encodeURIComponent(currentPage()); }
