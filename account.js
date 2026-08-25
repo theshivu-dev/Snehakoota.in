@@ -10,16 +10,14 @@
      <link rel="stylesheet" href="account.css?v=1">
      <script src="account.js?v=1" defer></script>
 
-   This is Option A of the sign-in flow: the "Continue with Google"
-   button is a real <a href="signin.html?return=...">, reusing the
-   tested OAuth flow in signin.html as-is. When a second provider
-   (Apple, passkey, etc.) needs a direct in-sheet OAuth call instead
-   of a page link, add an `action` function to that provider's entry
-   below instead of an `href` — the render loop already supports both.
-   This is the current temporary login-options flow.
-For now, the Login options button reuses the tested signin.html
-OAuth flow. Additional providers (Apple, passkey, etc.) can later
-be added directly to the provider list below.
+   The "Continue with Google" button now fires the tested Supabase
+   Google OAuth flow directly from this widget. signin.html remains
+   available as a backup/testing page, but is no longer part of the
+   normal account-widget login flow.
+
+   When a second provider (Apple, passkey, etc.) is added, give that
+   provider an `action` function below. The render loop already supports
+   both direct actions and links for future providers.
    =================================================================== */
 (function(){
   "use strict";
@@ -58,10 +56,30 @@ be added directly to the provider list below.
   var providers = [
     {
       id: 'google',
-      label: 'Login options',
+      label: 'Continue with Google',
       style: 'ska-primary',
       icon: GOOGLE_ICON,
-      href: function(){ return 'signin.html?return=' + encodeURIComponent(currentPage()); }
+      action: function(btn){
+        if (btn) btn.disabled = true;
+
+        var redirectTo = window.location.origin + window.location.pathname;
+        var message = document.getElementById('skaMessage');
+        if (message) message.textContent = 'Google ಮೂಲಕ ಸುರಕ್ಷಿತವಾಗಿ ಸೈನ್ ಇನ್ ಮಾಡಲಾಗುತ್ತಿದೆ…';
+
+        supabaseClient.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: redirectTo,
+            queryParams: { prompt: 'select_account' }
+          }
+        }).then(function(res){
+          if (res.error) {
+            console.error('Google sign-in error:', res.error);
+            if (message) message.textContent = 'ಸೈನ್ ಇನ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.';
+            if (btn) btn.disabled = false;
+          }
+        });
+      }
     }
     /* Next provider goes here, e.g.:
     {
@@ -69,7 +87,7 @@ be added directly to the provider list below.
       label: 'Continue with Apple',
       style: 'ska-secondary',
       icon: '<svg>...</svg>',
-      href: function(){ return 'signin.html?provider=apple&return=' + encodeURIComponent(currentPage()); }
+      action: function(btn){ ... }
     }
     */
   ];
@@ -145,7 +163,7 @@ be added directly to the provider list below.
     body.querySelectorAll('[data-provider]').forEach(function(btn){
       btn.addEventListener('click', function(){
         var p = providers.filter(function(pr){ return pr.id === btn.getAttribute('data-provider'); })[0];
-        if (p && typeof p.action === 'function') p.action();
+        if (p && typeof p.action === 'function') p.action(btn);
       });
     });
   }
