@@ -1,0 +1,156 @@
+/* ===================================================================
+   SNEHAKOOTA ACCOUNT WIDGET — styles
+   Version: 1  (bump the ?v= on the <link>/<script> tags when you edit
+   this file, so returning visitors' browsers don't serve a stale copy)
+
+   Scoped under #sk-account-root / .ska- prefixed classes so it never
+   collides with any page's own CSS. Reads the site's existing
+   --rust / --banyan / --ink / --sky-top / --sky-bottom variables with
+   safe fallbacks, same pattern as the game widget's #sk-game-root.
+
+   Position: fixed bottom-LEFT. Deliberately opposite the game
+   launcher (bottom-right desktop / bottom-center mobile) so the two
+   never share a tap zone or visually collide, at any screen width.
+   =================================================================== */
+
+#sk-account-root{
+  --ska-rust: var(--rust, #B5502E);
+  --ska-banyan: var(--banyan, #2F5233);
+  --ska-ink: var(--ink, #2B2118);
+  --ska-ink-soft: var(--ink-soft, #6B5C4C);
+  --ska-sky-top: var(--sky-top, #FFF6E8);
+  --ska-sky-bottom: var(--sky-bottom, #FDE7C8);
+  font-family: 'Work Sans', sans-serif;
+}
+
+/* ---- Tray (the small fixed pill, bottom-left) ---- */
+.ska-tray{
+  position: fixed; left: 18px; bottom: 18px; z-index: 55;
+  display: flex; align-items: center;
+}
+.ska-trigger{
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 1px solid rgba(43,33,24,0.14);
+  background: var(--ska-sky-top);
+  box-shadow: 0 4px 14px rgba(43,33,24,0.14);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.ska-trigger:hover, .ska-trigger:focus-visible{
+  transform: translateY(-1px);
+  box-shadow: 0 7px 18px rgba(43,33,24,0.18);
+  outline: none;
+}
+.ska-trigger.ska-signed-in{
+  border-color: rgba(47,82,51,0.3);
+  background: rgba(47,82,51,0.08);
+}
+.ska-icon{ position: relative; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; }
+.ska-icon svg{
+  width: 21px; height: 21px; fill: none; stroke: var(--ska-ink-soft);
+  stroke-width: 1.65; stroke-linecap: round; stroke-linejoin: round;
+}
+.ska-signed-in .ska-icon svg{ stroke: var(--ska-banyan); }
+.ska-status{
+  position: absolute; right: -2px; bottom: -1px; width: 9px; height: 9px;
+  border-radius: 50%; background: var(--ska-ink-soft);
+  border: 2px solid var(--ska-sky-top);
+}
+.ska-signed-in .ska-status{ background: var(--ska-banyan); }
+
+@media (max-width: 380px){
+  .ska-tray{ left: 12px; bottom: 12px; }
+  .ska-trigger{ width: 40px; height: 40px; }
+}
+
+/* ---- Backdrop ---- */
+.ska-backdrop{
+  position: fixed; inset: 0; background: rgba(43,33,24,0.32);
+  opacity: 0; pointer-events: none; transition: opacity .22s ease; z-index: 56;
+}
+.ska-backdrop.ska-show{ opacity: 1; pointer-events: auto; }
+
+/* ---- Bottom sheet ---- */
+.ska-sheet{
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 57;
+  background: var(--ska-sky-top);
+  border-top: 1px solid rgba(43,33,24,0.14);
+  border-radius: 18px 18px 0 0;
+  box-shadow: 0 -10px 30px rgba(43,33,24,0.22);
+  max-height: 78vh; overflow-y: auto;
+  transform: translateY(100%);
+  visibility: hidden; pointer-events: none;
+  transition: transform .28s ease, visibility .28s;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+.ska-sheet.ska-show{ transform: translateY(0); visibility: visible; pointer-events: auto; }
+
+@media (min-width: 701px){
+  .ska-sheet{
+    left: 18px; right: auto; bottom: 18px; width: 340px;
+    border-radius: 18px; max-height: 70vh;
+  }
+}
+
+.ska-sheet-top{
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 1.1rem .8rem;
+}
+.ska-sheet-title{ font-family: 'Fraunces', serif; font-weight: 600; font-size: .95rem; color: var(--ska-ink); }
+.ska-close{
+  width: 28px; height: 28px; border-radius: 50%; border: none;
+  background: rgba(181,80,46,0.1); color: var(--ska-ink-soft);
+  cursor: pointer; font-size: .85rem;
+}
+
+.ska-sheet-body{ padding: 0 1.1rem 1.3rem; }
+
+/* ---- Signed-out state ---- */
+.ska-avatar{
+  width: 48px; height: 48px; border-radius: 50%;
+  background: rgba(181,80,46,0.1);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: .9rem;
+}
+.ska-avatar svg{ width: 26px; height: 26px; fill: none; stroke: var(--ska-rust); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.ska-avatar.ska-signed-in{ background: rgba(47,82,51,0.1); }
+.ska-avatar.ska-signed-in svg{ stroke: var(--ska-banyan); }
+
+.ska-note{ font-size: .84rem; color: var(--ska-ink-soft); line-height: 1.6; margin: 0 0 1.1rem; }
+
+/* ---- Provider buttons (data-driven — see account.js providers list) ---- */
+.ska-providers{ display: flex; flex-direction: column; gap: .6rem; }
+.ska-provider-btn{
+  width: 100%; border-radius: 999px; padding: .82rem 1.1rem;
+  display: flex; align-items: center; justify-content: center; gap: .65rem;
+  font: 600 .88rem 'Work Sans', sans-serif;
+  text-decoration: none; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.ska-provider-btn:hover{ transform: translateY(-1px); }
+.ska-provider-btn.ska-primary{
+  background: #fff; color: var(--ska-ink);
+  border: 1px solid rgba(43,33,24,0.16);
+  box-shadow: 0 2px 8px rgba(43,33,24,0.06);
+}
+.ska-provider-btn.ska-secondary{
+  background: none; color: var(--ska-ink);
+  border: 1px solid rgba(43,33,24,0.22);
+}
+.ska-provider-btn img, .ska-provider-btn svg{ width: 18px; height: 18px; flex-shrink: 0; }
+
+/* ---- Signed-in state ---- */
+.ska-identity{ margin-bottom: 1rem; }
+.ska-identity strong{ display: block; font-family: 'Fraunces', serif; font-size: 1rem; font-weight: 600; color: var(--ska-ink); }
+.ska-identity span{ font-size: .8rem; color: var(--ska-ink-soft); }
+.ska-signout-btn{
+  width: 100%; border-radius: 999px; padding: .78rem;
+  background: none; border: 1px solid rgba(181,80,46,0.3); color: var(--ska-rust);
+  font: 600 .86rem 'Work Sans', sans-serif; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ska-message{ min-height: 1.2em; margin-top: .8rem; font-size: .78rem; color: var(--ska-rust); }
