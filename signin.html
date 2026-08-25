@@ -25,7 +25,8 @@ const SUPABASE_PUBLISHABLE_KEY='sb_publishable_6_9Fc319vRsSZSksFlhzSw_28-glehH';
 const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:'pkce'}});
 const button=document.getElementById('googleSignIn');const message=document.getElementById('message');
 const params=new URLSearchParams(window.location.search);const returnTo=params.get('return');
-const destination=returnTo==='story'?'story.html':'index.html';
+function safeDestination(v){if(!v||!/^[a-zA-Z0-9_-]+\.html$/.test(v))return'index.html';return v;}
+const destination=safeDestination(returnTo);
 let redirecting=false;
 function finishLogin(session){if(redirecting||!session)return;redirecting=true;message.textContent='ಸೈನ್ ಇನ್ ಯಶಸ್ವಿಯಾಗಿದೆ. ಮುಂದುವರಿಯುತ್ತಿದೆ…';button.disabled=true;window.setTimeout(()=>window.location.replace(destination),250);}
 
