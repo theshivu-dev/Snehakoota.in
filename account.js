@@ -86,7 +86,7 @@
     },
     {
       id: 'passkey',
-     label: 'Continue with Passkey (Account must exist)',
+      label: 'Continue with Passkey (Account must exist)',
       style: 'ska-secondary',
       icon: PASSKEY_ICON,
       action: function(btn){
@@ -210,6 +210,29 @@
     var signOutBtn = document.getElementById('skaSignOut');
     var message = document.getElementById('skaMessage');
 
+    function showPasskeyReady(){
+      registerPasskeyBtn.innerHTML = PASSKEY_ICON + '<span>Passkey enabled</span>';
+      registerPasskeyBtn.disabled = true;
+      registerPasskeyBtn.setAttribute('aria-label', 'Passkey enabled');
+    }
+
+    /* Supabase can list the passkeys already registered for the current
+       signed-in user. If at least one exists, do not offer "Set up
+       Passkey" again — the account already has a passkey. */
+    if (supabaseClient.auth.passkey && typeof supabaseClient.auth.passkey.list === 'function') {
+      supabaseClient.auth.passkey.list().then(function(res){
+        if (res.error) {
+          console.warn('Passkey list error:', res.error);
+          return;
+        }
+        if (Array.isArray(res.data) && res.data.length > 0) {
+          showPasskeyReady();
+        }
+      }).catch(function(err){
+        console.warn('Passkey list check failed:', err);
+      });
+    }
+
     registerPasskeyBtn.addEventListener('click', function(){
       registerPasskeyBtn.disabled = true;
       message.textContent = 'ಈ ಸಾಧನದಲ್ಲಿ Passkey ಹೊಂದಿಸಲಾಗುತ್ತಿದೆ…';
@@ -228,7 +251,7 @@
           return;
         }
         message.textContent = 'Passkey ಯಶಸ್ವಿಯಾಗಿ ಸೇರಿಸಲಾಗಿದೆ.';
-        registerPasskeyBtn.disabled = false;
+        showPasskeyReady();
       });
     });
 
