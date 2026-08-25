@@ -86,7 +86,7 @@
     },
     {
       id: 'passkey',
-      label: 'Continue with Passkey',
+     label: 'Continue with Passkey (Account must exist)',
       style: 'ska-secondary',
       icon: PASSKEY_ICON,
       action: function(btn){
