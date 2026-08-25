@@ -1,23 +1,14 @@
 /* ===================================================================
    SNEHAKOOTA ACCOUNT WIDGET — logic
-   Version: 1  (bump the ?v= on the <link>/<script> tags when you edit
-   this file — browsers cache .js aggressively, and this file now runs
-   sitewide, so a stale cached copy means EVERY page shows old behavior)
+   Version: 2
 
-   Drop this + account.css into any page that has:
-     <div id="sk-account-root"></div>
-   right before </body>, then:
-     <link rel="stylesheet" href="account.css?v=1">
-     <script src="account.js?v=1" defer></script>
+   The "Continue with Google" button fires the tested Supabase Google
+   OAuth flow directly from this widget. signin.html remains available
+   as a backup/testing page.
 
-   The "Continue with Google" button now fires the tested Supabase
-   Google OAuth flow directly from this widget. signin.html remains
-   available as a backup/testing page, but is no longer part of the
-   normal account-widget login flow.
-
-   When a second provider (Apple, passkey, etc.) is added, give that
-   provider an `action` function below. The render loop already supports
-   both direct actions and links for future providers.
+   Passkey authentication is also enabled here. A signed-in user can
+   register a passkey from the account panel, and once registered the
+   "Continue with Passkey" option can sign them in without email/phone.
    =================================================================== */
 (function(){
   "use strict";
@@ -33,18 +24,20 @@
     return;
   }
   var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: 'pkce' }
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+      flowType: 'pkce',
+      experimental: { passkey: true }
+    }
   });
 
-  /* -----------------------------------------------------------------
-     PROVIDERS — data-driven list. Add an entry here to add a sign-in
-     option everywhere at once; nothing else in this file needs to
-     change. `style` is 'ska-primary' (filled/first) or 'ska-secondary'.
-     ----------------------------------------------------------------- */
   function currentPage(){
     var p = location.pathname.split('/').pop();
     return p && p.length ? p : 'index.html';
   }
+
   var GOOGLE_ICON =
     '<svg viewBox="0 0 24 24" aria-hidden="true">' +
     '<path fill="#4285F4" d="M21.35 12.23c0-.72-.06-1.42-.18-2.09H12v3.96h5.23a4.47 4.47 0 0 1-1.94 2.93v2.43h3.14c1.84-1.69 2.92-4.18 2.92-7.23z"/>' +
@@ -53,6 +46,16 @@
     '<path fill="#EA4335" d="M12 6.38c1.43 0 2.71.49 3.72 1.46l2.79-2.79C16.84 3.5 14.63 2.5 12 2.5a9.74 9.74 0 0 0-8.7 5.41l3.24 2.5C7.31 8.1 9.46 6.38 12 6.38z"/>' +
     '</svg>';
 
+  var PASSKEY_ICON =
+    '<svg viewBox="0 0 24 24" aria-hidden="true">' +
+    '<circle cx="8.5" cy="8.5" r="3.5"></circle>' +
+    '<path d="M11 11l8 8M15 15l2-2M17 17l2-2"></path>' +
+    '</svg>';
+
+  /* -----------------------------------------------------------------
+     PROVIDERS — add future providers here. Direct `action` functions
+     can call Supabase auth APIs without going through signin.html.
+     ----------------------------------------------------------------- */
   var providers = [
     {
       id: 'google',
@@ -80,19 +83,40 @@
           }
         });
       }
-    }
-    /* Next provider goes here, e.g.:
+    },
     {
-      id: 'apple',
-      label: 'Continue with Apple',
+      id: 'passkey',
+      label: 'Continue with Passkey',
       style: 'ska-secondary',
-      icon: '<svg>...</svg>',
-      action: function(btn){ ... }
-    }
-    */
-  ];
+      icon: PASSKEY_ICON,
+      action: function(btn){
+        if (btn) btn.disabled = true;
 
-  /* ----------------------------------------------------------------- */
+        var message = document.getElementById('skaMessage');
+        if (message) message.textContent = 'Passkey ಮೂಲಕ ಸುರಕ್ಷಿತವಾಗಿ ಸೈನ್ ಇನ್ ಮಾಡಲಾಗುತ್ತಿದೆ…';
+
+        if (!window.PublicKeyCredential || !navigator.credentials) {
+          if (message) message.textContent = 'ಈ ಸಾಧನ ಅಥವಾ ಬ್ರೌಸರ್‌ನಲ್ಲಿ Passkey ಬೆಂಬಲವಿಲ್ಲ.';
+          if (btn) btn.disabled = false;
+          return;
+        }
+
+        supabaseClient.auth.signInWithPasskey().then(function(res){
+          if (res.error) {
+            console.error('Passkey sign-in error:', res.error);
+            if (message) {
+              if (res.error.code === 'webauthn_credential_not_found') {
+                message.textContent = 'ಈ ಖಾತೆಗೆ ಇನ್ನೂ Passkey ಸೇರಿಸಿಲ್ಲ. ಮೊದಲು ಖಾತೆ ಒಳಗೆ Passkey ಸೇರಿಸಿ.';
+              } else {
+                message.textContent = 'Passkey ಮೂಲಕ ಸೈನ್ ಇನ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.';
+              }
+            }
+            if (btn) btn.disabled = false;
+          }
+        });
+      }
+    }
+  ];
 
   mount.innerHTML =
     '<div class="ska-backdrop" id="skaBackdrop"></div>' +
@@ -178,11 +202,36 @@
         '<strong>' + displayName(user) + '</strong>' +
         '<span>' + (user.email || 'Google ಖಾತೆ') + '</span>' +
       '</div>' +
+      '<button type="button" class="ska-provider-btn ska-secondary" id="skaRegisterPasskey">' + PASSKEY_ICON + '<span>Set up Passkey</span></button>' +
       '<button type="button" class="ska-signout-btn" id="skaSignOut">ಸೈನ್ ಔಟ್</button>' +
       '<div class="ska-message" id="skaMessage"></div>';
 
+    var registerPasskeyBtn = document.getElementById('skaRegisterPasskey');
     var signOutBtn = document.getElementById('skaSignOut');
     var message = document.getElementById('skaMessage');
+
+    registerPasskeyBtn.addEventListener('click', function(){
+      registerPasskeyBtn.disabled = true;
+      message.textContent = 'ಈ ಸಾಧನದಲ್ಲಿ Passkey ಹೊಂದಿಸಲಾಗುತ್ತಿದೆ…';
+
+      if (!window.PublicKeyCredential || !navigator.credentials) {
+        message.textContent = 'ಈ ಸಾಧನ ಅಥವಾ ಬ್ರೌಸರ್‌ನಲ್ಲಿ Passkey ಬೆಂಬಲವಿಲ್ಲ.';
+        registerPasskeyBtn.disabled = false;
+        return;
+      }
+
+      supabaseClient.auth.registerPasskey().then(function(res){
+        if (res.error) {
+          console.error('Passkey registration error:', res.error);
+          message.textContent = 'Passkey ಹೊಂದಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.';
+          registerPasskeyBtn.disabled = false;
+          return;
+        }
+        message.textContent = 'Passkey ಯಶಸ್ವಿಯಾಗಿ ಸೇರಿಸಲಾಗಿದೆ.';
+        registerPasskeyBtn.disabled = false;
+      });
+    });
+
     signOutBtn.addEventListener('click', function(){
       signOutBtn.disabled = true;
       message.textContent = 'ಸೈನ್ ಔಟ್ ಮಾಡಲಾಗುತ್ತಿದೆ…';
