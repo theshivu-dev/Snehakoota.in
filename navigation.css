@@ -16,283 +16,96 @@
 /* =========================================================
    STAGE 2A — SCROLLBAR VISUAL FOUNDATION
    ========================================================= */
-html{
-  scrollbar-width:thin;
-  scrollbar-color:rgba(181,80,46,0.28) transparent;
-}
-html::-webkit-scrollbar{ width:7px; height:7px; }
-html::-webkit-scrollbar-track{ background:transparent; }
-html::-webkit-scrollbar-thumb{
-  background:rgba(181,80,46,0.26);
-  border-radius:999px;
-  border:2px solid transparent;
-  background-clip:padding-box;
-}
-html::-webkit-scrollbar-thumb:hover{
-  background:rgba(181,80,46,0.42);
-  border:2px solid transparent;
-  background-clip:padding-box;
-}
-html::-webkit-scrollbar-button{ display:none; width:0; height:0; }
+html{scrollbar-width:thin;scrollbar-color:rgba(181,80,46,0.28) transparent;}
+html::-webkit-scrollbar{width:7px;height:7px;}
+html::-webkit-scrollbar-track{background:transparent;}
+html::-webkit-scrollbar-thumb{background:rgba(181,80,46,0.26);border-radius:999px;border:2px solid transparent;background-clip:padding-box;}
+html::-webkit-scrollbar-thumb:hover{background:rgba(181,80,46,0.42);border:2px solid transparent;background-clip:padding-box;}
+html::-webkit-scrollbar-button{display:none;width:0;height:0;}
 
 /* =========================================================
    SHARED NAVIGATION PANEL
    ========================================================= */
-.sk-nav-edge-strip{
-  position:fixed; left:0; top:0; bottom:0;
-  width:var(--sk-edge-width,22px);
-  background:var(--sk-edge-binding,#F5D9AE);
-  border-right:1px solid var(--line-idle,rgba(43,33,24,0.16));
-  display:flex; flex-direction:column; align-items:center; justify-content:space-evenly;
-  z-index:20; cursor:pointer;
-}
-.sk-nav-edge-strip .sk-nav-ring{
-  width:8px; height:8px; border-radius:50%;
-  background:rgba(181,80,46,0.4);
-  transition:background .2s, transform .2s;
-}
-.sk-nav-edge-strip:hover .sk-nav-ring{ background:rgba(181,80,46,0.65); }
-.sk-nav-backdrop{
-  position:fixed; inset:0;
-  background:var(--sk-overlay,rgba(43,33,24,0.38));
-  opacity:0; pointer-events:none; transition:opacity .25s ease; z-index:30;
-}
-body.sk-nav-open .sk-nav-backdrop{ opacity:1; pointer-events:auto; }
-.sk-nav-panel{
-  position:fixed; left:0; top:0; bottom:0;
-  width:76%; max-width:var(--sk-panel-max-width,300px);
-  display:flex; z-index:31;
-  transform:translateX(-100%); transition:transform .28s ease;
-  box-shadow:var(--sk-shadow-panel,2px 0 18px rgba(0,0,0,0.18));
-}
-body.sk-nav-open .sk-nav-panel{ transform:translateX(0); }
-.sk-nav-panel .sk-nav-binding{
-  width:var(--sk-edge-width,22px);
-  background:var(--sk-edge-binding,#F5D9AE);
-  border-right:1px solid var(--line-idle,rgba(43,33,24,0.16));
-  display:flex; flex-direction:column; align-items:center; justify-content:space-evenly;
-}
-.sk-nav-panel .sk-nav-binding .sk-nav-ring{
-  width:8px; height:8px; border-radius:50%; background:var(--rust,#B5502E);
-}
-.sk-nav-panel .sk-nav-body{
-  flex:1; background:var(--sky-bottom,#FDE7C8);
-  padding:1.4rem 1.1rem; display:flex; flex-direction:column; height:100%;
-}
-.sk-nav-panel .sk-nav-top{
-  display:flex; justify-content:space-between; align-items:center;
-  margin-bottom:1.6rem; flex-shrink:0;
-}
-.sk-nav-panel .sk-nav-brand{
-  font-family:var(--font-display,'Fraunces',serif); font-weight:600; font-size:.95rem;
-}
-.sk-nav-panel .sk-nav-brand .sk-nav-sneha{ color:var(--rust,#B5502E); }
-.sk-nav-panel .sk-nav-brand .sk-nav-koota{ color:var(--banyan,#2F5233); }
-.sk-nav-panel .sk-nav-close{
-  background:none; border:none; font-size:1.1rem; color:var(--ink-soft,#6B5C4C);
-  cursor:pointer; line-height:1; padding:.3rem;
-  min-width:var(--sk-touch-target,44px); min-height:var(--sk-touch-target,44px);
-}
-.sk-nav-links{
-  display:flex; flex-direction:column; gap:.3rem; flex:1;
-  justify-content:center; margin-bottom:8vh;
-}
-.sk-nav-links a{
-  display:block; padding:.75rem .85rem; min-height:var(--sk-touch-target,44px);
-  border-radius:10px; text-decoration:none; color:var(--ink,#2B2118);
-  font-size:.95rem; font-family:var(--font-body,'Work Sans',sans-serif);
-}
-.sk-nav-links a.active{
-  background:var(--sk-rust-soft,rgba(181,80,46,0.10)); color:var(--rust,#B5502E); font-weight:600;
-}
-.sk-nav-links a.disabled{ color:var(--ink-soft,#6B5C4C); opacity:.55; pointer-events:none; }
-.sk-nav-links a .sk-nav-tag{ font-size:.72rem; margin-left:.4em; }
+.sk-nav-edge-strip{position:fixed;left:0;top:0;bottom:0;width:var(--sk-edge-width,22px);background:var(--sk-edge-binding,#F5D9AE);border-right:1px solid var(--line-idle,rgba(43,33,24,0.16));display:flex;flex-direction:column;align-items:center;justify-content:space-evenly;z-index:20;cursor:pointer;}
+.sk-nav-edge-strip .sk-nav-ring{width:8px;height:8px;border-radius:50%;background:rgba(181,80,46,0.4);transition:background .2s,transform .2s;}
+.sk-nav-edge-strip:hover .sk-nav-ring{background:rgba(181,80,46,0.65);}
+.sk-nav-backdrop{position:fixed;inset:0;background:var(--sk-overlay,rgba(43,33,24,0.38));opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:30;}
+body.sk-nav-open .sk-nav-backdrop{opacity:1;pointer-events:auto;}
+.sk-nav-panel{position:fixed;left:0;top:0;bottom:0;width:76%;max-width:var(--sk-panel-max-width,300px);display:flex;z-index:31;transform:translateX(-100%);transition:transform .28s ease;box-shadow:var(--sk-shadow-panel,2px 0 18px rgba(0,0,0,0.18));}
+body.sk-nav-open .sk-nav-panel{transform:translateX(0);}
+.sk-nav-panel .sk-nav-binding{width:var(--sk-edge-width,22px);background:var(--sk-edge-binding,#F5D9AE);border-right:1px solid var(--line-idle,rgba(43,33,24,0.16));display:flex;flex-direction:column;align-items:center;justify-content:space-evenly;}
+.sk-nav-panel .sk-nav-binding .sk-nav-ring{width:8px;height:8px;border-radius:50%;background:var(--rust,#B5502E);}
+.sk-nav-panel .sk-nav-body{flex:1;background:var(--sky-bottom,#FDE7C8);padding:1.4rem 1.1rem;display:flex;flex-direction:column;height:100%;}
+.sk-nav-panel .sk-nav-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.6rem;flex-shrink:0;}
+.sk-nav-panel .sk-nav-brand{font-family:var(--font-display,'Fraunces',serif);font-weight:600;font-size:.95rem;}
+.sk-nav-panel .sk-nav-brand .sk-nav-sneha{color:var(--rust,#B5502E);}.sk-nav-panel .sk-nav-brand .sk-nav-koota{color:var(--banyan,#2F5233);}
+.sk-nav-panel .sk-nav-close{background:none;border:none;font-size:1.1rem;color:var(--ink-soft,#6B5C4C);cursor:pointer;line-height:1;padding:.3rem;min-width:var(--sk-touch-target,44px);min-height:var(--sk-touch-target,44px);}
+.sk-nav-links{display:flex;flex-direction:column;gap:.3rem;flex:1;justify-content:center;margin-bottom:8vh;}
+.sk-nav-links a{display:block;padding:.75rem .85rem;min-height:var(--sk-touch-target,44px);border-radius:10px;text-decoration:none;color:var(--ink,#2B2118);font-size:.95rem;font-family:var(--font-body,'Work Sans',sans-serif);}
+.sk-nav-links a.active{background:var(--sk-rust-soft,rgba(181,80,46,0.10));color:var(--rust,#B5502E);font-weight:600;}
+.sk-nav-links a.disabled{color:var(--ink-soft,#6B5C4C);opacity:.55;pointer-events:none;}.sk-nav-links a .sk-nav-tag{font-size:.72rem;margin-left:.4em;}
 
 /* =========================================================
    STAGE 2B — FIXED-ELEMENT POSITIONING FOUNDATION
    ========================================================= */
-:root{
-  --sk-nav-trigger-top:50vh;
-  --sk-nav-trigger-width:20px;
-  --sk-nav-trigger-height:48px;
-  --sk-nav-trigger-safe-gap:12px;
-}
-.sk-nav-opener{
-  position:fixed; left:var(--sk-edge-width,22px); top:var(--sk-nav-trigger-top,50vh);
-  width:var(--sk-nav-trigger-width,20px); height:var(--sk-nav-trigger-height,48px);
-  margin-top:calc(var(--sk-nav-trigger-height,48px) / -2);
-  background:var(--rust,#B5502E); border-radius:0 8px 8px 0;
-  box-shadow:var(--sk-shadow-soft,2px 2px 6px rgba(43,33,24,0.18));
-  z-index:32; cursor:pointer; border:none; padding:0;
-  display:flex; align-items:center; justify-content:center;
-  animation:skNavTabNudge 2.4s ease-in-out 1s 3;
-  -webkit-tap-highlight-color:transparent;
-}
-.sk-nav-opener::after{
-  content:''; width:6px; height:6px; border-radius:50%; background:rgba(255,246,232,0.85);
-}
-.sk-nav-opener.sk-nav-pulsing::before{
-  content:''; position:absolute; inset:0; border-radius:0 8px 8px 0;
-  box-shadow:0 0 0 0 rgba(181,80,46,0.5); animation:skNavTabPulse 2.2s ease-out infinite;
-}
-@keyframes skNavTabPulse{
-  0%{ box-shadow:0 0 0 0 rgba(181,80,46,0.45); }
-  70%{ box-shadow:0 0 0 10px rgba(181,80,46,0); }
-  100%{ box-shadow:0 0 0 0 rgba(181,80,46,0); }
-}
-@keyframes skNavTabNudge{
-  0%,100%{ transform:translateX(0); }
-  10%{ transform:translateX(4px); }
-  20%{ transform:translateX(0); }
-  30%{ transform:translateX(4px); }
-  40%{ transform:translateX(0); }
-}
-@media (max-width:700px){
-  :root{ --sk-nav-trigger-safe-gap:10px; }
-  .sk-nav-opener{ left:var(--sk-edge-width,22px); }
-}
-@media (prefers-reduced-motion: reduce){
-  .sk-nav-opener{ animation:none; }
-  .sk-nav-opener.sk-nav-pulsing::before{ animation:none; }
-}
+:root{--sk-nav-trigger-top:50vh;--sk-nav-trigger-width:20px;--sk-nav-trigger-height:48px;--sk-nav-trigger-safe-gap:12px;}
+.sk-nav-opener{position:fixed;left:var(--sk-edge-width,22px);top:var(--sk-nav-trigger-top,50vh);width:var(--sk-nav-trigger-width,20px);height:var(--sk-nav-trigger-height,48px);margin-top:calc(var(--sk-nav-trigger-height,48px)/-2);background:var(--rust,#B5502E);border-radius:0 8px 8px 0;box-shadow:var(--sk-shadow-soft,2px 2px 6px rgba(43,33,24,0.18));z-index:32;cursor:pointer;border:none;padding:0;display:flex;align-items:center;justify-content:center;animation:skNavTabNudge 2.4s ease-in-out 1s 3;-webkit-tap-highlight-color:transparent;}
+.sk-nav-opener::after{content:'';width:6px;height:6px;border-radius:50%;background:rgba(255,246,232,0.85);}
+.sk-nav-opener.sk-nav-pulsing::before{content:'';position:absolute;inset:0;border-radius:0 8px 8px 0;box-shadow:0 0 0 0 rgba(181,80,46,0.5);animation:skNavTabPulse 2.2s ease-out infinite;}
+@keyframes skNavTabPulse{0%{box-shadow:0 0 0 0 rgba(181,80,46,0.45);}70%{box-shadow:0 0 0 10px rgba(181,80,46,0);}100%{box-shadow:0 0 0 0 rgba(181,80,46,0);}}
+@keyframes skNavTabNudge{0%,100%{transform:translateX(0);}10%{transform:translateX(4px);}20%{transform:translateX(0);}30%{transform:translateX(4px);}40%{transform:translateX(0);}}
+@media (max-width:700px){:root{--sk-nav-trigger-safe-gap:10px;}.sk-nav-opener{left:var(--sk-edge-width,22px);}}
+@media (prefers-reduced-motion:reduce){.sk-nav-opener{animation:none;}.sk-nav-opener.sk-nav-pulsing::before{animation:none;}}
 
 /* =========================================================
    STAGE 2B-1 — LEGACY TRIGGER BRIDGE
    ========================================================= */
-button.bookmark-tab{ top:var(--sk-nav-trigger-top,50vh); }
+button.bookmark-tab{top:var(--sk-nav-trigger-top,50vh);}
 
 /* =========================================================
    STAGE 2B-2 — LEGACY TRIGGER SHARED-STYLE ADAPTER
-   ---------------------------------------------------------
-   The index page still owns the trigger markup for this migration
-   step. Behaviour stays in index.html; styling is being centralised.
    ========================================================= */
-button.bookmark-tab{
-  left:var(--sk-edge-width,22px); top:var(--sk-nav-trigger-top,50vh);
-  width:var(--sk-nav-trigger-width,20px); height:var(--sk-nav-trigger-height,48px);
-  margin-top:calc(var(--sk-nav-trigger-height,48px) / -2);
-  background:var(--rust,#B5502E); border-radius:0 8px 8px 0;
-  box-shadow:var(--sk-shadow-soft,2px 2px 6px rgba(43,33,24,0.18)); z-index:32;
-  animation:skNavTabNudge 2.4s ease-in-out 1s 3;
-}
-button.bookmark-tab::after{ background:rgba(255,246,232,0.85); }
-button.bookmark-tab.pulsing::before{
-  border-radius:0 8px 8px 0; box-shadow:0 0 0 0 rgba(181,80,46,0.5);
-  animation:skNavTabPulse 2.2s ease-out infinite;
-}
-@media (prefers-reduced-motion: reduce){
-  button.bookmark-tab{ animation:none; }
-  button.bookmark-tab.pulsing::before{ animation:none; }
-}
+button.bookmark-tab{left:var(--sk-edge-width,22px);top:var(--sk-nav-trigger-top,50vh);width:var(--sk-nav-trigger-width,20px);height:var(--sk-nav-trigger-height,48px);margin-top:calc(var(--sk-nav-trigger-height,48px)/-2);background:var(--rust,#B5502E);border-radius:0 8px 8px 0;box-shadow:var(--sk-shadow-soft,2px 2px 6px rgba(43,33,24,0.18));z-index:32;animation:skNavTabNudge 2.4s ease-in-out 1s 3;}
+button.bookmark-tab::after{background:rgba(255,246,232,0.85);}.bookmark-tab.pulsing::before{border-radius:0 8px 8px 0;box-shadow:0 0 0 0 rgba(181,80,46,0.5);animation:skNavTabPulse 2.2s ease-out infinite;}
+@media (prefers-reduced-motion:reduce){button.bookmark-tab{animation:none;}button.bookmark-tab.pulsing::before{animation:none;}}
 
 /* =========================================================
    STAGE 2B-3 — LEGACY PANEL SHARED-STYLE ADAPTER
+   ========================================================= */
+html body .backdrop{position:fixed!important;inset:0!important;background:var(--sk-overlay,rgba(43,33,24,0.38))!important;transition:opacity .25s ease!important;z-index:30!important;}
+html body.nav-open .backdrop{opacity:1!important;pointer-events:auto!important;}html body:not(.nav-open) .backdrop{opacity:0!important;pointer-events:none!important;}
+html body .side-panel{position:fixed!important;left:0!important;top:0!important;bottom:0!important;width:76%!important;max-width:var(--sk-panel-max-width,300px)!important;display:flex!important;z-index:31!important;transform:translateX(-100%)!important;transition:transform .28s ease!important;box-shadow:var(--sk-shadow-panel,2px 0 18px rgba(0,0,0,0.18))!important;}
+html body.nav-open .side-panel{transform:translateX(0)!important;}
+html body .side-panel .binding{width:var(--sk-edge-width,22px)!important;background:var(--sk-edge-binding,#F5D9AE)!important;border-right:1px solid var(--line-idle,rgba(43,33,24,0.16))!important;}
+html body .side-panel .binding .ring{width:8px!important;height:8px!important;border-radius:50%!important;background:var(--rust,#B5502E)!important;}
+html body .side-panel .panel-body{flex:1!important;background:var(--sky-bottom,#FDE7C8)!important;padding:1.4rem 1.1rem!important;display:flex!important;flex-direction:column!important;height:100%!important;}
+html body .side-panel .panel-top{display:flex!important;justify-content:space-between!important;align-items:center!important;margin-bottom:1.6rem!important;flex-shrink:0!important;}
+html body .side-panel .closer{min-width:var(--sk-touch-target,44px)!important;min-height:var(--sk-touch-target,44px)!important;}
+html body .panel-links{display:flex!important;flex-direction:column!important;gap:.3rem!important;flex:1!important;justify-content:center!important;margin-bottom:8vh!important;}
+html body .panel-links a{min-height:var(--sk-touch-target,44px)!important;border-radius:10px!important;color:var(--ink,#2B2118)!important;font-family:var(--font-body,'Work Sans',sans-serif)!important;}
+html body .panel-links a.active{background:var(--sk-rust-soft,rgba(181,80,46,0.10))!important;color:var(--rust,#B5502E)!important;}html body .panel-links a.disabled{color:var(--ink-soft,#6B5C4C)!important;}
+
+/* =========================================================
+   STAGE 2B-4 — LEGACY EDGE STRIP SHARED-STYLE ADAPTER
    ---------------------------------------------------------
-   index.html still owns the original navigation markup and its
-   original `nav-open` class during this migration step.
+   index.html still owns the original .edge-strip markup.
+   This adapter moves its visual ownership into this shared file
+   while preserving the current HTML, click behaviour, dots, width,
+   and fixed position.
 
-   This adapter deliberately supports BOTH state/class languages:
-   - legacy: .backdrop / .side-panel / body.nav-open
-   - shared: .sk-nav-backdrop / .sk-nav-panel / body.sk-nav-open
-
-   We use higher specificity here because index.html currently has
-   an older inline <style> block loaded after navigation.css.
-   This lets the shared foundation take ownership of the important
-   panel geometry without deleting the old code yet.
+   The old .edge-strip CSS can now be removed from index.html in a
+   later cleanup step without changing the visible navigation.
 
    SAFETY:
-   - No HTML migration in this step.
-   - No navigation.js change.
-   - No road/path SVG change.
-   - No account/Supabase change.
-   - No game-launcher change.
-   - No dotted page-progress navigator.
-
-   Once this is verified, the next migration can remove the legacy
-   panel CSS/JS from index.html and switch the markup to data-sk-*.
+   - No road/path SVG changes.
+   - No account/Supabase changes.
+   - No game-launcher changes.
+   - No navigation.js changes.
+   - No dotted page-progress navigator yet.
    ========================================================= */
-html body .backdrop{
-  position:fixed !important;
-  inset:0 !important;
-  background:var(--sk-overlay,rgba(43,33,24,0.38)) !important;
-  transition:opacity .25s ease !important;
-  z-index:30 !important;
-}
-html body.nav-open .backdrop{
-  opacity:1 !important;
-  pointer-events:auto !important;
-}
-html body:not(.nav-open) .backdrop{
-  opacity:0 !important;
-  pointer-events:none !important;
-}
-html body .side-panel{
-  position:fixed !important;
-  left:0 !important;
-  top:0 !important;
-  bottom:0 !important;
-  width:76% !important;
-  max-width:var(--sk-panel-max-width,300px) !important;
-  display:flex !important;
-  z-index:31 !important;
-  transform:translateX(-100%) !important;
-  transition:transform .28s ease !important;
-  box-shadow:var(--sk-shadow-panel,2px 0 18px rgba(0,0,0,0.18)) !important;
-}
-html body.nav-open .side-panel{
-  transform:translateX(0) !important;
-}
-html body .side-panel .binding{
-  width:var(--sk-edge-width,22px) !important;
-  background:var(--sk-edge-binding,#F5D9AE) !important;
-  border-right:1px solid var(--line-idle,rgba(43,33,24,0.16)) !important;
-}
-html body .side-panel .binding .ring{
-  width:8px !important;
-  height:8px !important;
-  border-radius:50% !important;
-  background:var(--rust,#B5502E) !important;
-}
-html body .side-panel .panel-body{
-  flex:1 !important;
-  background:var(--sky-bottom,#FDE7C8) !important;
-  padding:1.4rem 1.1rem !important;
-  display:flex !important;
-  flex-direction:column !important;
-  height:100% !important;
-}
-html body .side-panel .panel-top{
-  display:flex !important;
-  justify-content:space-between !important;
-  align-items:center !important;
-  margin-bottom:1.6rem !important;
-  flex-shrink:0 !important;
-}
-html body .side-panel .closer{
-  min-width:var(--sk-touch-target,44px) !important;
-  min-height:var(--sk-touch-target,44px) !important;
-}
-html body .panel-links{
-  display:flex !important;
-  flex-direction:column !important;
-  gap:.3rem !important;
-  flex:1 !important;
-  justify-content:center !important;
-  margin-bottom:8vh !important;
-}
-html body .panel-links a{
-  min-height:var(--sk-touch-target,44px) !important;
-  border-radius:10px !important;
-  color:var(--ink,#2B2118) !important;
-  font-family:var(--font-body,'Work Sans',sans-serif) !important;
-}
-html body .panel-links a.active{
-  background:var(--sk-rust-soft,rgba(181,80,46,0.10)) !important;
-  color:var(--rust,#B5502E) !important;
-}
-html body .panel-links a.disabled{
-  color:var(--ink-soft,#6B5C4C) !important;
-}
+html body .edge-strip{position:fixed!important;left:0!important;top:0!important;bottom:0!important;width:var(--sk-edge-width,22px)!important;background:var(--sk-edge-binding,#F5D9AE)!important;border-right:1px solid var(--line-idle,rgba(43,33,24,0.16))!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:space-evenly!important;z-index:20!important;cursor:pointer!important;}
+html body .edge-strip .ring{width:8px!important;height:8px!important;border-radius:50%!important;background:rgba(181,80,46,0.4)!important;transition:background .2s,transform .2s!important;}
+html body .edge-strip:hover .ring{background:rgba(181,80,46,0.65)!important;}
 
 /* =========================================================
    Mobile safety note:
