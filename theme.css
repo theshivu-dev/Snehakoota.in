@@ -1,7 +1,7 @@
 :root{
   /* =========================================================
      SNEHAKOOTA — SHARED VISUAL FOUNDATION
-     Stage 2D-1
+     Stage 2D-1 / 2D-2
      ---------------------------------------------------------
      This file owns genuinely shared visual tokens only.
      Page-specific styling remains in the individual page/component
@@ -29,9 +29,6 @@
 
   /* =========================================================
      STAGE 2D-1 — SHARED TYPOGRAPHY TOKENS
-     ---------------------------------------------------------
-     Keep font-family decisions in one place so future pages can
-     consume the same visual language without copying font stacks.
      ========================================================= */
   --font-display: 'Fraunces', serif;
   --font-body: 'Work Sans', sans-serif;
@@ -89,3 +86,45 @@ button, a, input, select, textarea{
     --sk-mobile-gutter:28px;
   }
 }
+
+/* =========================================================
+   STAGE 2D-2 — STYLE OWNERSHIP CONTRACT
+   ---------------------------------------------------------
+   This is an architecture rule, not a visual override.
+
+   1. theme.css
+      Owns shared visual tokens and genuinely generic primitives.
+
+   2. navigation.css
+      Owns navigation visuals only.
+
+   3. account.css
+      Owns the account widget visuals only.
+
+   4. Individual page <style> blocks / page CSS
+      Own page-specific layout, artwork, content presentation and
+      special effects. A page may use shared tokens without moving
+      its unique rules into theme.css.
+
+   5. Component-local CSS
+      A reusable component may keep its own stylesheet when its rules
+      are not genuinely site-wide. Reuse is preferred over duplication,
+      but centralisation is not a goal by itself.
+
+   6. Safe migration rule
+      Do not move or delete page-specific CSS merely because a similar
+      selector exists in a shared stylesheet. First verify that the
+      selector is genuinely shared and that the migration causes no
+      visual or behavioural change on the owning page.
+
+   7. Isolation rule
+      A change to a page-specific selector must not be expected to alter
+      another page. A change to a shared token may affect multiple pages
+      intentionally, so shared-token changes must be treated as global
+      visual changes.
+
+   8. Protected page assets
+      The index/home road/path SVG animation, temporary game launcher,
+      and Supabase/account integration are not part of the theme layer.
+      They remain locally owned until a later, explicit migration.
+   ========================================================= */
