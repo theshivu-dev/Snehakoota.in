@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600&family=Noto+Sans+Kannada:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="theme.css?v=4">
-  <!-- =========================================================
+<!-- =========================================================
      STAGE 2A-3 — SHARED NAVIGATION ASSETS
      ========================================================= -->
 <link rel="stylesheet" href="navigation.css?v=6">
@@ -38,88 +38,22 @@
     font-family:'Work Sans', sans-serif;
     overflow-x:hidden;
   }
-  body{ padding-left:22px; }
 
-  .edge-strip{
-    position:fixed; left:0; top:0; bottom:0; width:22px;
-    background:#F5D9AE;
-    border-right:1px solid var(--line-idle);
-    display:flex; flex-direction:column; align-items:center; justify-content:space-evenly;
-    z-index:20; cursor:pointer;
-  }
-  .edge-strip .ring{ width:8px; height:8px; border-radius:50%; background:rgba(181,80,46,0.4); transition:background .2s; }
-  .edge-strip:hover .ring{ background:rgba(181,80,46,0.65); }
+  /* =========================================================
+     STAGE 2C-1 — NAVIGATION CSS OWNERSHIP CLEANUP
+     ---------------------------------------------------------
+     Navigation visual rules now live in navigation.css.
+     Keep this page-specific style block for index/home content only.
 
-  .topbar{
-    position:absolute; top:0; left:22px; right:0; z-index:10;
-    display:flex; align-items:center; justify-content:flex-start;
-    padding:1rem 5vw;
-  }
+     Intentionally preserved outside this cleanup:
+     - road/path SVG and its animation
+     - home-page content and typography
+     - mini-game widget
+     - account/Supabase integration
+     - existing navigation HTML and navigation.js behaviour
 
-  .bookmark-tab{
-    position:fixed; left:22px; top:58vh; width:20px; height:48px; margin-top:-24px;
-    background:var(--rust); border-radius:0 8px 8px 0;
-    box-shadow:2px 2px 6px rgba(43,33,24,0.18);
-    z-index:32; cursor:pointer; border:none; padding:0;
-    display:flex; align-items:center; justify-content:center;
-    animation:tabNudge 2.4s ease-in-out 1s 3;
-  }
-  .bookmark-tab::after{
-    content:''; width:6px; height:6px; border-radius:50%;
-    background:rgba(255,246,232,0.85);
-  }
-  .bookmark-tab.pulsing::before{
-    content:''; position:absolute; inset:0; border-radius:0 8px 8px 0;
-    box-shadow:0 0 0 0 rgba(181,80,46,0.5);
-    animation:tabPulse 2.2s ease-out infinite;
-  }
-  @keyframes tabPulse{
-    0%{ box-shadow:0 0 0 0 rgba(181,80,46,0.45); }
-    70%{ box-shadow:0 0 0 10px rgba(181,80,46,0); }
-    100%{ box-shadow:0 0 0 0 rgba(181,80,46,0); }
-  }
-  @keyframes tabNudge{
-    0%, 100%{ transform:translateX(0); }
-    10%{ transform:translateX(4px); }
-    20%{ transform:translateX(0); }
-    30%{ transform:translateX(4px); }
-    40%{ transform:translateX(0); }
-  }
-  @media (prefers-reduced-motion: reduce){
-    .bookmark-tab{ animation:none; }
-    .bookmark-tab.pulsing::before{ animation:none; }
-  }
-
-  .backdrop{
-    position:fixed; inset:0; background:rgba(43,33,24,0.38);
-    opacity:0; pointer-events:none; transition:opacity .25s ease; z-index:30;
-  }
-  body.nav-open .backdrop{ opacity:1; pointer-events:auto; }
-
-  .side-panel{
-    position:fixed; left:0; top:0; bottom:0; width:76%; max-width:300px;
-    display:flex; z-index:31;
-    transform:translateX(-100%); transition:transform .28s ease;
-    box-shadow:2px 0 18px rgba(0,0,0,0.18);
-  }
-  body.nav-open .side-panel{ transform:translateX(0); }
-  .side-panel .binding{
-    width:22px; background:#F5D9AE; border-right:1px solid var(--line-idle);
-    display:flex; flex-direction:column; align-items:center; justify-content:space-evenly;
-  }
-  .side-panel .binding .ring{ width:8px; height:8px; border-radius:50%; background:var(--rust); }
-  .side-panel .panel-body{ flex:1; background:var(--sky-bottom); padding:1.4rem 1.1rem; display:flex; flex-direction:column; height:100%; }
-  .side-panel .panel-top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:1.6rem; flex-shrink:0; }
-  .side-panel .panel-top .brand{ font-family:'Fraunces', serif; font-weight:600; font-size:.95rem; }
-  .side-panel .closer{ background:none; border:none; font-size:1.1rem; color:var(--ink-soft); cursor:pointer; line-height:1; padding:.3rem; }
-  .panel-links{ display:flex; flex-direction:column; gap:.3rem; flex:1; justify-content:center; margin-bottom:8vh; }
-  .panel-links a{
-    display:block; padding:.75rem .85rem; border-radius:10px; text-decoration:none;
-    color:var(--ink); font-size:.95rem; font-family:'Work Sans', sans-serif;
-  }
-  .panel-links a.active{ background:rgba(181,80,46,0.1); color:var(--rust); font-weight:600; }
-  .panel-links a.disabled{ color:var(--ink-soft); opacity:.55; pointer-events:none; }
-  .panel-links a .tag{ font-size:.72rem; margin-left:.4em; }
+     The old navigation CSS is no longer duplicated here.
+     ========================================================= */
 
   .stage{
     position:relative;
@@ -814,6 +748,6 @@ SKG.games.tileMerge = (function(){
 <div id="sk-account-root"></div>
 <link rel="stylesheet" href="account.css?v=3">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="account.js?v=2" defer></script>  
+<script src="account.js?v=2" defer></script>
 </body>
 </html>
