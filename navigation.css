@@ -13,6 +13,55 @@
    That lets us move one page at a time without disturbing the live UI.
    ========================================================= */
 
+/* =========================================================
+   STAGE 2A — SCROLLBAR VISUAL FOUNDATION
+   ---------------------------------------------------------
+   The browser's native scrollbar is functional, but its default
+   appearance does not belong to the SnehaKoota visual language.
+
+   For now we keep scrolling fully available while making the bar
+   quiet and unobtrusive. The browser scrollbar's top/bottom arrow
+   buttons are intentionally hidden; the later shared page-progress
+   component will provide the intentional SnehaKoota navigation cue.
+
+   IMPORTANT:
+   - This does NOT replace scrolling.
+   - This does NOT yet create the dotted progress navigator.
+   - The progress navigator will be handled separately in a later step.
+   ========================================================= */
+html{
+  scrollbar-width:thin;
+  scrollbar-color:rgba(181,80,46,0.28) transparent;
+}
+
+html::-webkit-scrollbar{
+  width:7px;
+  height:7px;
+}
+
+html::-webkit-scrollbar-track{
+  background:transparent;
+}
+
+html::-webkit-scrollbar-thumb{
+  background:rgba(181,80,46,0.26);
+  border-radius:999px;
+  border:2px solid transparent;
+  background-clip:padding-box;
+}
+
+html::-webkit-scrollbar-thumb:hover{
+  background:rgba(181,80,46,0.42);
+  border:2px solid transparent;
+  background-clip:padding-box;
+}
+
+html::-webkit-scrollbar-button{
+  display:none;
+  width:0;
+  height:0;
+}
+
 .sk-nav-edge-strip{
   position:fixed;
   left:0;
