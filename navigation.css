@@ -322,6 +322,61 @@ button.bookmark-tab{
 }
 
 /* =========================================================
+   STAGE 2B-2 — LEGACY TRIGGER SHARED-STYLE ADAPTER
+   ---------------------------------------------------------
+   The index page still owns the trigger markup for this migration
+   step, so we do NOT change its HTML or inline navigation logic yet.
+
+   This adapter makes that existing trigger consume the shared
+   navigation visual tokens and positioning foundation. It is a
+   deliberate bridge: behaviour stays exactly where it is today,
+   while styling ownership moves toward navigation.css.
+
+   Safety rules for this step:
+   - No road/path SVG changes.
+   - No account/Supabase changes.
+   - No game-launcher changes.
+   - No navigation.js behaviour changes.
+   - No dotted progress navigator yet.
+   - The old index trigger remains clickable and functional.
+
+   This bridge can be removed once index.html adopts the shared
+   .sk-nav-opener markup in a later navigation migration step.
+   ========================================================= */
+button.bookmark-tab{
+  left:var(--sk-edge-width,22px);
+  top:var(--sk-nav-trigger-top,50vh);
+  width:var(--sk-nav-trigger-width,20px);
+  height:var(--sk-nav-trigger-height,48px);
+  margin-top:calc(var(--sk-nav-trigger-height,48px) / -2);
+  background:var(--rust,#B5502E);
+  border-radius:0 8px 8px 0;
+  box-shadow:var(--sk-shadow-soft,2px 2px 6px rgba(43,33,24,0.18));
+  z-index:32;
+}
+
+button.bookmark-tab::after{
+  background:rgba(255,246,232,0.85);
+}
+
+button.bookmark-tab.pulsing::before{
+  border-radius:0 8px 8px 0;
+  box-shadow:0 0 0 0 rgba(181,80,46,0.5);
+  animation:skNavTabPulse 2.2s ease-out infinite;
+}
+
+/* Keep the old trigger's nudge behaviour visually identical while
+   using the shared animation name. */
+button.bookmark-tab{
+  animation:skNavTabNudge 2.4s ease-in-out 1s 3;
+}
+
+@media (prefers-reduced-motion: reduce){
+  button.bookmark-tab{ animation:none; }
+  button.bookmark-tab.pulsing::before{ animation:none; }
+}
+
+/* =========================================================
    Mobile safety note:
    The fixed navigation remains outside normal document flow.
    This prevents page content from shifting when the trigger is
