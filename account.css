@@ -1,6 +1,6 @@
 /* ===================================================================
    SNEHAKOOTA ACCOUNT WIDGET — styles
-   Version: 1  (bump the ?v= on the <link>/<script> tags when you edit
+   Version: 2  (bump the ?v= on the <link>/<script> tags when you edit
    this file, so returning visitors' browsers don't serve a stale copy)
 
    Scoped under #sk-account-root / .ska- prefixed classes so it never
@@ -8,9 +8,25 @@
    --rust / --banyan / --ink / --sky-top / --sky-bottom variables with
    safe fallbacks, same pattern as the game widget's #sk-game-root.
 
-   Position: fixed bottom-LEFT. Deliberately opposite the game
-   launcher (bottom-right desktop / bottom-center mobile) so the two
-   never share a tap zone or visually collide, at any screen width.
+   ================================================================
+   STAGE 2C-2 — FIXED-ELEMENT POSITIONING
+   ---------------------------------------------------------------
+   The account trigger is a separate fixed control from navigation.
+   It deliberately lives at the lower-left, while the navigation
+   trigger lives around the vertical centre of the left edge.
+
+   Shared positioning rule:
+   - Account trigger clears the shared navigation edge strip.
+   - Account trigger stays in the lower-left safe zone.
+   - Account trigger sits BELOW the navigation overlay when the nav
+     panel/backdrop opens, so two controls cannot visually fight.
+   - The account sheet itself remains above overlays when it is open.
+
+   Do not put navigation styles here. Do not put Supabase/auth logic
+   here. This file controls account-widget presentation only.
+   ================================================================
+
+   Position: fixed bottom-left, offset from the shared navigation edge.
    =================================================================== */
 
 #sk-account-root{
@@ -20,13 +36,18 @@
   --ska-ink-soft: var(--ink-soft, #6B5C4C);
   --ska-sky-top: var(--sky-top, #FFF6E8);
   --ska-sky-bottom: var(--sky-bottom, #FDE7C8);
+  --ska-edge-clearance: calc(var(--sk-edge-width, 22px) + var(--sk-nav-trigger-safe-gap, 12px));
   font-family: 'Work Sans', sans-serif;
 }
 
-/* ---- Tray (the small fixed pill, bottom-left) ---- */
+/* ---- Tray (small fixed pill, lower-left; clear of navigation edge) ---- */
 .ska-tray{
-  position: fixed; left: 18px; bottom: 18px; z-index: 55;
-  display: flex; align-items: center;
+  position: fixed;
+  left: var(--ska-edge-clearance, 34px);
+  bottom: 18px;
+  z-index: 25;
+  display: flex;
+  align-items: center;
 }
 .ska-trigger{
   width: 44px; height: 44px; border-radius: 50%;
@@ -60,8 +81,11 @@
 }
 .ska-signed-in .ska-status{ background: var(--ska-banyan); }
 
-@media (max-width: 380px){
-  .ska-tray{ left: 12px; bottom: 12px; }
+@media (max-width:380px){
+  .ska-tray{
+    left: calc(var(--sk-edge-width, 22px) + var(--sk-nav-trigger-safe-gap, 10px));
+    bottom: 12px;
+  }
   .ska-trigger{ width: 40px; height: 40px; }
 }
 
@@ -87,7 +111,7 @@
 }
 .ska-sheet.ska-show{ transform: translateY(0); visibility: visible; pointer-events: auto; }
 
-@media (min-width: 701px){
+@media (min-width:701px){
   .ska-sheet{
     left: 18px; right: auto; bottom: 18px; width: 340px;
     border-radius: 18px; max-height: 70vh;
