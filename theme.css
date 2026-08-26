@@ -1,0 +1,25 @@
+:root{
+  /* SnehaKoota visual palette — shared foundation */
+  --sky-top:    #FFF6E8;
+  --sky-bottom: #FDE7C8;
+  --marigold:   #E29B3F;
+  --rust:       #B5502E;
+  --banyan:     #2F5233;
+  --ink:        #2B2118;
+  --ink-soft:   #6B5C4C;
+  --rose:       #E07A66;
+  --line-idle:  rgba(43,33,24,0.16);
+
+  /* Shared typography tokens */
+  --font-display: 'Fraunces', serif;
+  --font-body: 'Work Sans', sans-serif;
+  --font-kannada: 'Noto Sans Kannada', sans-serif;
+
+  /* Shared component tokens — intentionally additive for now */
+  --sk-radius-sm: 8px;
+  --sk-radius-md: 12px;
+  --sk-radius-lg: 20px;
+  --sk-shadow-soft: 0 3px 8px rgba(43,33,24,0.18);
+  --sk-shadow-panel: 2px 0 18px rgba(0,0,0,0.18);
+  --sk-safe-edge: 22px;
+}
