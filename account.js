@@ -1,14 +1,18 @@
 /* ===================================================================
    SNEHAKOOTA ACCOUNT WIDGET — logic
-   Version: 2
+   Version: 3
 
    The "Continue with Google" button fires the tested Supabase Google
    OAuth flow directly from this widget. signin.html remains available
    as a backup/testing page.
 
-   Passkey authentication is also enabled here. A signed-in user can
-   register a passkey from the account panel, and once registered the
-   "Continue with Passkey" option can sign them in without email/phone.
+   Passkey authentication is also enabled here. The same
+   "Continue with Passkey" action is used in both signed-out and
+   signed-in states:
+     - signed out: authenticate with an existing passkey
+     - signed in: register/add a passkey for the current account
+       on the current device/browser
+   Multiple passkeys can exist on the same Supabase account.
    =================================================================== */
 (function(){
   "use strict";
@@ -32,11 +36,6 @@
       experimental: { passkey: true }
     }
   });
-
-  function currentPage(){
-    var p = location.pathname.split('/').pop();
-    return p && p.length ? p : 'index.html';
-  }
 
   var GOOGLE_ICON =
     '<svg viewBox="0 0 24 24" aria-hidden="true">' +
@@ -64,11 +63,9 @@
       icon: GOOGLE_ICON,
       action: function(btn){
         if (btn) btn.disabled = true;
-
         var redirectTo = window.location.origin + window.location.pathname;
         var message = document.getElementById('skaMessage');
         if (message) message.textContent = 'Google ಮೂಲಕ ಸುರಕ್ಷಿತವಾಗಿ ಸೈನ್ ಇನ್ ಮಾಡಲಾಗುತ್ತಿದೆ…';
-
         supabaseClient.auth.signInWithOAuth({
           provider: 'google',
           options: {
@@ -91,16 +88,13 @@
       icon: PASSKEY_ICON,
       action: function(btn){
         if (btn) btn.disabled = true;
-
         var message = document.getElementById('skaMessage');
         if (message) message.textContent = 'Passkey ಮೂಲಕ ಸುರಕ್ಷಿತವಾಗಿ ಸೈನ್ ಇನ್ ಮಾಡಲಾಗುತ್ತಿದೆ…';
-
         if (!window.PublicKeyCredential || !navigator.credentials) {
           if (message) message.textContent = 'ಈ ಸಾಧನ ಅಥವಾ ಬ್ರೌಸರ್‌ನಲ್ಲಿ Passkey ಬೆಂಬಲವಿಲ್ಲ.';
           if (btn) btn.disabled = false;
           return;
         }
-
         supabaseClient.auth.signInWithPasskey().then(function(res){
           if (res.error) {
             console.error('Passkey sign-in error:', res.error);
@@ -167,22 +161,15 @@
     return m.full_name || m.name || m.user_name || 'SnehaKoota ಸದಸ್ಯ';
   }
 
-  function providerButtonHTML(p){
-    var attrs = 'class="ska-provider-btn ' + p.style + '"';
-    if (p.href) {
-      return '<a ' + attrs + ' href="' + p.href() + '">' + p.icon + '<span>' + p.label + '</span></a>';
-    }
-    return '<button type="button" ' + attrs + ' data-provider="' + p.id + '">' + p.icon + '<span>' + p.label + '</span></button>';
-  }
-
   function renderSignedOut(){
-    var html =
+    body.innerHTML =
       '<div class="ska-avatar" id="skaAvatar">' +
         '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.2"></circle><path d="M5.5 19c.7-3.1 3-4.8 6.5-4.8s5.8 1.7 6.5 4.8"></path></svg>' +
       '</div>' +
       '<p class="ska-note">ಸೈನ್ ಇನ್ ಮಾಡಿದರೆ ನಿಮ್ಮ ಖಾತೆ ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತದೆ.</p>' +
-      '<div class="ska-providers">' + providers.map(providerButtonHTML).join('') + '</div>';
-    body.innerHTML = html;
+      '<div class="ska-providers">' + providers.map(function(p){
+        return '<button type="button" class="ska-provider-btn ' + p.style + '" data-provider="' + p.id + '">' + p.icon + '<span>' + p.label + '</span></button>';
+      }).join('') + '</div>';
 
     body.querySelectorAll('[data-provider]').forEach(function(btn){
       btn.addEventListener('click', function(){
@@ -198,60 +185,38 @@
       '<div class="ska-avatar ska-signed-in" id="skaAvatar">' +
         '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.2"></circle><path d="M5.5 19c.7-3.1 3-4.8 6.5-4.8s5.8 1.7 6.5 4.8"></path></svg>' +
       '</div>' +
-      '<div class="ska-identity">' +
-        '<strong>' + displayName(user) + '</strong>' +
-        '<span>' + (user.email || 'Google ಖಾತೆ') + '</span>' +
-      '</div>' +
-      '<button type="button" class="ska-provider-btn ska-secondary" id="skaRegisterPasskey">' + PASSKEY_ICON + '<span>Set up Passkey</span></button>' +
+      '<div class="ska-identity"><strong>' + displayName(user) + '</strong><span>' + (user.email || 'Google ಖಾತೆ') + '</span></div>' +
+      '<button type="button" class="ska-provider-btn ska-secondary" id="skaRegisterPasskey">' + PASSKEY_ICON + '<span>Continue with Passkey</span></button>' +
       '<button type="button" class="ska-signout-btn" id="skaSignOut">ಸೈನ್ ಔಟ್</button>' +
       '<div class="ska-message" id="skaMessage"></div>';
 
-    var registerPasskeyBtn = document.getElementById('skaRegisterPasskey');
+    var passkeyBtn = document.getElementById('skaRegisterPasskey');
     var signOutBtn = document.getElementById('skaSignOut');
     var message = document.getElementById('skaMessage');
 
-    function showPasskeyReady(){
-      registerPasskeyBtn.innerHTML = PASSKEY_ICON + '<span>Passkey enabled</span>';
-      registerPasskeyBtn.disabled = true;
-      registerPasskeyBtn.setAttribute('aria-label', 'Passkey enabled');
-    }
-
-    /* Supabase can list the passkeys already registered for the current
-       signed-in user. If at least one exists, do not offer "Set up
-       Passkey" again — the account already has a passkey. */
-    if (supabaseClient.auth.passkey && typeof supabaseClient.auth.passkey.list === 'function') {
-      supabaseClient.auth.passkey.list().then(function(res){
-        if (res.error) {
-          console.warn('Passkey list error:', res.error);
-          return;
-        }
-        if (Array.isArray(res.data) && res.data.length > 0) {
-          showPasskeyReady();
-        }
-      }).catch(function(err){
-        console.warn('Passkey list check failed:', err);
-      });
-    }
-
-    registerPasskeyBtn.addEventListener('click', function(){
-      registerPasskeyBtn.disabled = true;
-      message.textContent = 'ಈ ಸಾಧನದಲ್ಲಿ Passkey ಹೊಂದಿಸಲಾಗುತ್ತಿದೆ…';
+    passkeyBtn.addEventListener('click', function(){
+      passkeyBtn.disabled = true;
+      message.textContent = 'Passkey ಹೊಂದಿಸಲಾಗುತ್ತಿದೆ…';
 
       if (!window.PublicKeyCredential || !navigator.credentials) {
         message.textContent = 'ಈ ಸಾಧನ ಅಥವಾ ಬ್ರೌಸರ್‌ನಲ್ಲಿ Passkey ಬೆಂಬಲವಿಲ್ಲ.';
-        registerPasskeyBtn.disabled = false;
+        passkeyBtn.disabled = false;
         return;
       }
 
+      /* Registration is intentionally attempted from the signed-in state.
+         This allows the current device/browser to add another passkey to
+         the same Supabase user even when that account already has passkeys
+         registered on other devices. */
       supabaseClient.auth.registerPasskey().then(function(res){
         if (res.error) {
           console.error('Passkey registration error:', res.error);
           message.textContent = 'Passkey ಹೊಂದಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.';
-          registerPasskeyBtn.disabled = false;
+          passkeyBtn.disabled = false;
           return;
         }
         message.textContent = 'Passkey ಯಶಸ್ವಿಯಾಗಿ ಸೇರಿಸಲಾಗಿದೆ.';
-        showPasskeyReady();
+        passkeyBtn.disabled = false;
       });
     });
 
