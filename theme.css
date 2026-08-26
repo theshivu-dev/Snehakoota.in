@@ -10,16 +10,28 @@
   --rose:       #E07A66;
   --line-idle:  rgba(43,33,24,0.16);
 
+  /* Existing SnehaKoota surface / interaction values */
+  --sk-edge-binding: #F5D9AE;
+  --sk-rust-soft: rgba(181,80,46,0.10);
+  --sk-rust-faint: rgba(181,80,46,0.08);
+  --sk-rust-border: rgba(181,80,46,0.25);
+  --sk-overlay: rgba(43,33,24,0.38);
+  --sk-game-overlay: rgba(43,33,24,0.28);
+
   /* Shared typography tokens */
   --font-display: 'Fraunces', serif;
   --font-body: 'Work Sans', sans-serif;
   --font-kannada: 'Noto Sans Kannada', sans-serif;
 
-  /* Shared component tokens — intentionally additive for now */
+  /* Shared component tokens — additive for now; page-specific styles stay local */
   --sk-radius-sm: 8px;
   --sk-radius-md: 12px;
   --sk-radius-lg: 20px;
+  --sk-radius-pill: 999px;
   --sk-shadow-soft: 0 3px 8px rgba(43,33,24,0.18);
   --sk-shadow-panel: 2px 0 18px rgba(0,0,0,0.18);
+  --sk-shadow-game: 0 10px 30px rgba(43,33,24,0.22);
   --sk-safe-edge: 22px;
+  --sk-edge-width: 22px;
+  --sk-panel-max-width: 300px;
 }
