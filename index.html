@@ -7,7 +7,8 @@
 <meta name="description" content="SnehaKoota — friends beyond friends. A community, on its way.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600&family=Noto+Sans+Kannada:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css?v=1">
 <style>
   :root{
     --sky-top:    #FFF6E8;
@@ -364,7 +365,9 @@
      - Scoped under #sk-game-root and .skg- prefixed classes to avoid
        colliding with host-page CSS.
      - All JS wrapped in an IIFE — no globals leaked.
-     - To reuse on another page: copy this whole block (style + markup +
+       CSS variables (falls back to sensible defaults if not).
+       CSS variables (falls back to sensible defaults if not).
+       To reuse on another page: copy this whole block (style + markup +
        script) and paste before </body>. Nothing else required, as long
        as the host page already defines the same --rust/--banyan/etc.
        CSS variables (falls back to sensible defaults if not).
