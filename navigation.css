@@ -1,0 +1,230 @@
+/* =========================================================
+   SNEHAKOOTA — SHARED NAVIGATION FOUNDATION
+   Stage 2A
+   ---------------------------------------------------------
+   Purpose:
+   - Shared styling for the site navigation panel and its edge trigger.
+   - Uses the existing SnehaKoota visual tokens from theme.css.
+   - Page-specific content and special effects stay outside this file.
+   - Do not place account-widget or game-launcher styling here.
+
+   Integration note:
+   This file is intentionally created before migrating any existing page.
+   That lets us move one page at a time without disturbing the live UI.
+   ========================================================= */
+
+.sk-nav-edge-strip{
+  position:fixed;
+  left:0;
+  top:0;
+  bottom:0;
+  width:var(--sk-edge-width,22px);
+  background:var(--sk-edge-binding,#F5D9AE);
+  border-right:1px solid var(--line-idle,rgba(43,33,24,0.16));
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:space-evenly;
+  z-index:20;
+  cursor:pointer;
+}
+
+.sk-nav-edge-strip .sk-nav-ring{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:rgba(181,80,46,0.4);
+  transition:background .2s, transform .2s;
+}
+
+.sk-nav-edge-strip:hover .sk-nav-ring{
+  background:rgba(181,80,46,0.65);
+}
+
+.sk-nav-backdrop{
+  position:fixed;
+  inset:0;
+  background:var(--sk-overlay,rgba(43,33,24,0.38));
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .25s ease;
+  z-index:30;
+}
+
+body.sk-nav-open .sk-nav-backdrop{
+  opacity:1;
+  pointer-events:auto;
+}
+
+.sk-nav-panel{
+  position:fixed;
+  left:0;
+  top:0;
+  bottom:0;
+  width:76%;
+  max-width:var(--sk-panel-max-width,300px);
+  display:flex;
+  z-index:31;
+  transform:translateX(-100%);
+  transition:transform .28s ease;
+  box-shadow:var(--sk-shadow-panel,2px 0 18px rgba(0,0,0,0.18));
+}
+
+body.sk-nav-open .sk-nav-panel{
+  transform:translateX(0);
+}
+
+.sk-nav-panel .sk-nav-binding{
+  width:var(--sk-edge-width,22px);
+  background:var(--sk-edge-binding,#F5D9AE);
+  border-right:1px solid var(--line-idle,rgba(43,33,24,0.16));
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:space-evenly;
+}
+
+.sk-nav-panel .sk-nav-binding .sk-nav-ring{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:var(--rust,#B5502E);
+}
+
+.sk-nav-panel .sk-nav-body{
+  flex:1;
+  background:var(--sky-bottom,#FDE7C8);
+  padding:1.4rem 1.1rem;
+  display:flex;
+  flex-direction:column;
+  height:100%;
+}
+
+.sk-nav-panel .sk-nav-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:1.6rem;
+  flex-shrink:0;
+}
+
+.sk-nav-panel .sk-nav-brand{
+  font-family:var(--font-display,'Fraunces',serif);
+  font-weight:600;
+  font-size:.95rem;
+}
+
+.sk-nav-panel .sk-nav-brand .sk-nav-sneha{ color:var(--rust,#B5502E); }
+.sk-nav-panel .sk-nav-brand .sk-nav-koota{ color:var(--banyan,#2F5233); }
+
+.sk-nav-panel .sk-nav-close{
+  background:none;
+  border:none;
+  font-size:1.1rem;
+  color:var(--ink-soft,#6B5C4C);
+  cursor:pointer;
+  line-height:1;
+  padding:.3rem;
+  min-width:var(--sk-touch-target,44px);
+  min-height:var(--sk-touch-target,44px);
+}
+
+.sk-nav-links{
+  display:flex;
+  flex-direction:column;
+  gap:.3rem;
+  flex:1;
+  justify-content:center;
+  margin-bottom:8vh;
+}
+
+.sk-nav-links a{
+  display:block;
+  padding:.75rem .85rem;
+  min-height:var(--sk-touch-target,44px);
+  border-radius:10px;
+  text-decoration:none;
+  color:var(--ink,#2B2118);
+  font-size:.95rem;
+  font-family:var(--font-body,'Work Sans',sans-serif);
+}
+
+.sk-nav-links a.active{
+  background:var(--sk-rust-soft,rgba(181,80,46,0.10));
+  color:var(--rust,#B5502E);
+  font-weight:600;
+}
+
+.sk-nav-links a.disabled{
+  color:var(--ink-soft,#6B5C4C);
+  opacity:.55;
+  pointer-events:none;
+}
+
+.sk-nav-links a .sk-nav-tag{
+  font-size:.72rem;
+  margin-left:.4em;
+}
+
+.sk-nav-opener{
+  position:fixed;
+  left:var(--sk-edge-width,22px);
+  top:58vh;
+  width:20px;
+  height:48px;
+  margin-top:-24px;
+  background:var(--rust,#B5502E);
+  border-radius:0 8px 8px 0;
+  box-shadow:var(--sk-shadow-soft,2px 2px 6px rgba(43,33,24,0.18));
+  z-index:32;
+  cursor:pointer;
+  border:none;
+  padding:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  animation:skNavTabNudge 2.4s ease-in-out 1s 3;
+}
+
+.sk-nav-opener::after{
+  content:'';
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:rgba(255,246,232,0.85);
+}
+
+.sk-nav-opener.sk-nav-pulsing::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:0 8px 8px 0;
+  box-shadow:0 0 0 0 rgba(181,80,46,0.5);
+  animation:skNavTabPulse 2.2s ease-out infinite;
+}
+
+@keyframes skNavTabPulse{
+  0%{ box-shadow:0 0 0 0 rgba(181,80,46,0.45); }
+  70%{ box-shadow:0 0 0 10px rgba(181,80,46,0); }
+  100%{ box-shadow:0 0 0 0 rgba(181,80,46,0); }
+}
+
+@keyframes skNavTabNudge{
+  0%,100%{ transform:translateX(0); }
+  10%{ transform:translateX(4px); }
+  20%{ transform:translateX(0); }
+  30%{ transform:translateX(4px); }
+  40%{ transform:translateX(0); }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .sk-nav-opener{ animation:none; }
+  .sk-nav-opener.sk-nav-pulsing::before{ animation:none; }
+}
+
+/* =========================================================
+   Mobile safety note:
+   We deliberately do not reposition the navigation yet.
+   Stage 2B will establish the final fixed-element positioning
+   system after this shared foundation has been reviewed.
+   ========================================================= */
