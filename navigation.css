@@ -1,6 +1,6 @@
 /* =========================================================
    SNEHAKOOTA — SHARED NAVIGATION FOUNDATION
-   Stage 2A
+   Stage 2A / 2B
    ---------------------------------------------------------
    Purpose:
    - Shared styling for the site navigation panel and its edge trigger.
@@ -9,8 +9,8 @@
    - Do not place account-widget or game-launcher styling here.
 
    Integration note:
-   This file is intentionally created before migrating any existing page.
-   That lets us move one page at a time without disturbing the live UI.
+   This file is intentionally shared so pages can adopt navigation
+   one at a time without disturbing page-specific UI.
    ========================================================= */
 
 /* =========================================================
@@ -62,6 +62,9 @@ html::-webkit-scrollbar-button{
   height:0;
 }
 
+/* =========================================================
+   SHARED NAVIGATION PANEL
+   ========================================================= */
 .sk-nav-edge-strip{
   position:fixed;
   left:0;
@@ -215,13 +218,34 @@ body.sk-nav-open .sk-nav-panel{
   margin-left:.4em;
 }
 
+/* =========================================================
+   STAGE 2B — FIXED-ELEMENT POSITIONING FOUNDATION
+   ---------------------------------------------------------
+   This establishes the shared spatial rule for the navigation
+   trigger. Account and game widgets remain independent components.
+
+   Agreed visual rule:
+   - Navigation trigger lives on the left edge.
+   - Its vertical position is centred rather than page-dependent.
+   - It keeps a dedicated tap zone and never becomes part of page flow.
+   - The account widget remains bottom-left and is not moved here.
+   - The future dotted page-progress navigator is a separate component;
+     it is NOT being implemented by this rule.
+   ========================================================= */
+:root{
+  --sk-nav-trigger-top:50vh;
+  --sk-nav-trigger-width:20px;
+  --sk-nav-trigger-height:48px;
+  --sk-nav-trigger-safe-gap:12px;
+}
+
 .sk-nav-opener{
   position:fixed;
   left:var(--sk-edge-width,22px);
-  top:58vh;
-  width:20px;
-  height:48px;
-  margin-top:-24px;
+  top:var(--sk-nav-trigger-top,50vh);
+  width:var(--sk-nav-trigger-width,20px);
+  height:var(--sk-nav-trigger-height,48px);
+  margin-top:calc(var(--sk-nav-trigger-height,48px) / -2);
   background:var(--rust,#B5502E);
   border-radius:0 8px 8px 0;
   box-shadow:var(--sk-shadow-soft,2px 2px 6px rgba(43,33,24,0.18));
@@ -233,6 +257,7 @@ body.sk-nav-open .sk-nav-panel{
   align-items:center;
   justify-content:center;
   animation:skNavTabNudge 2.4s ease-in-out 1s 3;
+  -webkit-tap-highlight-color:transparent;
 }
 
 .sk-nav-opener::after{
@@ -266,6 +291,16 @@ body.sk-nav-open .sk-nav-panel{
   40%{ transform:translateX(0); }
 }
 
+@media (max-width:700px){
+  :root{
+    --sk-nav-trigger-safe-gap:10px;
+  }
+
+  .sk-nav-opener{
+    left:var(--sk-edge-width,22px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce){
   .sk-nav-opener{ animation:none; }
   .sk-nav-opener.sk-nav-pulsing::before{ animation:none; }
@@ -273,7 +308,7 @@ body.sk-nav-open .sk-nav-panel{
 
 /* =========================================================
    Mobile safety note:
-   We deliberately do not reposition the navigation yet.
-   Stage 2B will establish the final fixed-element positioning
-   system after this shared foundation has been reviewed.
+   The fixed navigation remains outside normal document flow.
+   This prevents page content from shifting when the trigger is
+   present and gives us one stable positioning rule for all pages.
    ========================================================= */
