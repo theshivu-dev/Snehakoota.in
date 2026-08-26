@@ -307,6 +307,21 @@ body.sk-nav-open .sk-nav-panel{
 }
 
 /* =========================================================
+   STAGE 2B-1 — LEGACY TRIGGER BRIDGE
+   ---------------------------------------------------------
+   index.html still uses its original .bookmark-tab trigger while
+   the shared navigation markup is introduced page-by-page.
+   This higher-specificity bridge makes that existing trigger obey
+   the same centred 50vh positioning rule without changing its
+   appearance, animation, road artwork, or click behaviour.
+
+   Remove this bridge later when index.html adopts .sk-nav-opener.
+   ========================================================= */
+button.bookmark-tab{
+  top:var(--sk-nav-trigger-top,50vh);
+}
+
+/* =========================================================
    Mobile safety note:
    The fixed navigation remains outside normal document flow.
    This prevents page content from shifting when the trigger is
