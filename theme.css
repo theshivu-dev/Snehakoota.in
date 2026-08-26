@@ -1,5 +1,14 @@
 :root{
-  /* SnehaKoota visual palette — shared foundation */
+  /* =========================================================
+     SNEHAKOOTA — SHARED VISUAL FOUNDATION
+     Stage 2D-1
+     ---------------------------------------------------------
+     This file owns genuinely shared visual tokens only.
+     Page-specific styling remains in the individual page/component
+     stylesheet until that component is deliberately migrated.
+     ========================================================= */
+
+  /* ---- Core SnehaKoota palette ---- */
   --sky-top:    #FFF6E8;
   --sky-bottom: #FDE7C8;
   --marigold:   #E29B3F;
@@ -10,7 +19,7 @@
   --rose:       #E07A66;
   --line-idle:  rgba(43,33,24,0.16);
 
-  /* Existing SnehaKoota surface / interaction values */
+  /* ---- Shared surfaces / interaction ---- */
   --sk-edge-binding: #F5D9AE;
   --sk-rust-soft: rgba(181,80,46,0.10);
   --sk-rust-faint: rgba(181,80,46,0.08);
@@ -18,21 +27,28 @@
   --sk-overlay: rgba(43,33,24,0.38);
   --sk-game-overlay: rgba(43,33,24,0.28);
 
-  /* Shared typography tokens */
+  /* =========================================================
+     STAGE 2D-1 — SHARED TYPOGRAPHY TOKENS
+     ---------------------------------------------------------
+     Keep font-family decisions in one place so future pages can
+     consume the same visual language without copying font stacks.
+     ========================================================= */
   --font-display: 'Fraunces', serif;
   --font-body: 'Work Sans', sans-serif;
   --font-kannada: 'Noto Sans Kannada', sans-serif;
 
-  /* Shared component tokens — additive for now; page-specific styles stay local */
+  /* ---- Shared component geometry ---- */
   --sk-radius-sm: 8px;
   --sk-radius-md: 12px;
   --sk-radius-lg: 20px;
   --sk-radius-pill: 999px;
+
+  /* ---- Shared elevation ---- */
   --sk-shadow-soft: 0 3px 8px rgba(43,33,24,0.18);
   --sk-shadow-panel: 2px 0 18px rgba(0,0,0,0.18);
   --sk-shadow-game: 0 10px 30px rgba(43,33,24,0.22);
 
-  /* Mobile-first layout foundation */
+  /* ---- Mobile-first shared layout primitives ---- */
   --sk-safe-edge: 22px;
   --sk-edge-width: 22px;
   --sk-panel-max-width: 300px;
@@ -43,13 +59,13 @@
   --sk-safe-top: env(safe-area-inset-top, 0px);
 }
 
-/*
-  Stage 1D — mobile-first foundation.
-  These rules are intentionally limited to shared primitives and do not
-  restyle existing page-specific components. Existing page CSS remains
-  the source of truth until each component is migrated in a later stage.
-*/
-
+/* =========================================================
+   STAGE 1D — MOBILE-FIRST SHARED PRIMITIVES
+   ---------------------------------------------------------
+   Retained from the earlier foundation stage.
+   These are deliberately generic and do not restyle existing
+   page-specific components.
+   ========================================================= */
 *, *::before, *::after{
   box-sizing:border-box;
 }
