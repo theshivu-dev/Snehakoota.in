@@ -31,7 +31,45 @@
   --sk-shadow-soft: 0 3px 8px rgba(43,33,24,0.18);
   --sk-shadow-panel: 2px 0 18px rgba(0,0,0,0.18);
   --sk-shadow-game: 0 10px 30px rgba(43,33,24,0.22);
+
+  /* Mobile-first layout foundation */
   --sk-safe-edge: 22px;
   --sk-edge-width: 22px;
   --sk-panel-max-width: 300px;
+  --sk-touch-target: 44px;
+  --sk-mobile-gutter: clamp(16px, 5vw, 28px);
+  --sk-content-max: 640px;
+  --sk-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --sk-safe-top: env(safe-area-inset-top, 0px);
+}
+
+/*
+  Stage 1D — mobile-first foundation.
+  These rules are intentionally limited to shared primitives and do not
+  restyle existing page-specific components. Existing page CSS remains
+  the source of truth until each component is migrated in a later stage.
+*/
+
+*, *::before, *::after{
+  box-sizing:border-box;
+}
+
+img, svg, video, canvas{
+  max-width:100%;
+}
+
+button, a, input, select, textarea{
+  -webkit-tap-highlight-color:transparent;
+}
+
+@media (max-width:480px){
+  :root{
+    --sk-mobile-gutter:16px;
+  }
+}
+
+@media (min-width:721px){
+  :root{
+    --sk-mobile-gutter:28px;
+  }
 }
