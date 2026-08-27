@@ -15,6 +15,15 @@
     .then(html => {
       root.innerHTML = html;
       initialiseFooter(root);
+
+      // Index-only: restore the existing single tile-merge game runtime.
+      // The game repair is loaded only when this page actually contains the game.
+      if (document.getElementById('sk-game-root')) {
+        const script = document.createElement('script');
+        script.src = 'game-repair.js';
+        script.defer = true;
+        document.head.appendChild(script);
+      }
     })
     .catch(error => {
       console.error('SnehaKoota shared footer:', error);
