@@ -84,28 +84,36 @@ html body .edge-strip:hover .ring{background:rgba(181,80,46,0.65)!important;}
 
 /* =========================================================
    STAGE 4B-1 — SIX-DOT NAVIGATION MARK
-   ---------------------------------------------------------
-   The fixed NAV trigger uses a compact 2-column x 3-row
-   six-dot mark. This is the navigation trigger only;
-   it is NOT the future page-progress/section-dot control.
    ========================================================= */
 
 /* =========================================================
    STAGE 4B-2 — OPEN-STATE NAV TRIGGER HANDOFF
-   ---------------------------------------------------------
-   Closed state: six-dot trigger is the visible invitation to open NAV.
-   Open state: the trigger yields to the navigation panel so there is
-   only one obvious navigation surface. It slides/fades away while the
-   panel takes ownership of the left edge.
    ========================================================= */
 button.bookmark-tab{transition:opacity .22s ease,transform .28s ease,visibility .22s ease;}
 body.nav-open button.bookmark-tab{opacity:0;visibility:hidden;pointer-events:none;transform:translateX(-110%);}
-
-/* The shared semantic opener follows the same handoff when used later. */
 body.sk-nav-open .sk-nav-opener{opacity:0;visibility:hidden;pointer-events:none;transform:translateX(-110%);}
+
+/* =========================================================
+   STAGE 4B-3 — MOBILE-SAFE NAV TRIGGER
+   ---------------------------------------------------------
+   The desktop trigger remains visually compact. On small screens,
+   the visible tab gets a slightly larger touch target and a little
+   more vertical presence, while keeping the same six-dot identity.
+   This does not change panel width or account-widget positioning.
+   ========================================================= */
+@media (max-width:700px){
+  :root{
+    --sk-nav-trigger-width:24px;
+    --sk-nav-trigger-height:52px;
+  }
+  button.bookmark-tab{
+    width:var(--sk-nav-trigger-width,24px);
+    height:var(--sk-nav-trigger-height,52px);
+  }
+}
 
 /* =========================================================
    Mobile safety note:
    Fixed navigation remains outside normal document flow.
-   Account and game widgets remain separate components.
+   Account and game styling remain separate components.
    ========================================================= */
