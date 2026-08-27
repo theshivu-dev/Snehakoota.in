@@ -8,165 +8,22 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600&family=Noto+Sans+Kannada:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --sky-top:    #FFF6E8;
-    --sky-bottom: #FDE7C8;
-    --marigold:   #E29B3F;
-    --rust:       #B5502E;
-    --banyan:     #2F5233;
-    --ink:        #2B2118;
-    --ink-soft:   #6B5C4C;
-    --card-line:  rgba(43,33,24,0.10);
-    --panel-bg:   #FDE7C8;
-    --edge-bg:    #F5D9AE;
-  }
-  *{ box-sizing:border-box; }
-  html,body{
-    margin:0; padding:0;
-    background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-bottom) 55%, var(--sky-bottom) 100%);
-    color:var(--ink);
-    font-family:'Noto Sans Kannada','Work Sans', sans-serif;
-    overflow-x:hidden;
-  }
-  body{ padding-left:22px; }
-  a{ color:var(--rust); }
 
-  .edge-strip{
-    position:fixed; left:0; top:0; bottom:0; width:22px;
-    background:var(--edge-bg);
-    border-right:1px solid var(--card-line);
-    display:flex; flex-direction:column; align-items:center; justify-content:space-evenly;
-    z-index:20;
-  }
-  .edge-strip .dot-btn{
-    width:22px; height:22px;
-    display:flex; align-items:center; justify-content:center;
-    background:none; border:none; padding:0; cursor:pointer;
-  }
-  .edge-strip .ring{
-    width:8px; height:8px; border-radius:50%;
-    background:rgba(181,80,46,0.4);
-    transition:background .2s, transform .2s;
-  }
-  .edge-strip .dot-btn:hover .ring{ background:rgba(181,80,46,0.7); }
-  .edge-strip .dot-btn.active .ring{
-    background:var(--rust);
-    transform:scale(1.35);
-  }
-
-  .topbar{
-    position:sticky; top:0; z-index:10;
-    display:flex; align-items:center; justify-content:center;
-    padding:.9rem 5vw;
-    backdrop-filter:blur(10px);
-    background:rgba(255,246,232,0.75);
-    border-bottom:1px solid var(--card-line);
-  }
-  .topbar .brand{ font-family:'Fraunces', serif; font-weight:600; font-size:1rem; text-decoration:none; }
-  .topbar .brand .sneha{ color:var(--rust); }
-  .topbar .brand .koota{ color:var(--banyan); }
-
-  .bookmark-tab{
-    position:fixed; left:22px; top:58vh; width:20px; height:48px; margin-top:-24px;
-    background:var(--rust); border-radius:0 8px 8px 0;
-    box-shadow:2px 2px 6px rgba(43,33,24,0.18);
-    z-index:32; cursor:pointer; border:none; padding:0;
-    display:flex; align-items:center; justify-content:center;
-    animation:tabNudge 2.4s ease-in-out 1s 3;
-  }
-  .bookmark-tab::after{
-    content:''; width:6px; height:6px; border-radius:50%;
-    background:rgba(255,246,232,0.85);
-  }
-  .bookmark-tab.pulsing::before{
-    content:''; position:absolute; inset:0; border-radius:0 8px 8px 0;
-    box-shadow:0 0 0 0 rgba(181,80,46,0.5);
-    animation:tabPulse 2.2s ease-out infinite;
-  }
-  @keyframes tabPulse{
-    0%{ box-shadow:0 0 0 0 rgba(181,80,46,0.45); }
-    70%{ box-shadow:0 0 0 10px rgba(181,80,46,0); }
-    100%{ box-shadow:0 0 0 0 rgba(181,80,46,0); }
-  }
-  @keyframes tabNudge{
-    0%, 100%{ transform:translateX(0); }
-    10%{ transform:translateX(4px); }
-    20%{ transform:translateX(0); }
-    30%{ transform:translateX(4px); }
-    40%{ transform:translateX(0); }
-  }
-  @media (prefers-reduced-motion: reduce){
-    .bookmark-tab{ animation:none; }
-    .bookmark-tab.pulsing::before{ animation:none; }
-  }
-
-  .backdrop{
-    position:fixed; inset:0; background:rgba(43,33,24,0.38);
-    opacity:0; pointer-events:none; transition:opacity .25s ease; z-index:30;
-  }
-  body.nav-open .backdrop{ opacity:1; pointer-events:auto; }
-
-  .side-panel{
-    position:fixed; left:0; top:0; bottom:0; width:76%; max-width:300px;
-    display:flex; z-index:31;
-    transform:translateX(-100%); transition:transform .28s ease;
-    box-shadow:2px 0 18px rgba(0,0,0,0.18);
-  }
-  body.nav-open .side-panel{ transform:translateX(0); }
-  .side-panel .binding{
-    width:22px; background:var(--edge-bg); border-right:1px solid var(--card-line);
-    display:flex; flex-direction:column; align-items:center; justify-content:space-evenly;
-  }
-  .side-panel .binding .ring{ width:8px; height:8px; border-radius:50%; background:var(--rust); }
-  .side-panel .panel-body{ flex:1; background:var(--panel-bg); padding:1.4rem 1.1rem; display:flex; flex-direction:column; height:100%; }
-  .side-panel .panel-top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:1.6rem; flex-shrink:0; }
-  .side-panel .panel-top .brand{ font-family:'Fraunces', serif; font-weight:600; font-size:.95rem; }
-  .side-panel .closer{ background:none; border:none; font-size:1.1rem; color:var(--ink-soft); cursor:pointer; line-height:1; padding:.3rem; }
-  .panel-links{ display:flex; flex-direction:column; gap:.3rem; flex:1; justify-content:center; margin-bottom:8vh; }
-  .panel-links a{
-    display:block; padding:.75rem .85rem; border-radius:10px; text-decoration:none;
-    color:var(--ink); font-size:.95rem; font-family:'Work Sans', sans-serif;
-  }
-  .panel-links a.active{ background:rgba(181,80,46,0.1); color:var(--rust); font-weight:600; }
-  .panel-links a.disabled{ color:var(--ink-soft); opacity:.55; pointer-events:none; }
-  .panel-links a .tag{ font-size:.72rem; margin-left:.4em; }
-
-  .chapter{ position:relative; max-width:640px; margin:0 auto; padding:6vh 6vw; }
-  .chapter + .chapter{ border-top:1px solid var(--card-line); }
-  .chapter:first-of-type{ padding-top:7vh; }
-  .chapter-label{
-    font-family:'Work Sans', sans-serif; font-size:.7rem; font-weight:600;
-    letter-spacing:.14em; text-transform:uppercase; color:var(--banyan); margin-bottom:.6rem;
-  }
-  .chapter h2{ font-family:'Fraunces', serif; font-weight:600; font-size:clamp(1.5rem, 6vw, 2.1rem); margin:0 0 1.3rem; line-height:1.25; }
-  .chapter p{ font-size:1.05rem; line-height:1.9; color:var(--ink-soft); margin:0 0 1.1rem; }
-  .chapter p.lede{ color:var(--ink); font-weight:500; }
-
-  .steps-list{ list-style:none; margin:1.6rem 0 0; padding:0; }
-  .steps-list li{ position:relative; padding-left:1.3rem; margin-bottom:.7rem; font-size:.98rem; color:var(--ink-soft); line-height:1.6; }
-  .steps-list li::before{ content:'—'; position:absolute; left:0; color:var(--marigold); }
-  .steps-list li:last-child{ color:var(--ink); font-weight:500; }
-
-  .way-list{ list-style:none; margin:1.6rem 0 0; padding:0; display:grid; grid-template-columns:1fr 1fr; gap:.6rem; }
-  .way-list li{ background:rgba(255,255,255,0.4); border:1px solid var(--card-line); border-radius:10px; padding:.7rem .85rem; font-size:.92rem; color:var(--ink); text-align:center; }
-
-  .closing{ text-align:center; background:linear-gradient(180deg, transparent 0%, rgba(226,155,63,0.08) 100%); }
-  .closing p{ color:var(--ink); }
-  .cta-wrap{ margin-top:1.6rem; }
-  .cta{
-    display:inline-block; padding:.85em 2.1em; background:var(--rust); color:#FFF6E8;
-    text-decoration:none; font-weight:600; font-size:.92rem; border-radius:999px;
-    border:none; cursor:pointer; font-family:'Work Sans', sans-serif;
-  }
-  .cta-note{ margin-top:.9rem; font-size:.85rem; color:var(--ink-soft); font-style:italic; min-height:1.2em; opacity:0; transition:opacity .3s ease; }
-  .cta-note.show{ opacity:1; }
-
-  footer{ text-align:center; padding:5vh 6vw 6vh; font-size:.8rem; color:var(--ink-soft); opacity:.75; }
-</style>
+<!-- =========================================================
+     STAGE 3B — STORY SHARED FOUNDATION
+     Shared theme/navigation are loaded before Story-specific CSS.
+     ========================================================= -->
+<link rel="stylesheet" href="theme.css?v=5">
+<link rel="stylesheet" href="navigation.css?v=6">
+<link rel="stylesheet" href="story.css?v=1">
 </head>
 <body>
 
+<!-- =========================================================
+     STAGE 3B — STORY-OWNED CHAPTER STRIP
+     Kept local because these dots jump between Story chapters.
+     They are intentionally different from the global site nav.
+     ========================================================= -->
 <div class="edge-strip" id="edgeStrip" aria-label="Jump to chapter">
   <button class="dot-btn" data-target="ch1" aria-label="ಅಧ್ಯಾಯ ೧"><span class="ring"></span></button>
   <button class="dot-btn" data-target="ch2" aria-label="ಅಧ್ಯಾಯ ೨"><span class="ring"></span></button>
@@ -174,29 +31,32 @@
   <button class="dot-btn" data-target="ch4" aria-label="ಅಧ್ಯಾಯ ೪"><span class="ring"></span></button>
 </div>
 
-<div class="backdrop" id="backdrop"></div>
+<div data-sk-nav-root>
+  <!-- Stage 3B: shared navigation backdrop/panel/trigger -->
+  <div class="sk-nav-backdrop" data-sk-nav-backdrop></div>
 
-<nav class="side-panel" aria-hidden="true">
-  <div class="binding">
-    <span class="ring"></span><span class="ring"></span><span class="ring"></span>
-    <span class="ring"></span><span class="ring"></span><span class="ring"></span><span class="ring"></span>
-  </div>
-  <div class="panel-body">
-    <div class="panel-top">
-      <span class="brand"><span class="sneha" style="color:var(--rust);">ಸ್ನೇಹ</span><span class="koota" style="color:var(--banyan);">ಕೂಟ</span></span>
-      <button class="closer" id="closer" aria-label="Close menu">&#10005;</button>
+  <nav class="sk-nav-panel" data-sk-nav-panel aria-hidden="true">
+    <div class="sk-nav-binding">
+      <span class="sk-nav-ring"></span><span class="sk-nav-ring"></span><span class="sk-nav-ring"></span>
+      <span class="sk-nav-ring"></span><span class="sk-nav-ring"></span><span class="sk-nav-ring"></span><span class="sk-nav-ring"></span>
     </div>
-    <div class="panel-links">
-      <a href="index.html">ಸ್ನೇಹಕೂಟ</a>
-      <a href="story.html" class="active">ಪಯಣ</a>
-      <a href="samparka.html">ಸ್ನೇಹಸಂಪರ್ಕ</a>
-      <a href="#" class="disabled">Gallery <span class="tag">(soon)</span></a>
-      <a href="#" class="disabled">Contact <span class="tag">(soon)</span></a>
+    <div class="sk-nav-body">
+      <div class="sk-nav-top">
+        <span class="sk-nav-brand"><span class="sk-nav-sneha">ಸ್ನೇಹ</span><span class="sk-nav-koota">ಕೂಟ</span></span>
+        <button class="sk-nav-close" data-sk-nav-close aria-label="Close menu">&#10005;</button>
+      </div>
+      <div class="sk-nav-links">
+        <a href="index.html">ಸ್ನೇಹಕೂಟ</a>
+        <a href="story.html" class="active">ಪಯಣ</a>
+        <a href="samparka.html">ಸ್ನೇಹಸಂಪರ್ಕ</a>
+        <a href="#" class="disabled">Gallery <span class="sk-nav-tag">(soon)</span></a>
+        <a href="#" class="disabled">Contact <span class="sk-nav-tag">(soon)</span></a>
+      </div>
     </div>
-  </div>
-</nav>
+  </nav>
 
-<button class="bookmark-tab pulsing" id="opener" aria-label="Open menu" role="button" tabindex="0"></button>
+  <button class="sk-nav-opener sk-nav-pulsing" data-sk-nav-opener aria-label="Open menu" aria-expanded="false"></button>
+</div>
 
 <header class="topbar">
   <a href="index.html" class="brand"><span class="sneha">Sneha</span><span class="koota">Koota</span></a>
@@ -277,25 +137,16 @@
 </footer>
 
 <script>
+  /* =========================================================
+     STAGE 3B — STORY PAGE SCRIPT
+     Shared navigation behaviour is owned by navigation.js.
+     This script keeps only Story-specific behaviour.
+     ========================================================= */
   document.getElementById('year').textContent = new Date().getFullYear();
 
-  const body = document.body;
-  const openNav = () => body.classList.add('nav-open');
-  const closeNav = () => body.classList.remove('nav-open');
-  const toggleNav = () => body.classList.toggle('nav-open');
-
-  const openerBtn = document.getElementById('opener');
-  openerBtn.addEventListener('click', () => {
-    toggleNav();
-    openerBtn.classList.remove('pulsing');
-  });
-  openerBtn.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') { toggleNav(); openerBtn.classList.remove('pulsing'); }
-  });
-  document.getElementById('closer').addEventListener('click', closeNav);
-  document.getElementById('backdrop').addEventListener('click', closeNav);
-
   const dotBtns = document.querySelectorAll('.dot-btn');
+  const chapters = ['ch1','ch2','ch3','ch4'].map(id => document.getElementById(id));
+
   dotBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       const target = document.getElementById(btn.dataset.target);
@@ -303,23 +154,28 @@
     });
   });
 
-  const chapters = ['ch1','ch2','ch3','ch4'].map(id => document.getElementById(id));
   const setActive = (id) => {
     dotBtns.forEach(b => b.classList.toggle('active', b.dataset.target === id));
   };
+
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) setActive(entry.target.id);
     });
   }, { rootMargin: '-40% 0px -50% 0px', threshold: 0 });
+
   chapters.forEach(ch => { if (ch) observer.observe(ch); });
 
   const interestBtn = document.getElementById('interestBtn');
   const interestNote = document.getElementById('interestNote');
+
   interestBtn.addEventListener('click', () => {
     interestNote.classList.add('show');
   });
 </script>
+
+<!-- Stage 3B: shared navigation controller -->
+<script src="navigation.js?v=1" defer></script>
 <div id="sk-account-root"></div>
 <link rel="stylesheet" href="account.css?v=1">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
