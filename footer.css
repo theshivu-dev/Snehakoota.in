@@ -5,8 +5,8 @@
 
 .sk-footer {
   position: relative;
-  margin-top: 4rem;
-  padding: 2.25rem 1.25rem 1.6rem;
+  margin-top: 2rem;
+  padding: 1.125rem 1.25rem .8rem;
   background: linear-gradient(180deg, #FDE7C8 0%, #F5D9AE 100%);
   border-top: 1px solid rgba(43,33,24,.12);
   color: var(--ink, #2B2118);
@@ -44,7 +44,7 @@
 .sk-footer-brand .sk-footer-koota { color: var(--banyan, #2F5233); }
 
 .sk-footer-tagline {
-  margin: .55rem auto 1.35rem;
+  margin: .275rem auto .675rem;
   max-width: 520px;
   color: var(--ink-soft, #6B5C4C);
   font-family: var(--font-body, 'Work Sans', sans-serif);
@@ -56,14 +56,14 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: .85rem;
+  gap: .425rem;
   flex-wrap: wrap;
 }
 
 .sk-footer-links button {
   appearance: none;
   border: 0;
-  padding: .3rem .15rem;
+  padding: .15rem .15rem;
   background: transparent;
   color: var(--ink, #2B2118);
   font: inherit;
@@ -86,7 +86,7 @@
 }
 
 .sk-footer-copy {
-  margin: 1.35rem 0 0;
+  margin: .675rem 0 0;
   color: rgba(43,33,24,.5);
   font-size: .7rem;
   line-height: 1.4;
@@ -194,11 +194,11 @@ body.sk-footer-modal-open { overflow: hidden; }
 
 @media (max-width: 600px) {
   .sk-footer {
-    margin-top: 3rem;
-    padding: 2rem 1rem 1.35rem;
+    margin-top: 1.5rem;
+    padding: 1rem 1rem .675rem;
   }
 
-  .sk-footer-links { gap: .65rem; }
+  .sk-footer-links { gap: .325rem; }
 
   .sk-footer-modal {
     width: calc(100vw - 24px);
