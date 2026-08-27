@@ -1,6 +1,6 @@
 /* ===================================================================
    SNEHAKOOTA ACCOUNT WIDGET — styles
-   Version: 2  (bump the ?v= on the <link>/<script> tags when you edit
+   Version: 3  (bump the ?v= on the <link>/<script> tags when you edit
    this file, so returning visitors' browsers don't serve a stale copy)
 
    Scoped under #sk-account-root / .ska- prefixed classes so it never
@@ -8,25 +8,9 @@
    --rust / --banyan / --ink / --sky-top / --sky-bottom variables with
    safe fallbacks, same pattern as the game widget's #sk-game-root.
 
-   ================================================================
-   STAGE 2C-2 — FIXED-ELEMENT POSITIONING
-   ---------------------------------------------------------------
-   The account trigger is a separate fixed control from navigation.
-   It deliberately lives at the lower-left, while the navigation
-   trigger lives around the vertical centre of the left edge.
-
-   Shared positioning rule:
-   - Account trigger clears the shared navigation edge strip.
-   - Account trigger stays in the lower-left safe zone.
-   - Account trigger sits BELOW the navigation overlay when the nav
-     panel/backdrop opens, so two controls cannot visually fight.
-   - The account sheet itself remains above overlays when it is open.
-
-   Do not put navigation styles here. Do not put Supabase/auth logic
-   here. This file controls account-widget presentation only.
-   ================================================================
-
-   Position: fixed bottom-left, offset from the shared navigation edge.
+   Account-1 — Visual alignment with the settled OneHaveri account UI.
+   This file controls presentation only. Authentication behaviour remains
+   in account.js.
    =================================================================== */
 
 #sk-account-root{
@@ -40,7 +24,7 @@
   font-family: 'Work Sans', sans-serif;
 }
 
-/* ---- Tray (small fixed pill, lower-left; clear of navigation edge) ---- */
+/* ---- Account trigger: small fixed pill, lower-left ---- */
 .ska-tray{
   position: fixed;
   left: var(--ska-edge-clearance, 34px);
@@ -50,131 +34,300 @@
   align-items: center;
 }
 .ska-trigger{
-  width: 44px; height: 44px; border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
   border: 1px solid rgba(43,33,24,0.14);
-  background: var(--ska-sky-top);
+  background: rgba(255,246,232,0.96);
   box-shadow: 0 4px 14px rgba(43,33,24,0.14);
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
   -webkit-tap-highlight-color: transparent;
-  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease;
 }
-.ska-trigger:hover, .ska-trigger:focus-visible{
+.ska-trigger:hover,
+.ska-trigger:focus-visible{
   transform: translateY(-1px);
   box-shadow: 0 7px 18px rgba(43,33,24,0.18);
   outline: none;
 }
 .ska-trigger.ska-signed-in{
-  border-color: rgba(47,82,51,0.3);
-  background: rgba(47,82,51,0.08);
+  border-color: rgba(47,82,51,0.30);
+  background: rgba(47,82,51,0.09);
 }
-.ska-icon{ position: relative; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; }
+.ska-icon{
+  position: relative;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .ska-icon svg{
-  width: 21px; height: 21px; fill: none; stroke: var(--ska-ink-soft);
-  stroke-width: 1.65; stroke-linecap: round; stroke-linejoin: round;
+  width: 21px;
+  height: 21px;
+  fill: none;
+  stroke: var(--ska-rust);
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
-.ska-signed-in .ska-icon svg{ stroke: var(--ska-banyan); }
+.ska-signed-in .ska-icon svg{
+  fill: var(--ska-banyan);
+  stroke: var(--ska-banyan);
+}
 .ska-status{
-  position: absolute; right: -2px; bottom: -1px; width: 9px; height: 9px;
-  border-radius: 50%; background: var(--ska-ink-soft);
+  position: absolute;
+  right: -2px;
+  bottom: -1px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ska-rust);
   border: 2px solid var(--ska-sky-top);
 }
-.ska-signed-in .ska-status{ background: var(--ska-banyan); }
+.ska-signed-in .ska-status{
+  background: var(--ska-banyan);
+}
 
 @media (max-width:380px){
   .ska-tray{
     left: calc(var(--sk-edge-width, 22px) + var(--sk-nav-trigger-safe-gap, 10px));
     bottom: 12px;
   }
-  .ska-trigger{ width: 40px; height: 40px; }
+  .ska-trigger{
+    width: 40px;
+    height: 40px;
+  }
 }
 
 /* ---- Backdrop ---- */
 .ska-backdrop{
-  position: fixed; inset: 0; background: rgba(43,33,24,0.32);
-  opacity: 0; pointer-events: none; transition: opacity .22s ease; z-index: 56;
+  position: fixed;
+  inset: 0;
+  background: rgba(43,33,24,0.35);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .22s ease;
+  z-index: 56;
+  backdrop-filter: blur(3px);
 }
-.ska-backdrop.ska-show{ opacity: 1; pointer-events: auto; }
+.ska-backdrop.ska-show{
+  opacity: 1;
+  pointer-events: auto;
+}
 
-/* ---- Bottom sheet ---- */
+/* ---- Account panel: OneHaveri-style floating card ---- */
 .ska-sheet{
-  position: fixed; left: 0; right: 0; bottom: 0; z-index: 57;
-  background: var(--ska-sky-top);
-  border-top: 1px solid rgba(43,33,24,0.14);
-  border-radius: 18px 18px 0 0;
-  box-shadow: 0 -10px 30px rgba(43,33,24,0.22);
-  max-height: 78vh; overflow-y: auto;
-  transform: translateY(100%);
-  visibility: hidden; pointer-events: none;
-  transition: transform .28s ease, visibility .28s;
+  position: fixed;
+  left: 50%;
+  right: auto;
+  bottom: 18px;
+  z-index: 57;
+  width: min(420px, calc(100vw - 36px));
+  max-height: 78vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+  background: #FFFCF5;
+  border: 1px solid rgba(181,80,46,0.15);
+  border-radius: 22px;
+  box-shadow: 0 20px 60px rgba(43,33,24,0.25);
+  transform: translate(-50%, calc(100% + 24px));
+  visibility: hidden;
+  pointer-events: none;
+  transition: transform .25s ease, visibility .25s;
   padding-bottom: env(safe-area-inset-bottom, 0);
 }
-.ska-sheet.ska-show{ transform: translateY(0); visibility: visible; pointer-events: auto; }
-
-@media (min-width:701px){
-  .ska-sheet{
-    left: 18px; right: auto; bottom: 18px; width: 340px;
-    border-radius: 18px; max-height: 70vh;
-  }
+.ska-sheet.ska-show{
+  transform: translate(-50%, 0);
+  visibility: visible;
+  pointer-events: auto;
 }
 
 .ska-sheet-top{
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 1rem 1.1rem .8rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.05rem 1.2rem .75rem;
 }
-.ska-sheet-title{ font-family: 'Fraunces', serif; font-weight: 600; font-size: .95rem; color: var(--ska-ink); }
+.ska-sheet-title{
+  font-family: 'Work Sans', sans-serif;
+  font-weight: 800;
+  font-size: .72rem;
+  letter-spacing: 1.45px;
+  text-transform: uppercase;
+  color: var(--ska-rust);
+}
 .ska-close{
-  width: 28px; height: 28px; border-radius: 50%; border: none;
-  background: rgba(181,80,46,0.1); color: var(--ska-ink-soft);
-  cursor: pointer; font-size: .85rem;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 0;
+  background: rgba(181,80,46,0.08);
+  color: var(--ska-ink-soft);
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .18s ease, transform .18s ease;
+}
+.ska-close:hover,
+.ska-close:focus-visible{
+  background: rgba(181,80,46,0.13);
+  transform: scale(1.03);
+  outline: none;
 }
 
-.ska-sheet-body{ padding: 0 1.1rem 1.3rem; }
+.ska-sheet-body{
+  padding: 0 1.2rem 1.2rem;
+}
 
-/* ---- Signed-out state ---- */
+/* ---- Signed-out / signed-in identity avatar ---- */
 .ska-avatar{
-  width: 48px; height: 48px; border-radius: 50%;
-  background: rgba(181,80,46,0.1);
-  display: flex; align-items: center; justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(181,80,46,0.10);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-bottom: .9rem;
 }
-.ska-avatar svg{ width: 26px; height: 26px; fill: none; stroke: var(--ska-rust); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-.ska-avatar.ska-signed-in{ background: rgba(47,82,51,0.1); }
-.ska-avatar.ska-signed-in svg{ stroke: var(--ska-banyan); }
-
-.ska-note{ font-size: .84rem; color: var(--ska-ink-soft); line-height: 1.6; margin: 0 0 1.1rem; }
-
-/* ---- Provider buttons (data-driven — see account.js providers list) ---- */
-.ska-providers{ display: flex; flex-direction: column; gap: .6rem; }
-.ska-provider-btn{
-  width: 100%; border-radius: 999px; padding: .82rem 1.1rem;
-  display: flex; align-items: center; justify-content: center; gap: .65rem;
-  font: 600 .88rem 'Work Sans', sans-serif;
-  text-decoration: none; cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  transition: transform .15s ease, box-shadow .15s ease;
+.ska-avatar svg{
+  width: 26px;
+  height: 26px;
+  fill: none;
+  stroke: var(--ska-rust);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
-.ska-provider-btn:hover{ transform: translateY(-1px); }
+.ska-avatar.ska-signed-in{
+  background: rgba(47,82,51,0.10);
+}
+.ska-avatar.ska-signed-in svg{
+  fill: var(--ska-banyan);
+  stroke: var(--ska-banyan);
+}
+
+.ska-note{
+  font-size: .84rem;
+  color: var(--ska-ink-soft);
+  line-height: 1.55;
+  margin: 0 0 1.1rem;
+}
+
+/* ---- Provider buttons: same hierarchy as OneHaveri reference ---- */
+.ska-providers{
+  display: flex;
+  flex-direction: column;
+  gap: .6rem;
+}
+.ska-provider-btn{
+  width: 100%;
+  border-radius: 12px;
+  padding: .82rem 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .65rem;
+  font: 700 .88rem 'Work Sans', sans-serif;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background .2s ease, transform .1s ease, box-shadow .15s ease;
+  box-sizing: border-box;
+}
+.ska-provider-btn:hover{
+  transform: translateY(-1px);
+}
+.ska-provider-btn:active{
+  transform: scale(.98);
+}
 .ska-provider-btn.ska-primary{
-  background: #fff; color: var(--ska-ink);
-  border: 1px solid rgba(43,33,24,0.16);
-  box-shadow: 0 2px 8px rgba(43,33,24,0.06);
+  background: #fff;
+  color: var(--ska-ink);
+  border: 1px solid rgba(181,80,46,0.20);
+  box-shadow: 0 2px 8px rgba(43,33,24,0.04);
+}
+.ska-provider-btn.ska-primary:hover{
+  background: rgba(181,80,46,0.04);
 }
 .ska-provider-btn.ska-secondary{
-  background: none; color: var(--ska-ink);
-  border: 1px solid rgba(43,33,24,0.22);
+  background: var(--ska-rust);
+  color: #fff;
+  border: 0;
+  box-shadow: 0 5px 14px rgba(181,80,46,0.18);
 }
-.ska-provider-btn img, .ska-provider-btn svg{ width: 18px; height: 18px; flex-shrink: 0; }
+.ska-provider-btn.ska-secondary:hover{
+  background: #9f4528;
+}
+.ska-provider-btn img,
+.ska-provider-btn svg{
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
 
-/* ---- Signed-in state ---- */
-.ska-identity{ margin-bottom: 1rem; }
-.ska-identity strong{ display: block; font-family: 'Fraunces', serif; font-size: 1rem; font-weight: 600; color: var(--ska-ink); }
-.ska-identity span{ font-size: .8rem; color: var(--ska-ink-soft); }
+/* ---- Signed-in state: show name, retain email in JS for future use ---- */
+.ska-identity{
+  margin-bottom: 1rem;
+}
+.ska-identity strong{
+  display: block;
+  margin: 0;
+  font-family: 'Work Sans', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--ska-ink);
+}
+.ska-identity span{
+  display: none;
+}
 .ska-signout-btn{
-  width: 100%; border-radius: 999px; padding: .78rem;
-  background: none; border: 1px solid rgba(181,80,46,0.3); color: var(--ska-rust);
-  font: 600 .86rem 'Work Sans', sans-serif; cursor: pointer;
+  width: 100%;
+  border-radius: 12px;
+  padding: .78rem;
+  background: transparent;
+  border: 1px solid rgba(181,80,46,0.20);
+  color: var(--ska-rust);
+  font: 700 .86rem 'Work Sans', sans-serif;
+  cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  transition: background .2s ease, transform .1s ease;
+}
+.ska-signout-btn:hover{
+  background: rgba(181,80,46,0.05);
+}
+.ska-signout-btn:active{
+  transform: scale(.98);
 }
 
-.ska-message{ min-height: 1.2em; margin-top: .8rem; font-size: .78rem; color: var(--ska-rust); }
+.ska-message{
+  min-height: 1.2em;
+  margin-top: .8rem;
+  font-size: .78rem;
+  line-height: 1.4;
+  color: var(--ska-rust);
+  text-align: center;
+}
+
+@media (max-width:520px){
+  .ska-sheet{
+    width: calc(100vw - 28px);
+    bottom: 14px;
+  }
+  .ska-sheet-top{
+    padding-left: 1.1rem;
+    padding-right: 1.1rem;
+  }
+  .ska-sheet-body{
+    padding-left: 1.1rem;
+    padding-right: 1.1rem;
+  }
+}
