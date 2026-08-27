@@ -1,16 +1,33 @@
 /* =========================================================
    SNEHAKOOTA — SHARED NAVIGATION FOUNDATION
-   Stage 2A / 2B
+   Stage 2A / 2B / 2E-1
    ---------------------------------------------------------
    Purpose:
-   - Shared styling for the site navigation panel and its edge trigger.
-   - Uses the existing SnehaKoota visual tokens from theme.css.
-   - Page-specific content and special effects stay outside this file.
-   - Do not place account-widget or game-launcher styling here.
+   - Shared styling for site navigation.
+   - Reusable by future pages without depending on Index-only layout.
+   - Legacy Index selectors remain temporarily supported during migration.
+   - Page-specific content/effects stay outside this file.
+   - Account and game styling stay outside this file.
+   ========================================================= */
 
-   Integration note:
-   This file is intentionally shared so pages can adopt navigation
-   one at a time without disturbing page-specific UI.
+/* =========================================================
+   STAGE 2E-1 — REUSABLE NAVIGATION COMPONENT CONTRACT
+   ---------------------------------------------------------
+   Future pages should use the semantic sk-nav-* classes below.
+   Legacy .edge-strip / .backdrop / .side-panel markup remains supported
+   for Index until that page is deliberately migrated.
+
+   Component boundary:
+   - navigation.css owns navigation presentation and fixed geometry.
+   - navigation.js owns navigation interaction when a page opts into it.
+   - page CSS owns page content and special visual effects.
+   - account.css/account.js remain separate.
+
+   A page does NOT need to reproduce Index's .stage, .paths, game widget,
+   or any other Index-specific structure in order to use navigation.
+
+   This contract is intentionally CSS-only in this step: no other HTML page
+   is modified and no new navigation behaviour is introduced.
    ========================================================= */
 
 /* =========================================================
@@ -87,21 +104,6 @@ html body .panel-links a.active{background:var(--sk-rust-soft,rgba(181,80,46,0.1
 
 /* =========================================================
    STAGE 2B-4 — LEGACY EDGE STRIP SHARED-STYLE ADAPTER
-   ---------------------------------------------------------
-   index.html still owns the original .edge-strip markup.
-   This adapter moves its visual ownership into this shared file
-   while preserving the current HTML, click behaviour, dots, width,
-   and fixed position.
-
-   The old .edge-strip CSS can now be removed from index.html in a
-   later cleanup step without changing the visible navigation.
-
-   SAFETY:
-   - No road/path SVG changes.
-   - No account/Supabase changes.
-   - No game-launcher changes.
-   - No navigation.js changes.
-   - No dotted page-progress navigator yet.
    ========================================================= */
 html body .edge-strip{position:fixed!important;left:0!important;top:0!important;bottom:0!important;width:var(--sk-edge-width,22px)!important;background:var(--sk-edge-binding,#F5D9AE)!important;border-right:1px solid var(--line-idle,rgba(43,33,24,0.16))!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:space-evenly!important;z-index:20!important;cursor:pointer!important;}
 html body .edge-strip .ring{width:8px!important;height:8px!important;border-radius:50%!important;background:rgba(181,80,46,0.4)!important;transition:background .2s,transform .2s!important;}
