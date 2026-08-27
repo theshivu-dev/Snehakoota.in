@@ -83,7 +83,7 @@
     },
     {
       id: 'passkey',
-      label: 'Continue with Passkey (Account must exist)',
+      label: 'Sign in with passkey',
       style: 'ska-secondary',
       icon: PASSKEY_ICON,
       action: function(btn){
@@ -115,7 +115,7 @@
   mount.innerHTML =
     '<div class="ska-backdrop" id="skaBackdrop"></div>' +
     '<div class="ska-tray" id="skaTray">' +
-      '<button class="ska-trigger" id="skaTrigger" type="button" aria-label="ಖಾತೆ" aria-expanded="false" aria-controls="skaSheet">' +
+      '<button class="ska-trigger" id="skaTrigger" type="button" aria-label="Account" aria-expanded="false" aria-controls="skaSheet">' +
         '<span class="ska-icon" id="skaIcon">' +
           '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.2"></circle><path d="M5.5 19c.7-3.1 3-4.8 6.5-4.8s5.8 1.7 6.5 4.8"></path></svg>' +
           '<span class="ska-status" id="skaStatus"></span>' +
@@ -124,7 +124,7 @@
     '</div>' +
     '<div class="ska-sheet" id="skaSheet" role="dialog" aria-modal="true" aria-hidden="true">' +
       '<div class="ska-sheet-top">' +
-        '<span class="ska-sheet-title">ನನ್ನ ಖಾತೆ</span>' +
+        '<span class="ska-sheet-title">SnehaKoota Account</span>' +
         '<button class="ska-close" id="skaClose" type="button" aria-label="Close">&#10005;</button>' +
       '</div>' +
       '<div class="ska-sheet-body" id="skaBody"></div>' +
@@ -158,18 +158,17 @@
 
   function displayName(user){
     var m = (user && user.user_metadata) || {};
-    return m.full_name || m.name || m.user_name || 'SnehaKoota ಸದಸ್ಯ';
+    return m.full_name || m.name || m.user_name || 'SnehaKoota Member';
   }
 
   function renderSignedOut(){
     body.innerHTML =
-      '<div class="ska-avatar" id="skaAvatar">' +
-        '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.2"></circle><path d="M5.5 19c.7-3.1 3-4.8 6.5-4.8s5.8 1.7 6.5 4.8"></path></svg>' +
-      '</div>' +
-      '<p class="ska-note">ಸೈನ್ ಇನ್ ಮಾಡಿದರೆ ನಿಮ್ಮ ಖಾತೆ ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತದೆ.</p>' +
+      '<h3 class="ska-auth-title">Sign in to SnehaKoota</h3>' +
+      '<p class="ska-auth-sub">Save your contributions and come back anytime.</p>' +
       '<div class="ska-providers">' + providers.map(function(p){
         return '<button type="button" class="ska-provider-btn ' + p.style + '" data-provider="' + p.id + '">' + p.icon + '<span>' + p.label + '</span></button>';
-      }).join('') + '</div>';
+      }).join('') + '</div>' +
+      '<div class="ska-message" id="skaMessage"></div>';
 
     body.querySelectorAll('[data-provider]').forEach(function(btn){
       btn.addEventListener('click', function(){
@@ -182,12 +181,10 @@
   function renderSignedIn(session){
     var user = session.user;
     body.innerHTML =
-      '<div class="ska-avatar ska-signed-in" id="skaAvatar">' +
-        '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.2"></circle><path d="M5.5 19c.7-3.1 3-4.8 6.5-4.8s5.8 1.7 6.5 4.8"></path></svg>' +
-      '</div>' +
-      '<div class="ska-identity"><strong>' + displayName(user) + '</strong><span>' + (user.email || 'Google ಖಾತೆ') + '</span></div>' +
-      '<button type="button" class="ska-provider-btn ska-secondary" id="skaRegisterPasskey">' + PASSKEY_ICON + '<span>Continue with Passkey</span></button>' +
-      '<button type="button" class="ska-signout-btn" id="skaSignOut">ಸೈನ್ ಔಟ್</button>' +
+      '<h3 class="ska-auth-title">Signed in</h3>' +
+      '<div class="ska-identity"><strong>' + displayName(user) + '</strong><span>' + (user.email || 'Google account') + '</span></div>' +
+      '<button type="button" class="ska-provider-btn ska-secondary" id="skaRegisterPasskey">' + PASSKEY_ICON + '<span>Add a passkey to this device</span></button>' +
+      '<button type="button" class="ska-signout-btn" id="skaSignOut">Sign out</button>' +
       '<div class="ska-message" id="skaMessage"></div>';
 
     var passkeyBtn = document.getElementById('skaRegisterPasskey');
