@@ -1,28 +1,10 @@
 /* =========================================================
    SNEHAKOOTA — SHARED NAVIGATION FOUNDATION
-   Stage 2A / 4C-3
-   ---------------------------------------------------------
-   Purpose:
-   - One small, reusable controller for the site navigation panel.
-   - Handles open / close / keyboard access only.
-   - Does NOT handle authentication, account state, memberships,
-     Supabase, page authorization, or page-specific behaviour.
-
-   Security rule:
-   Frontend navigation visibility is never a security boundary.
-   Protected content must still be enforced by the application/data layer.
+   Stage 2A / 4C-3 / 4D-1
    ========================================================= */
 (function(){
   'use strict';
 
-  /* =========================================================
-     STAGE 4C-3 — COLLECTIONS COMING-SOON NAVIGATION
-     ---------------------------------------------------------
-     Collections is intentionally only a navigation placeholder today.
-     No real Collection pages or content are created by this step.
-     The small expandable list gives us the future UI shape without
-     pretending those destinations already exist.
-     ========================================================= */
   function addCollections(root){
     var links = root.querySelector('.sk-nav-links');
     if (!links || links.querySelector('[data-sk-collections]')) return;
@@ -37,7 +19,6 @@
     button.setAttribute('aria-controls', 'sk-collections-soon');
     button.style.cssText = 'width:100%;display:flex;align-items:center;min-height:44px;padding:.62rem .75rem;border-radius:10px;border:1px solid transparent;background:transparent;color:var(--ink,#2B2118);font:inherit;font-size:.95rem;line-height:1.25;text-align:left;cursor:pointer;transition:background .18s ease,color .18s ease,border-color .18s ease;';
 
-    /* Same simple line-style visual language as the Stage 4C-2 icons. */
     var icon = document.createElement('span');
     icon.setAttribute('aria-hidden', 'true');
     icon.textContent = '▣';
@@ -86,6 +67,47 @@
     links.appendChild(item);
   }
 
+  function isolatePageChrome(){
+    /* Samparka's vertical dots are page-progress controls, not NAV. */
+    var edge = document.querySelector('.edge-strip');
+    if (edge){
+      edge.querySelectorAll('.dot-btn').forEach(function(btn){
+        btn.style.setProperty('appearance','none','important');
+        btn.style.setProperty('-webkit-appearance','none','important');
+        btn.style.setProperty('border','0','important');
+        btn.style.setProperty('outline','0','important');
+        btn.style.setProperty('background','transparent','important');
+        btn.style.setProperty('box-shadow','none','important');
+        btn.style.setProperty('padding','0','important');
+        btn.style.setProperty('margin','0','important');
+        btn.style.setProperty('width','10px','important');
+        btn.style.setProperty('height','10px','important');
+        btn.style.setProperty('min-width','10px','important');
+        btn.style.setProperty('min-height','10px','important');
+        btn.style.setProperty('border-radius','50%','important');
+        btn.style.setProperty('display','flex','important');
+        btn.style.setProperty('align-items','center','important');
+        btn.style.setProperty('justify-content','center','important');
+      });
+      edge.querySelectorAll('.dot-btn .ring').forEach(function(ring){
+        ring.style.setProperty('width','8px','important');
+        ring.style.setProperty('height','8px','important');
+        ring.style.setProperty('border-radius','50%','important');
+        ring.style.setProperty('background','rgba(181,80,46,.40)','important');
+        ring.style.setProperty('display','block','important');
+        ring.style.setProperty('border','0','important');
+        ring.style.setProperty('box-shadow','none','important');
+      });
+    }
+
+    /* Samparka's top brand is a page link, not a NAV row. */
+    var brand = document.querySelector('.topbar .brand');
+    if (brand){
+      brand.style.setProperty('text-decoration','none','important');
+      brand.style.setProperty('color','var(--rust,#B5502E)','important');
+    }
+  }
+
   function init(root){
     if (!root || root.dataset.skNavReady === 'true') return;
 
@@ -130,6 +152,7 @@
   }
 
   function boot(){
+    isolatePageChrome();
     document.querySelectorAll('[data-sk-nav-root]').forEach(init);
   }
 
