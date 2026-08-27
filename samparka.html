@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600&family=Noto+Sans+Kannada:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="navigation.css?v=1">
 <style>
   :root{
     --sky-top:    #FFF6E8;
@@ -33,65 +34,8 @@
   a{ color:var(--rust); }
   button{ font-family:inherit; }
 
-  /* ===== Nav — identical pattern to story.html ===== */
-  .edge-strip{
-    position:fixed; left:0; top:0; bottom:0; width:22px;
-    background:var(--edge-bg);
-    border-right:1px solid var(--card-line);
-    display:flex; flex-direction:column; align-items:center; justify-content:space-evenly;
-    z-index:20;
-  }
-  .edge-strip .dot-btn{ width:22px; height:22px; display:flex; align-items:center; justify-content:center; background:none; border:none; padding:0; cursor:pointer; }
-  .edge-strip .ring{ width:8px; height:8px; border-radius:50%; background:rgba(181,80,46,0.4); transition:background .2s, transform .2s; }
-  .edge-strip .dot-btn:hover .ring{ background:rgba(181,80,46,0.7); }
-  .edge-strip .dot-btn.active .ring{ background:var(--rust); transform:scale(1.35); }
-
-  .topbar{
-    position:sticky; top:0; z-index:10;
-    display:flex; align-items:center; justify-content:center;
-    padding:.9rem 5vw;
-    backdrop-filter:blur(10px);
-    background:rgba(255,246,232,0.75);
-    border-bottom:1px solid var(--card-line);
-  }
-  .topbar .brand{ font-family:'Fraunces', serif; font-weight:600; font-size:1rem; text-decoration:none; }
-  .topbar .brand .sneha{ color:var(--rust); }
-  .topbar .brand .koota{ color:var(--banyan); }
-
-  .bookmark-tab{
-    position:fixed; left:22px; top:58vh; width:20px; height:48px; margin-top:-24px;
-    background:var(--rust); border-radius:0 8px 8px 0;
-    box-shadow:2px 2px 6px rgba(43,33,24,0.18);
-    z-index:32; cursor:pointer; border:none; padding:0;
-    display:flex; align-items:center; justify-content:center;
-    animation:tabNudge 2.4s ease-in-out 1s 3;
-  }
-  .bookmark-tab::after{ content:''; width:6px; height:6px; border-radius:50%; background:rgba(255,246,232,0.85); }
-  .bookmark-tab.pulsing::before{
-    content:''; position:absolute; inset:0; border-radius:0 8px 8px 0;
-    box-shadow:0 0 0 0 rgba(181,80,46,0.5);
-    animation:tabPulse 2.2s ease-out infinite;
-  }
-  @keyframes tabPulse{ 0%{ box-shadow:0 0 0 0 rgba(181,80,46,0.45); } 70%{ box-shadow:0 0 0 10px rgba(181,80,46,0); } 100%{ box-shadow:0 0 0 0 rgba(181,80,46,0); } }
-  @keyframes tabNudge{ 0%,100%{ transform:translateX(0); } 10%{ transform:translateX(4px); } 20%{ transform:translateX(0); } 30%{ transform:translateX(4px); } 40%{ transform:translateX(0); } }
-  @media (prefers-reduced-motion: reduce){ .bookmark-tab{ animation:none; } .bookmark-tab.pulsing::before{ animation:none; } }
-
-  .backdrop{ position:fixed; inset:0; background:rgba(43,33,24,0.38); opacity:0; pointer-events:none; transition:opacity .25s ease; z-index:30; }
-  body.nav-open .backdrop{ opacity:1; pointer-events:auto; }
-
-  .side-panel{ position:fixed; left:0; top:0; bottom:0; width:76%; max-width:300px; display:flex; z-index:31; transform:translateX(-100%); transition:transform .28s ease; box-shadow:2px 0 18px rgba(0,0,0,0.18); }
-  body.nav-open .side-panel{ transform:translateX(0); }
-  .side-panel .binding{ width:22px; background:var(--edge-bg); border-right:1px solid var(--card-line); display:flex; flex-direction:column; align-items:center; justify-content:space-evenly; }
-  .side-panel .binding .ring{ width:8px; height:8px; border-radius:50%; background:var(--rust); }
-  .side-panel .panel-body{ flex:1; background:var(--panel-bg); padding:1.4rem 1.1rem; display:flex; flex-direction:column; height:100%; }
-  .side-panel .panel-top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:1.6rem; flex-shrink:0; }
-  .side-panel .panel-top .brand{ font-family:'Fraunces', serif; font-weight:600; font-size:.95rem; }
-  .side-panel .closer{ background:none; border:none; font-size:1.1rem; color:var(--ink-soft); cursor:pointer; line-height:1; padding:.3rem; }
-  .panel-links{ display:flex; flex-direction:column; gap:.3rem; flex:1; justify-content:center; margin-bottom:8vh; }
-  .panel-links a{ display:block; padding:.75rem .85rem; border-radius:10px; text-decoration:none; color:var(--ink); font-size:.95rem; font-family:'Work Sans', sans-serif; }
-  .panel-links a.active{ background:rgba(181,80,46,0.1); color:var(--rust); font-weight:600; }
-  .panel-links a.disabled{ color:var(--ink-soft); opacity:.55; pointer-events:none; }
-  .panel-links a .tag{ font-size:.72rem; margin-left:.4em; }
+  /* ===== Shared navigation ===== */
+  /* NAV structure and behaviour are provided by navigation.css / navigation.js. */
 
   /* ===== Page intro ===== */
   .page{ max-width:1040px; margin:0 auto; padding:3vh 5vw 8vh; }
@@ -208,29 +152,31 @@
   <button class="dot-btn" data-tile="1" aria-label="Listing 2"><span class="ring"></span></button>
 </div>
 
-<div class="backdrop" id="backdrop"></div>
+<div class="sk-nav-root" data-sk-nav-root>
+  <button class="sk-nav-opener sk-nav-pulsing" data-sk-nav-opener aria-label="Open menu" aria-expanded="false"></button>
 
-<nav class="side-panel" aria-hidden="true">
-  <div class="binding">
-    <span class="ring"></span><span class="ring"></span><span class="ring"></span>
-    <span class="ring"></span><span class="ring"></span><span class="ring"></span><span class="ring"></span>
-  </div>
-  <div class="panel-body">
-    <div class="panel-top">
-      <span class="brand"><span style="color:var(--rust);">ಸ್ನೇಹ</span><span style="color:var(--banyan);">ಕೂಟ</span></span>
-      <button class="closer" id="closer" aria-label="Close menu">&#10005;</button>
-    </div>
-    <div class="panel-links">
-      <a href="index.html">ಸ್ನೇಹಕೂಟ</a>
-      <a href="story.html">ಪಯಣ</a>
-      <a href="samparka.html" class="active">ಸ್ನೇಹಸಂಪರ್ಕ</a>
-      <a href="#" class="disabled">Gallery <span class="tag">(soon)</span></a>
-      <a href="#" class="disabled">Contact <span class="tag">(soon)</span></a>
-    </div>
-  </div>
-</nav>
+  <div class="sk-nav-backdrop" data-sk-nav-backdrop></div>
 
-<button class="bookmark-tab pulsing" id="opener" aria-label="Open menu" role="button" tabindex="0"></button>
+  <nav class="sk-nav-panel" data-sk-nav-panel aria-hidden="true" aria-label="SnehaKoota navigation">
+    <div class="sk-nav-binding" aria-hidden="true">
+      <span class="sk-nav-ring"></span><span class="sk-nav-ring"></span><span class="sk-nav-ring"></span>
+      <span class="sk-nav-ring"></span><span class="sk-nav-ring"></span><span class="sk-nav-ring"></span><span class="sk-nav-ring"></span>
+    </div>
+    <div class="sk-nav-body">
+      <div class="sk-nav-top">
+        <span class="sk-nav-brand"><span class="sk-nav-sneha">ಸ್ನೇಹ</span><span class="sk-nav-koota">ಕೂಟ</span></span>
+        <button class="sk-nav-close" data-sk-nav-close aria-label="Close menu">&#10005;</button>
+      </div>
+      <div class="sk-nav-links">
+        <a href="index.html">ಸ್ನೇಹಕೂಟ</a>
+        <a href="story.html">ಪಯಣ</a>
+        <a href="samparka.html" class="active">ಸ್ನೇಹಸಂಪರ್ಕ</a>
+        <a href="#" class="disabled">Gallery <span class="sk-nav-tag">(soon)</span></a>
+        <a href="#" class="disabled">Contact <span class="sk-nav-tag">(soon)</span></a>
+      </div>
+    </div>
+  </nav>
+</div>
 
 <header class="topbar">
   <a href="index.html" class="brand"><span class="sneha">Sneha</span><span class="koota">Koota</span></a>
@@ -387,7 +333,7 @@ function detailHTML(item){
     </div>
 
     <div class="contact-row">
-      <a href="tel:${item.phone.replace(/\\s+/g,'')}">${ICONS.phone}Call</a>
+      <a href="tel:${item.phone.replace(/\s+/g,'')}">${ICONS.phone}Call</a>
       <a href="https://wa.me/${item.whatsapp}" target="_blank" rel="noopener">${ICONS.whatsapp}WhatsApp</a>
       <a href="https://${item.website}" target="_blank" rel="noopener">${ICONS.web}Website</a>
     </div>
@@ -413,7 +359,7 @@ gridContainer.addEventListener('click', function(e) {
     doShare(LISTINGS[Number(shareBtn.dataset.idx)]);
     return;
   }
-  
+
   const tile = e.target.closest('.tile');
   if (tile) {
     openDetail(Number(tile.dataset.idx));
@@ -437,10 +383,11 @@ function closeDetail(){
   detailSheetEl.classList.remove('show');
   document.body.style.overflow = '';
 }
+
 detailBackdropEl.addEventListener('click', closeDetail);
 
 function doShare(item){
-  const text = `${item.name} — ${item.category}\\n${item.short}\\n${item.mapsUrl}`;
+  const text = `${item.name} — ${item.category}\n${item.short}\n${item.mapsUrl}`;
   if(navigator.share){
     navigator.share({ title: item.name, text }).catch(()=>{});
   } else if (navigator.clipboard) {
@@ -454,16 +401,8 @@ function doShare(item){
 LISTINGS = loadListings();
 renderGrid();
 
-/* ===================== Nav (identical to story.html) ===================== */
-const body = document.body;
-const openNav = () => body.classList.add('nav-open');
-const closeNav = () => body.classList.remove('nav-open');
-const toggleNav = () => body.classList.toggle('nav-open');
-const openerBtn = document.getElementById('opener');
-openerBtn.addEventListener('click', () => { toggleNav(); openerBtn.classList.remove('pulsing'); });
-openerBtn.addEventListener('keypress', (e) => { if (e.key === 'Enter') { toggleNav(); openerBtn.classList.remove('pulsing'); } });
-document.getElementById('closer').addEventListener('click', closeNav);
-document.getElementById('backdrop').addEventListener('click', closeNav);
+/* ===================== Shared NAV ===================== */
+/* navigation.js owns NAV open/close behaviour and the Collections placeholder. */
 
 /* Edge-strip: first dot scrolls to top, remaining dots jump to each tile */
 const dotBtns = document.querySelectorAll('.edge-strip .dot-btn');
@@ -484,6 +423,7 @@ for (let i = 0; i < dotBtns.length; i++) {
   });
 }
 </script>
+<script src="navigation.js?v=1" defer></script>
 <div id="sk-account-root"></div>
 <link rel="stylesheet" href="account.css?v=1">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
