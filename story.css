@@ -20,7 +20,7 @@ body{ padding-left:var(--sk-edge-width,22px); }
 a{ color:var(--rust); }
 
 /* Story-specific top bar */
-.story-topbar{
+.topbar{
   position:sticky;
   top:0;
   z-index:10;
@@ -32,14 +32,14 @@ a{ color:var(--rust); }
   background:rgba(255,246,232,.75);
   border-bottom:1px solid rgba(43,33,24,.10);
 }
-.story-topbar .brand{
+.topbar .brand{
   font-family:var(--font-display,'Fraunces',serif);
   font-weight:600;
   font-size:1rem;
   text-decoration:none;
 }
-.story-topbar .brand .sneha{ color:var(--rust); }
-.story-topbar .brand .koota{ color:var(--banyan); }
+.topbar .brand .sneha{ color:var(--rust); }
+.topbar .brand .koota{ color:var(--banyan); }
 
 /* Story chapters */
 .chapter{
