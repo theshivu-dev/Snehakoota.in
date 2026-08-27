@@ -1,12 +1,11 @@
 /* =========================================================
    SNEHAKOOTA — SHARED NAVIGATION FOUNDATION
-   Stage 2A / 4C-3 / 4D-1
+   Stage 2A / 4C-3 / 4D-1 / 4D-2A
    ========================================================= */
 (function(){
   'use strict';
 
-  function addCollections(root){
-    var links = root.querySelector('.sk-nav-links');
+  function makeCollectionsItem(links, legacy){
     if (!links || links.querySelector('[data-sk-collections]')) return;
 
     var item = document.createElement('div');
@@ -16,7 +15,7 @@
     var button = document.createElement('button');
     button.type = 'button';
     button.setAttribute('aria-expanded', 'false');
-    button.setAttribute('aria-controls', 'sk-collections-soon');
+    button.setAttribute('aria-controls', legacy ? 'sk-collections-soon-index' : 'sk-collections-soon');
     button.style.cssText = 'width:100%;display:flex;align-items:center;min-height:44px;padding:.62rem .75rem;border-radius:10px;border:1px solid transparent;background:transparent;color:var(--ink,#2B2118);font:inherit;font-size:.95rem;line-height:1.25;text-align:left;cursor:pointer;transition:background .18s ease,color .18s ease,border-color .18s ease;';
 
     var icon = document.createElement('span');
@@ -42,7 +41,7 @@
     button.appendChild(arrow);
 
     var submenu = document.createElement('div');
-    submenu.id = 'sk-collections-soon';
+    submenu.id = legacy ? 'sk-collections-soon-index' : 'sk-collections-soon';
     submenu.hidden = true;
     submenu.style.cssText = 'margin:.12rem 0 .28rem 2.55rem;padding:.45rem .7rem;border-left:1px solid rgba(181,80,46,.16);color:var(--ink-soft,#6B5C4C);font-size:.78rem;line-height:1.55;';
     submenu.innerHTML = '<div style="opacity:.78;">Quotes · Photos · Memories · Resources</div><div style="font-size:.7rem;margin-top:.15rem;opacity:.68;">Coming soon — these are future collection ideas.</div>';
@@ -65,6 +64,14 @@
     item.appendChild(button);
     item.appendChild(submenu);
     links.appendChild(item);
+  }
+
+  function addCollections(root){
+    makeCollectionsItem(root && root.querySelector('.sk-nav-links'), false);
+  }
+
+  function addLegacyCollections(){
+    makeCollectionsItem(document.querySelector('.panel-links'), true);
   }
 
   function isolatePageChrome(){
@@ -151,9 +158,72 @@
     });
   }
 
+  /* =========================================================
+     STAGE 4D-2A — INDEX LEGACY BRIDGE
+     ---------------------------------------------------------
+     Index keeps its existing page/game markup, but the NAV controller
+     is now owned here. The old vertical dotted strip is deliberately
+     not used as NAV; the orange 3x3-dot tab is the sole NAV trigger.
+     ========================================================= */
+  function initLegacyIndex(){
+    var opener = document.querySelector('button.bookmark-tab');
+    var closer = document.querySelector('.side-panel .closer');
+    var backdrop = document.querySelector('.backdrop');
+    var panel = document.querySelector('.side-panel');
+    var edge = document.querySelector('.edge-strip');
+
+    if (!opener || !closer || !backdrop || !panel) return;
+
+    /* Hide the old dotted page strip visually; it remains in the DOM so
+       the existing home-page script does not encounter a missing node. */
+    if (edge){
+      edge.style.setProperty('display','none','important');
+    }
+
+    addLegacyCollections();
+
+    /* Replace the legacy trigger/close nodes so the inline page script's
+       old listeners cannot double-toggle the shared controller. */
+    var newOpener = opener.cloneNode(true);
+    var newCloser = closer.cloneNode(true);
+    opener.parentNode.replaceChild(newOpener, opener);
+    closer.parentNode.replaceChild(newCloser, closer);
+
+    function setOpen(open){
+      document.body.classList.toggle('nav-open', open);
+      panel.setAttribute('aria-hidden', open ? 'false' : 'true');
+      newOpener.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (open) newCloser.focus();
+      else newOpener.focus();
+    }
+
+    newOpener.addEventListener('click', function(){
+      setOpen(!document.body.classList.contains('nav-open'));
+      newOpener.classList.remove('pulsing');
+    });
+    newOpener.addEventListener('keydown', function(event){
+      if (event.key === 'Enter' || event.key === ' '){
+        event.preventDefault();
+        setOpen(!document.body.classList.contains('nav-open'));
+        newOpener.classList.remove('pulsing');
+      }
+    });
+    newCloser.addEventListener('click', function(){ setOpen(false); });
+    backdrop.addEventListener('click', function(){ setOpen(false); });
+    document.addEventListener('keydown', function(event){
+      if (event.key === 'Escape' && document.body.classList.contains('nav-open')) setOpen(false);
+    });
+
+    panel.addEventListener('click', function(event){
+      var link = event.target.closest('a');
+      if (link && link.getAttribute('href') && link.getAttribute('href') !== '#') setOpen(false);
+    });
+  }
+
   function boot(){
     isolatePageChrome();
     document.querySelectorAll('[data-sk-nav-root]').forEach(init);
+    initLegacyIndex();
   }
 
   if (document.readyState === 'loading'){
@@ -166,12 +236,14 @@
     init: init,
     close: function(){
       var root = document.querySelector('[data-sk-nav-root]');
-      if (!root) return;
-      var panel = root.querySelector('[data-sk-nav-panel]');
-      var opener = root.querySelector('[data-sk-nav-opener]');
-      document.body.classList.remove('sk-nav-open');
-      if (panel) panel.setAttribute('aria-hidden', 'true');
-      if (opener) opener.setAttribute('aria-expanded', 'false');
+      if (root){
+        var panel = root.querySelector('[data-sk-nav-panel]');
+        var opener = root.querySelector('[data-sk-nav-opener]');
+        document.body.classList.remove('sk-nav-open');
+        if (panel) panel.setAttribute('aria-hidden', 'true');
+        if (opener) opener.setAttribute('aria-expanded', 'false');
+      }
+      document.body.classList.remove('nav-open');
     }
   };
 })();
