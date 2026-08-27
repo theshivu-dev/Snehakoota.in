@@ -19,6 +19,50 @@ html, body{
 body{ padding-left:var(--sk-edge-width,22px); }
 a{ color:var(--rust); }
 
+/* =========================================================
+   STAGE 3B — STORY-OWNED CHAPTER PROGRESS STRIP
+   ---------------------------------------------------------
+   These four dots are NOT the global site navigation.
+   They jump between Story chapters and therefore remain page-owned.
+   ========================================================= */
+.edge-strip{
+  position:fixed;
+  left:0;
+  top:0;
+  bottom:0;
+  width:var(--sk-edge-width,22px);
+  background:var(--sk-edge-binding,#F5D9AE);
+  border-right:1px solid var(--line-idle,rgba(43,33,24,.16));
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:space-evenly;
+  z-index:20;
+}
+.edge-strip .dot-btn{
+  width:var(--sk-edge-width,22px);
+  height:22px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:none;
+  border:none;
+  padding:0;
+  cursor:pointer;
+}
+.edge-strip .ring{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:rgba(181,80,46,.4);
+  transition:background .2s,transform .2s;
+}
+.edge-strip .dot-btn:hover .ring{ background:rgba(181,80,46,.7); }
+.edge-strip .dot-btn.active .ring{
+  background:var(--rust);
+  transform:scale(1.35);
+}
+
 /* Story-specific top bar */
 .topbar{
   position:sticky;
