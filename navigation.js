@@ -1,6 +1,6 @@
 /* =========================================================
    SNEHAKOOTA — SHARED NAVIGATION FOUNDATION
-   Stage 2A
+   Stage 2A / 4C-3
    ---------------------------------------------------------
    Purpose:
    - One small, reusable controller for the site navigation panel.
@@ -15,6 +15,77 @@
 (function(){
   'use strict';
 
+  /* =========================================================
+     STAGE 4C-3 — COLLECTIONS COMING-SOON NAVIGATION
+     ---------------------------------------------------------
+     Collections is intentionally only a navigation placeholder today.
+     No real Collection pages or content are created by this step.
+     The small expandable list gives us the future UI shape without
+     pretending those destinations already exist.
+     ========================================================= */
+  function addCollections(root){
+    var links = root.querySelector('.sk-nav-links');
+    if (!links || links.querySelector('[data-sk-collections]')) return;
+
+    var item = document.createElement('div');
+    item.setAttribute('data-sk-collections', 'true');
+    item.style.marginTop = '.12rem';
+
+    var button = document.createElement('button');
+    button.type = 'button';
+    button.setAttribute('aria-expanded', 'false');
+    button.setAttribute('aria-controls', 'sk-collections-soon');
+    button.style.cssText = 'width:100%;display:flex;align-items:center;min-height:44px;padding:.62rem .75rem;border-radius:10px;border:1px solid transparent;background:transparent;color:var(--ink,#2B2118);font:inherit;font-size:.95rem;line-height:1.25;text-align:left;cursor:pointer;transition:background .18s ease,color .18s ease,border-color .18s ease;';
+
+    /* Same simple line-style visual language as the Stage 4C-2 icons. */
+    var icon = document.createElement('span');
+    icon.setAttribute('aria-hidden', 'true');
+    icon.textContent = '▣';
+    icon.style.cssText = 'width:21px;min-width:21px;margin-right:.72rem;text-align:center;font-size:17px;line-height:21px;opacity:.72;';
+
+    var label = document.createElement('span');
+    label.textContent = 'Collections';
+
+    var tag = document.createElement('span');
+    tag.textContent = ' (soon)';
+    tag.style.cssText = 'font-size:.72rem;margin-left:.2em;color:var(--ink-soft,#6B5C4C);opacity:.8;';
+
+    var arrow = document.createElement('span');
+    arrow.textContent = '›';
+    arrow.setAttribute('aria-hidden', 'true');
+    arrow.style.cssText = 'margin-left:auto;font-size:1.25rem;line-height:1;opacity:.65;transition:transform .18s ease;';
+
+    button.appendChild(icon);
+    button.appendChild(label);
+    button.appendChild(tag);
+    button.appendChild(arrow);
+
+    var submenu = document.createElement('div');
+    submenu.id = 'sk-collections-soon';
+    submenu.hidden = true;
+    submenu.style.cssText = 'margin:.12rem 0 .28rem 2.55rem;padding:.45rem .7rem;border-left:1px solid rgba(181,80,46,.16);color:var(--ink-soft,#6B5C4C);font-size:.78rem;line-height:1.55;';
+    submenu.innerHTML = '<div style="opacity:.78;">Quotes · Photos · Memories · Resources</div><div style="font-size:.7rem;margin-top:.15rem;opacity:.68;">Coming soon — these are future collection ideas.</div>';
+
+    button.addEventListener('mouseenter', function(){
+      button.style.background = 'rgba(255,246,232,.48)';
+      button.style.borderColor = 'rgba(181,80,46,.08)';
+    });
+    button.addEventListener('mouseleave', function(){
+      button.style.background = 'transparent';
+      button.style.borderColor = 'transparent';
+    });
+    button.addEventListener('click', function(){
+      var open = button.getAttribute('aria-expanded') === 'true';
+      button.setAttribute('aria-expanded', String(!open));
+      submenu.hidden = open;
+      arrow.style.transform = open ? 'rotate(0deg)' : 'rotate(90deg)';
+    });
+
+    item.appendChild(button);
+    item.appendChild(submenu);
+    links.appendChild(item);
+  }
+
   function init(root){
     if (!root || root.dataset.skNavReady === 'true') return;
 
@@ -27,6 +98,7 @@
     if (!opener || !closer || !backdrop || !panel) return;
 
     root.dataset.skNavReady = 'true';
+    addCollections(root);
 
     function setOpen(open){
       body.classList.toggle('sk-nav-open', open);
