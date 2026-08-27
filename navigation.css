@@ -1,6 +1,6 @@
 /* =========================================================
    SNEHAKOOTA — SHARED NAVIGATION FOUNDATION
-   Stage 2A / 2B / 2E-1
+   Stage 2A / 2B / 2E-1 / 4B
    ---------------------------------------------------------
    Purpose:
    - Shared styling for site navigation.
@@ -67,7 +67,7 @@ body.sk-nav-open .sk-nav-panel{transform:translateX(0);}
    ========================================================= */
 :root{--sk-nav-trigger-top:50vh;--sk-nav-trigger-width:20px;--sk-nav-trigger-height:48px;--sk-nav-trigger-safe-gap:12px;}
 .sk-nav-opener{position:fixed;left:var(--sk-edge-width,22px);top:var(--sk-nav-trigger-top,50vh);width:var(--sk-nav-trigger-width,20px);height:var(--sk-nav-trigger-height,48px);margin-top:calc(var(--sk-nav-trigger-height,48px)/-2);background:var(--rust,#B5502E);border-radius:0 8px 8px 0;box-shadow:var(--sk-shadow-soft,2px 2px 6px rgba(43,33,24,0.18));z-index:32;cursor:pointer;border:none;padding:0;display:flex;align-items:center;justify-content:center;animation:skNavTabNudge 2.4s ease-in-out 1s 3;-webkit-tap-highlight-color:transparent;}
-.sk-nav-opener::after{content:'';width:6px;height:6px;border-radius:50%;background:rgba(255,246,232,0.85);}
+.sk-nav-opener::after{content:'';width:4px;height:4px;border-radius:50%;background:rgba(255,246,232,0.9);box-shadow:0 -7px rgba(255,246,232,0.9),0 7px rgba(255,246,232,0.9),7px -7px rgba(255,246,232,0.9),7px 0 rgba(255,246,232,0.9),7px 7px rgba(255,246,232,0.9);transform:translateX(-3.5px);}
 .sk-nav-opener.sk-nav-pulsing::before{content:'';position:absolute;inset:0;border-radius:0 8px 8px 0;box-shadow:0 0 0 0 rgba(181,80,46,0.5);animation:skNavTabPulse 2.2s ease-out infinite;}
 @keyframes skNavTabPulse{0%{box-shadow:0 0 0 0 rgba(181,80,46,0.45);}70%{box-shadow:0 0 0 10px rgba(181,80,46,0);}100%{box-shadow:0 0 0 0 rgba(181,80,46,0);}}
 @keyframes skNavTabNudge{0%,100%{transform:translateX(0);}10%{transform:translateX(4px);}20%{transform:translateX(0);}30%{transform:translateX(4px);}40%{transform:translateX(0);}}
@@ -83,7 +83,7 @@ button.bookmark-tab{top:var(--sk-nav-trigger-top,50vh);}
    STAGE 2B-2 — LEGACY TRIGGER SHARED-STYLE ADAPTER
    ========================================================= */
 button.bookmark-tab{left:var(--sk-edge-width,22px);top:var(--sk-nav-trigger-top,50vh);width:var(--sk-nav-trigger-width,20px);height:var(--sk-nav-trigger-height,48px);margin-top:calc(var(--sk-nav-trigger-height,48px)/-2);background:var(--rust,#B5502E);border-radius:0 8px 8px 0;box-shadow:var(--sk-shadow-soft,2px 2px 6px rgba(43,33,24,0.18));z-index:32;animation:skNavTabNudge 2.4s ease-in-out 1s 3;}
-button.bookmark-tab::after{background:rgba(255,246,232,0.85);}.bookmark-tab.pulsing::before{border-radius:0 8px 8px 0;box-shadow:0 0 0 0 rgba(181,80,46,0.5);animation:skNavTabPulse 2.2s ease-out infinite;}
+button.bookmark-tab::after{content:'';width:4px;height:4px;border-radius:50%;background:rgba(255,246,232,0.9);box-shadow:0 -7px rgba(255,246,232,0.9),0 7px rgba(255,246,232,0.9),7px -7px rgba(255,246,232,0.9),7px 0 rgba(255,246,232,0.9),7px 7px rgba(255,246,232,0.9);transform:translateX(-3.5px);}.bookmark-tab.pulsing::before{border-radius:0 8px 8px 0;box-shadow:0 0 0 0 rgba(181,80,46,0.5);animation:skNavTabPulse 2.2s ease-out infinite;}
 @media (prefers-reduced-motion:reduce){button.bookmark-tab{animation:none;}button.bookmark-tab.pulsing::before{animation:none;}}
 
 /* =========================================================
@@ -110,7 +110,14 @@ html body .edge-strip .ring{width:8px!important;height:8px!important;border-radi
 html body .edge-strip:hover .ring{background:rgba(181,80,46,0.65)!important;}
 
 /* =========================================================
-   Mobile safety note:
+   STAGE 4B — SIX-DOT NAVIGATION MARK
+   ---------------------------------------------------------
+   The fixed NAV trigger now uses a compact 2-column x 3-row
+   six-dot mark. This is intentionally the navigation trigger only;
+   it is NOT the future page-progress/section-dot control.
+   ========================================================= */
+
+/* Mobile safety note:
    Fixed navigation remains outside normal document flow.
    Account and game widgets remain separate components.
    ========================================================= */
