@@ -1,47 +1,10 @@
 /* =========================================================
    SNEHAKOOTA — SHARED NAVIGATION FOUNDATION
    Stage 2A / 2B / 2E-1 / 4B
-   ---------------------------------------------------------
-   Purpose:
-   - Shared styling for site navigation.
-   - Reusable by future pages without depending on Index-only layout.
-   - Legacy Index selectors remain temporarily supported during migration.
-   - Page-specific content/effects stay outside this file.
-   - Account and game styling stay outside this file.
    ========================================================= */
 
 /* =========================================================
    STAGE 2E-1 — REUSABLE NAVIGATION COMPONENT CONTRACT
-   ---------------------------------------------------------
-   Future pages should use the semantic sk-nav-* classes below.
-   Legacy .edge-strip / .backdrop / .side-panel markup remains supported
-   for Index until that page is deliberately migrated.
-
-   Component boundary:
-   - navigation.css owns navigation presentation and fixed geometry.
-   - navigation.js owns navigation interaction when a page opts into it.
-   - page CSS owns page content and special visual effects.
-   - account.css/account.js remain separate.
-
-   A page does NOT need to reproduce Index's .stage, .paths, game widget,
-   or any other Index-specific structure in order to use navigation.
-
-   This contract is intentionally CSS-only in this step: no other HTML page
-   is modified and no new navigation behaviour is introduced.
-   ========================================================= */
-
-/* =========================================================
-   STAGE 2A — SCROLLBAR VISUAL FOUNDATION
-   ========================================================= */
-html{scrollbar-width:thin;scrollbar-color:rgba(181,80,46,0.28) transparent;}
-html::-webkit-scrollbar{width:7px;height:7px;}
-html::-webkit-scrollbar-track{background:transparent;}
-html::-webkit-scrollbar-thumb{background:rgba(181,80,46,0.26);border-radius:999px;border:2px solid transparent;background-clip:padding-box;}
-html::-webkit-scrollbar-thumb:hover{background:rgba(181,80,46,0.42);border:2px solid transparent;background-clip:padding-box;}
-html::-webkit-scrollbar-button{display:none;width:0;height:0;}
-
-/* =========================================================
-   SHARED NAVIGATION PANEL
    ========================================================= */
 .sk-nav-edge-strip{position:fixed;left:0;top:0;bottom:0;width:var(--sk-edge-width,22px);background:var(--sk-edge-binding,#F5D9AE);border-right:1px solid var(--line-idle,rgba(43,33,24,0.16));display:flex;flex-direction:column;align-items:center;justify-content:space-evenly;z-index:20;cursor:pointer;}
 .sk-nav-edge-strip .sk-nav-ring{width:8px;height:8px;border-radius:50%;background:rgba(181,80,46,0.4);transition:background .2s,transform .2s;}
@@ -63,6 +26,16 @@ body.sk-nav-open .sk-nav-panel{transform:translateX(0);}
 .sk-nav-links a.disabled{color:var(--ink-soft,#6B5C4C);opacity:.55;pointer-events:none;}.sk-nav-links a .sk-nav-tag{font-size:.72rem;margin-left:.4em;}
 
 /* =========================================================
+   STAGE 2A — SCROLLBAR VISUAL FOUNDATION
+   ========================================================= */
+html{scrollbar-width:thin;scrollbar-color:rgba(181,80,46,0.28) transparent;}
+html::-webkit-scrollbar{width:7px;height:7px;}
+html::-webkit-scrollbar-track{background:transparent;}
+html::-webkit-scrollbar-thumb{background:rgba(181,80,46,0.26);border-radius:999px;border:2px solid transparent;background-clip:padding-box;}
+html::-webkit-scrollbar-thumb:hover{background:rgba(181,80,46,0.42);border:2px solid transparent;background-clip:padding-box;}
+html::-webkit-scrollbar-button{display:none;width:0;height:0;}
+
+/* =========================================================
    STAGE 2B — FIXED-ELEMENT POSITIONING FOUNDATION
    ========================================================= */
 :root{--sk-nav-trigger-top:50vh;--sk-nav-trigger-width:20px;--sk-nav-trigger-height:48px;--sk-nav-trigger-safe-gap:12px;}
@@ -82,7 +55,7 @@ button.bookmark-tab{top:var(--sk-nav-trigger-top,50vh);}
 /* =========================================================
    STAGE 2B-2 — LEGACY TRIGGER SHARED-STYLE ADAPTER
    ========================================================= */
-button.bookmark-tab{left:var(--sk-edge-width,22px);top:var(--sk-nav-trigger-top,50vh);width:var(--sk-nav-trigger-width,20px);height:var(--sk-nav-trigger-height,48px);margin-top:calc(var(--sk-nav-trigger-height,48px)/-2);background:var(--rust,#B5502E);border-radius:0 8px 8px 0;box-shadow:var(--sk-shadow-soft,2px 2px 6px rgba(43,33,24,0.18));z-index:32;animation:skNavTabNudge 2.4s ease-in-out 1s 3;}
+button.bookmark-tab{left:var(--sk-edge-width,22px);top:var(--sk-nav-trigger-top,50vh);width:var(--sk-nav-trigger-width,20px);height:var(--sk-nav-trigger-height,48px);margin-top:calc(var(--sk-nav-trigger-height,48px)/-2);background:var(--rust,#B5502E);border-radius:0 8px 8px 0;box-shadow:var(--sk-shadow-soft,2px 2px 6px rgba(43,33,24,0.18));z-index:32;animation:skNavTabNudge 2.4s ease-in-out 1s 3;transition:opacity .22s ease,transform .28s ease,visibility .22s ease;}
 button.bookmark-tab::after{content:'';width:4px;height:4px;border-radius:50%;background:rgba(255,246,232,0.9);box-shadow:0 -7px rgba(255,246,232,0.9),0 7px rgba(255,246,232,0.9),7px -7px rgba(255,246,232,0.9),7px 0 rgba(255,246,232,0.9),7px 7px rgba(255,246,232,0.9);transform:translateX(-3.5px);}.bookmark-tab.pulsing::before{border-radius:0 8px 8px 0;box-shadow:0 0 0 0 rgba(181,80,46,0.5);animation:skNavTabPulse 2.2s ease-out infinite;}
 @media (prefers-reduced-motion:reduce){button.bookmark-tab{animation:none;}button.bookmark-tab.pulsing::before{animation:none;}}
 
@@ -110,14 +83,29 @@ html body .edge-strip .ring{width:8px!important;height:8px!important;border-radi
 html body .edge-strip:hover .ring{background:rgba(181,80,46,0.65)!important;}
 
 /* =========================================================
-   STAGE 4B — SIX-DOT NAVIGATION MARK
+   STAGE 4B-1 — SIX-DOT NAVIGATION MARK
    ---------------------------------------------------------
-   The fixed NAV trigger now uses a compact 2-column x 3-row
-   six-dot mark. This is intentionally the navigation trigger only;
+   The fixed NAV trigger uses a compact 2-column x 3-row
+   six-dot mark. This is the navigation trigger only;
    it is NOT the future page-progress/section-dot control.
    ========================================================= */
 
-/* Mobile safety note:
+/* =========================================================
+   STAGE 4B-2 — OPEN-STATE NAV TRIGGER HANDOFF
+   ---------------------------------------------------------
+   Closed state: six-dot trigger is the visible invitation to open NAV.
+   Open state: the trigger yields to the navigation panel so there is
+   only one obvious navigation surface. It slides/fades away while the
+   panel takes ownership of the left edge.
+   ========================================================= */
+button.bookmark-tab{transition:opacity .22s ease,transform .28s ease,visibility .22s ease;}
+body.nav-open button.bookmark-tab{opacity:0;visibility:hidden;pointer-events:none;transform:translateX(-110%);}
+
+/* The shared semantic opener follows the same handoff when used later. */
+body.sk-nav-open .sk-nav-opener{opacity:0;visibility:hidden;pointer-events:none;transform:translateX(-110%);}
+
+/* =========================================================
+   Mobile safety note:
    Fixed navigation remains outside normal document flow.
    Account and game widgets remain separate components.
    ========================================================= */
