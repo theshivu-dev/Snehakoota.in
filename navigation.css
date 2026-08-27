@@ -1,6 +1,6 @@
 /* =========================================================
    SNEHAKOOTA — SHARED NAVIGATION FOUNDATION
-   Stage 2A / 2B / 2E-1 / 4B
+   Stage 2A / 2B / 2E-1 / 4B / 4C-1
    ========================================================= */
 
 /* =========================================================
@@ -15,14 +15,16 @@ body.sk-nav-open .sk-nav-backdrop{opacity:1;pointer-events:auto;}
 body.sk-nav-open .sk-nav-panel{transform:translateX(0);}
 .sk-nav-panel .sk-nav-binding{width:var(--sk-edge-width,22px);background:var(--sk-edge-binding,#F5D9AE);border-right:1px solid var(--line-idle,rgba(43,33,24,0.16));display:flex;flex-direction:column;align-items:center;justify-content:space-evenly;}
 .sk-nav-panel .sk-nav-binding .sk-nav-ring{width:8px;height:8px;border-radius:50%;background:var(--rust,#B5502E);}
-.sk-nav-panel .sk-nav-body{flex:1;background:var(--sky-bottom,#FDE7C8);padding:1.4rem 1.1rem;display:flex;flex-direction:column;height:100%;}
-.sk-nav-panel .sk-nav-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.6rem;flex-shrink:0;}
-.sk-nav-panel .sk-nav-brand{font-family:var(--font-display,'Fraunces',serif);font-weight:600;font-size:.95rem;}
+.sk-nav-panel .sk-nav-body{flex:1;background:var(--sky-bottom,#FDE7C8);padding:1.35rem 1.05rem 1.5rem;display:flex;flex-direction:column;height:100%;}
+.sk-nav-panel .sk-nav-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.15rem;flex-shrink:0;padding-bottom:.8rem;border-bottom:1px solid var(--line-idle,rgba(43,33,24,0.12));}
+.sk-nav-panel .sk-nav-brand{font-family:var(--font-display,'Fraunces',serif);font-weight:600;font-size:1rem;line-height:1.1;}
 .sk-nav-panel .sk-nav-brand .sk-nav-sneha{color:var(--rust,#B5502E);}.sk-nav-panel .sk-nav-brand .sk-nav-koota{color:var(--banyan,#2F5233);}
-.sk-nav-panel .sk-nav-close{background:none;border:none;font-size:1.1rem;color:var(--ink-soft,#6B5C4C);cursor:pointer;line-height:1;padding:.3rem;min-width:var(--sk-touch-target,44px);min-height:var(--sk-touch-target,44px);}
-.sk-nav-links{display:flex;flex-direction:column;gap:.3rem;flex:1;justify-content:center;margin-bottom:8vh;}
-.sk-nav-links a{display:block;padding:.75rem .85rem;min-height:var(--sk-touch-target,44px);border-radius:10px;text-decoration:none;color:var(--ink,#2B2118);font-size:.95rem;font-family:var(--font-body,'Work Sans',sans-serif);}
-.sk-nav-links a.active{background:var(--sk-rust-soft,rgba(181,80,46,0.10));color:var(--rust,#B5502E);font-weight:600;}
+.sk-nav-panel .sk-nav-close{background:rgba(181,80,46,0.08);border:1px solid rgba(181,80,46,0.14);font-size:1rem;color:var(--ink-soft,#6B5C4C);cursor:pointer;line-height:1;padding:.3rem;border-radius:50%;min-width:var(--sk-touch-target,44px);min-height:var(--sk-touch-target,44px);display:flex;align-items:center;justify-content:center;transition:background .18s ease,color .18s ease,transform .18s ease;}
+.sk-nav-panel .sk-nav-close:hover{background:rgba(181,80,46,0.14);color:var(--rust,#B5502E);transform:scale(1.03);}
+.sk-nav-links{display:flex;flex-direction:column;gap:.22rem;flex:1;justify-content:center;margin-bottom:8vh;}
+.sk-nav-links a{display:flex;align-items:center;min-height:var(--sk-touch-target,44px);padding:.62rem .75rem;border-radius:10px;text-decoration:none;color:var(--ink,#2B2118);font-size:.95rem;font-family:var(--font-body,'Work Sans',sans-serif);line-height:1.25;border:1px solid transparent;transition:background .18s ease,color .18s ease,border-color .18s ease;}
+.sk-nav-links a:hover{background:rgba(255,246,232,0.48);border-color:rgba(181,80,46,0.08);}
+.sk-nav-links a.active{background:var(--sk-rust-soft,rgba(181,80,46,0.10));color:var(--rust,#B5502E);font-weight:600;border-color:rgba(181,80,46,0.12);}
 .sk-nav-links a.disabled{color:var(--ink-soft,#6B5C4C);opacity:.55;pointer-events:none;}.sk-nav-links a .sk-nav-tag{font-size:.72rem;margin-left:.4em;}
 
 /* =========================================================
@@ -64,7 +66,7 @@ button.bookmark-tab::after{content:'';width:4px;height:4px;border-radius:50%;bac
    ========================================================= */
 html body .backdrop{position:fixed!important;inset:0!important;background:var(--sk-overlay,rgba(43,33,24,0.38))!important;transition:opacity .25s ease!important;z-index:30!important;}
 html body.nav-open .backdrop{opacity:1!important;pointer-events:auto!important;}html body:not(.nav-open) .backdrop{opacity:0!important;pointer-events:none!important;}
-html body .side-panel{position:fixed!important;left:0!important;top:0!important;bottom:0!important;width:76%!important;max-width:var(--sk-panel-max-width,300px)!important;display:flex!important;z-index:31!important;transform:translateX(-100%)!important;transition:transform .28s ease!important;box-shadow:var(--sk-shadow-panel,2px 0 18px rgba(0,0,0,0.18))!important;}
+html body .side-panel{position:fixed!important;left:0!important;top:0!important;bottom:0!important;width:76%!important;max-width:var(--sk-panel-max-width,300px)!important;display:flex!important;z-index:31!important;transform:translateX(-100%)!important;transition:transform .28s ease!important;box-shadow:var(--sk-shadow-panel,2px 0 18px rgba(43,33,24,0.18))!important;}
 html body.nav-open .side-panel{transform:translateX(0)!important;}
 html body .side-panel .binding{width:var(--sk-edge-width,22px)!important;background:var(--sk-edge-binding,#F5D9AE)!important;border-right:1px solid var(--line-idle,rgba(43,33,24,0.16))!important;}
 html body .side-panel .binding .ring{width:8px!important;height:8px!important;border-radius:50%!important;background:var(--rust,#B5502E)!important;}
@@ -102,15 +104,37 @@ body.sk-nav-open .sk-nav-opener{opacity:0;visibility:hidden;pointer-events:none;
    This does not change panel width or account-widget positioning.
    ========================================================= */
 @media (max-width:700px){
-  :root{
-    --sk-nav-trigger-width:24px;
-    --sk-nav-trigger-height:52px;
-  }
-  button.bookmark-tab{
-    width:var(--sk-nav-trigger-width,24px);
-    height:var(--sk-nav-trigger-height,52px);
-  }
+  :root{--sk-nav-trigger-width:24px;--sk-nav-trigger-height:52px;}
+  button.bookmark-tab{width:var(--sk-nav-trigger-width,24px);height:var(--sk-nav-trigger-height,52px);}
 }
+
+/* =========================================================
+   STAGE 4C-1 — NAV PANEL VISUAL HIERARCHY
+   ---------------------------------------------------------
+   This step gives the shared panel a clearer visual hierarchy while
+   keeping navigation destinations and interaction unchanged.
+   ========================================================= */
+
+/* Shared panel header: stronger brand separation, still quiet. */
+.sk-nav-panel .sk-nav-top{padding-bottom:.8rem;border-bottom:1px solid var(--line-idle,rgba(43,33,24,0.12));}
+
+/* Shared close control: consistent circular touch target. */
+.sk-nav-panel .sk-nav-close{background:rgba(181,80,46,0.08);border:1px solid rgba(181,80,46,0.14);border-radius:50%;min-width:var(--sk-touch-target,44px);min-height:var(--sk-touch-target,44px);display:flex;align-items:center;justify-content:center;}
+.sk-nav-panel .sk-nav-close:hover{background:rgba(181,80,46,0.14);color:var(--rust,#B5502E);}
+
+/* Navigation links: clean rows with a restrained active-page state. */
+.sk-nav-links{gap:.22rem;}
+.sk-nav-links a{min-height:var(--sk-touch-target,44px);padding:.62rem .75rem;border:1px solid transparent;line-height:1.25;transition:background .18s ease,color .18s ease,border-color .18s ease;}
+.sk-nav-links a:hover{background:rgba(255,246,232,0.48);border-color:rgba(181,80,46,0.08);}
+.sk-nav-links a.active{border-color:rgba(181,80,46,0.12);}
+
+/* Legacy Index bridge: apply the same hierarchy to the older markup. */
+html body .side-panel .panel-top{padding-bottom:.8rem;border-bottom:1px solid var(--line-idle,rgba(43,33,24,0.12));}
+html body .side-panel .closer{background:rgba(181,80,46,0.08)!important;border:1px solid rgba(181,80,46,0.14)!important;border-radius:50%!important;display:flex!important;align-items:center!important;justify-content:center!important;}
+html body .panel-links{gap:.22rem!important;}
+html body .panel-links a{padding:.62rem .75rem!important;border:1px solid transparent!important;line-height:1.25!important;text-decoration:none!important;transition:background .18s ease,color .18s ease,border-color .18s ease!important;}
+html body .panel-links a:hover{background:rgba(255,246,232,0.48)!important;border-color:rgba(181,80,46,0.08)!important;}
+html body .panel-links a.active{border-color:rgba(181,80,46,0.12)!important;}
 
 /* =========================================================
    Mobile safety note:
