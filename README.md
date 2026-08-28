@@ -409,7 +409,162 @@ The foundation should be deliberately small, but transformation-ready.
 
 ---
 
-## 15. Security and privacy
+## 15. Current invitation and membership foundation
+
+The invitation system has now moved from planning into an initial working implementation. This section records the decisions that future AI sessions must preserve unless the owner explicitly changes them.
+
+### Registration and invitation concepts
+
+Two concepts must remain separate:
+
+- **Authentication/signup availability** → whether Supabase Auth permits creation of a new authentication user.
+- **Snehakoota registration/invitation policy** → whether the application requires an invitation or otherwise permits onboarding/membership.
+
+Supabase provides a Dashboard-level **Allow new users to sign up** switch. When it is OFF, existing users can still sign in while new authentication users cannot be created. This is useful as a temporary development/operational safety switch and should not be duplicated unnecessarily in the application configuration table.
+
+The application's invitation/registration policy may later become invitation-only. A frontend switch may control presentation/UX, but security decisions must remain enforced server-side.
+
+### Membership foundation
+
+`HSHS2004` is currently the default/initial Snehakoota membership concept. The architecture must not assume that it will remain the only membership forever.
+
+The intended long-term model supports:
+
+- One user → one or more memberships.
+- Membership-specific status such as `pending` or `active`.
+- Membership data separate from Supabase authentication identity.
+- Future selection of one or more memberships when the schema and UI are ready.
+
+The current invitation RPC intentionally supports **one optional membership per invitation** plus a **general invitation**. Multiple-membership invitation selection is a planned schema enhancement, not to be simulated through repeated single-membership fields.
+
+### Invitation types
+
+The current design supports two invitation meanings:
+
+1. **Membership-specific invitation** — the sender selects an active membership and the invitation carries that suggested membership context.
+2. **General Snehakoota invitation** — the sender does not pre-attach a membership. The receiver can authenticate and later be presented with available membership choices according to the onboarding rules.
+
+A general invitation must not automatically grant an administrative role or manufacture a membership merely because authentication succeeded.
+
+### Invitation generation rules
+
+The current backend RPC is:
+
+`public.create_invitation(p_membership_id bigint default null)`
+
+The intended sequence is:
+
+`authenticated sender → validate profile → validate invitation configuration → validate optional membership → generate secure random token → hash token → persist invitation → return usable token/path`
+
+Important rules:
+
+- Only authenticated users may execute the invitation RPC.
+- The inviter must have an active application profile.
+- A supplied membership must belong to the inviter and be active.
+- Referenced school/batch data must be active.
+- The raw invitation token is not stored; a secure hash is stored.
+- The invitation record is persisted before the UI displays the resulting link.
+- Invitation validity is checked server-side, not by trusting frontend values.
+- Invitation errors should return structured application-level codes/types/messages rather than raw database errors such as duplicate-key violations.
+- A new invitation generation creates a **new invitation/token**. An old link is not silently reused for a later invitation.
+
+### Invitation expiry and retention
+
+The current standard invitation validity/retention period is **5 days**, represented through configuration rather than scattered hard-coded backend values.
+
+The intended lifecycle is:
+
+`created → usable until expires_at → cleanup/delete`
+
+The project should prefer deleting expired invitation records rather than accumulating a permanent history of expired tokens on the free database plan unless a future audit requirement makes retention necessary.
+
+A scheduled cleanup mechanism is planned. Manual SQL cleanup is acceptable during development/testing, but cleanup logic should eventually be handled by a controlled server-side job/RPC.
+
+### Invitation UI philosophy
+
+The Account widget is the entry point for a signed-in sender.
+
+The current sender flow is intentionally lightweight and mobile-friendly:
+
+`Invite a friend → membership/general choice → Generating… → persisted invitation → link → Copy/Share`
+
+The UI should not expose a link before the backend has successfully persisted the invitation.
+
+The sender can close the panel at any time. **Copy and Share must not close the panel.** Copy should give a simple human-facing confirmation such as `Link copied.` and then return to the normal invitation message. Share should similarly leave the panel available.
+
+The invitation UI should remain modular. Current frontend UX switches include the membership-selection mode and whether the general-invitation option is shown. These are presentation controls only and must never be treated as security controls.
+
+The current invitation wording should describe the link as an **invitation link**, not a "reusable invitation link", because each generation creates a new token/link.
+
+### Receiver-side design — pending implementation
+
+The invitation URL is expected to carry enough information for the application to identify and validate the invitation before granting or creating membership.
+
+The planned receiver flow is:
+
+`open invitation URL → identify invitation → show invitation context → authenticate if required → validate invitation server-side → determine membership/onboarding result`
+
+A receiver who already has an account must be able to authenticate without being treated as a new user. A general invitation should allow the receiver to choose from currently available membership options according to the eventual onboarding rules.
+
+Receiver-side implementation is **not yet complete** and must not be assumed to exist merely because invitation generation works.
+
+### Multiple-membership invitation — explicit future item
+
+The sender UI may eventually allow selecting **one or more memberships** in a single invitation. This requires a deliberate schema/API enhancement before implementation.
+
+Do not encode multiple memberships by overloading the current single `suggested_school_id` / `suggested_batch_id` fields.
+
+When this item is resumed, decide and document:
+
+- One invitation → multiple membership selections.
+- Whether the receiver can accept all or choose among them.
+- How duplicate/already-existing memberships are handled.
+- How membership status is created/updated for each selection.
+- How the invitation is displayed and audited.
+- Whether one token represents the whole invitation set.
+
+---
+
+## 16. Supabase operational foundation
+
+The project now has a small amount of real Supabase infrastructure in addition to the planned architecture.
+
+### Configuration
+
+Application configuration is intended to live in a configuration table so operational values can be changed without scattering constants through SQL functions.
+
+Current invitation-related configuration includes:
+
+- `invitation_enabled` → controls whether the invitation-generation backend is available.
+- `invitation_expiry_days` → controls the invitation lifetime; current standard value is 5 days.
+
+Configuration is application policy. Frontend controls may hide/show UI, but RPCs must still validate the relevant configuration server-side.
+
+### Heartbeat / project activity
+
+A lightweight `supabase_heartbeat()` function has been established as an operational activity check for the Supabase projects. It is intentionally not dependent on application data tables and may read a PostgreSQL system catalog so the call represents a real database interaction.
+
+GitHub Actions is being used to call the heartbeat on a schedule. This is an operational keep-alive mechanism, not an application feature, and it should remain isolated from Snehakoota business logic.
+
+If a heartbeat workflow fails, the failure should be investigated/retried by the workflow/operations setup; it is not a reason to add heartbeat code to the website UI.
+
+### Supabase Auth signup switch
+
+For development and temporary operational control, Supabase Dashboard's **Allow new users to sign up** setting can be turned OFF when the owner is not actively testing onboarding. Existing users remain able to sign in.
+
+This is intentionally separate from the application's invitation policy.
+
+### Security baseline
+
+The invitation RPC is a `SECURITY DEFINER` operation with a controlled search path and explicit execution grants. Privileged database logic must remain server-side.
+
+The browser may use a Supabase publishable/anonymous client key where Supabase documents that key as safe for client use, but must never contain a service-role key or database secret.
+
+RLS remains part of the database authorization model. Hiding UI controls is never sufficient protection.
+
+---
+
+## 17. Security and privacy
 
 Never place secrets in HTML, CSS or client-side JavaScript.
 
@@ -425,7 +580,7 @@ Public client-side configuration may be used only when the relevant service expl
 
 ---
 
-## 16. AI change protocol
+## 18. AI change protocol
 
 For every requested change, the AI should follow this order:
 
@@ -451,6 +606,7 @@ Check for:
 - Mobile layout problems.
 - Desktop layout problems.
 - Regression of existing interactions.
+- For Supabase changes: authorization, RLS/grants, error handling, configuration dependencies and persistence order.
 
 ### Step 6 — Report
 State:
@@ -459,10 +615,11 @@ State:
 - Main changes.
 - Any assumptions.
 - Anything that still needs browser/device testing.
+- Any follow-up architectural item deliberately left pending.
 
 ---
 
-## 17. Do not over-engineer the current project
+## 19. Do not over-engineer the current project
 
 Snehakoota.in is being built incrementally.
 
@@ -478,7 +635,7 @@ Future architecture should be anticipated, but future infrastructure should not 
 
 ---
 
-## 18. Current project philosophy
+## 20. Current project philosophy
 
 This project is a community project first and a technology project second.
 
@@ -496,7 +653,7 @@ Every new feature should be evaluated against these principles.
 
 ---
 
-## 19. Working instruction for future AI sessions
+## 21. Working instruction for future AI sessions
 
 When starting work on this repository, the AI should treat this README as the **baseline project contract**.
 
