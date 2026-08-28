@@ -2,7 +2,7 @@ name: Supabase heartbeat
 
 on:
   schedule:
-    - cron: "17 4 */3 * *"
+    - cron: "17 4 */2 * *"
   workflow_dispatch:
 
 jobs:
