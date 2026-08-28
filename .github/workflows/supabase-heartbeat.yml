@@ -16,7 +16,6 @@ jobs:
             -X POST \
             "https://${{ secrets.SNEHAKOOTA_SUPABASE_PROJECT_REF }}.supabase.co/rest/v1/rpc/supabase_heartbeat" \
             -H "apikey: ${{ secrets.SNEHAKOOTA_SUPABASE_ANON_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.SNEHAKOOTA_SUPABASE_ANON_KEY }}" \
             -H "Content-Type: application/json"
 
       - name: Keep OneHaveri Supabase active
@@ -25,5 +24,4 @@ jobs:
             -X POST \
             "https://${{ secrets.ONEHAVERI_SUPABASE_PROJECT_REF }}.supabase.co/rest/v1/rpc/supabase_heartbeat" \
             -H "apikey: ${{ secrets.ONEHAVERI_SUPABASE_ANON_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.ONEHAVERI_SUPABASE_ANON_KEY }}" \
             -H "Content-Type: application/json"
