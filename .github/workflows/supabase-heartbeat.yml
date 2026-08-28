@@ -1,0 +1,29 @@
+name: Supabase heartbeat
+
+on:
+  schedule:
+    - cron: "17 4 */3 * *"
+  workflow_dispatch:
+
+jobs:
+  heartbeat:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Keep Snehakoota Supabase active
+        run: |
+          curl --fail-with-body --silent --show-error \
+            -X POST \
+            "https://${{ secrets.SNEHAKOOTA_SUPABASE_PROJECT_REF }}.supabase.co/rest/v1/rpc/supabase_heartbeat" \
+            -H "apikey: ${{ secrets.SNEHAKOOTA_SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SNEHAKOOTA_SUPABASE_ANON_KEY }}" \
+            -H "Content-Type: application/json"
+
+      - name: Keep OneHaveri Supabase active
+        run: |
+          curl --fail-with-body --silent --show-error \
+            -X POST \
+            "https://${{ secrets.ONEHAVERI_SUPABASE_PROJECT_REF }}.supabase.co/rest/v1/rpc/supabase_heartbeat" \
+            -H "apikey: ${{ secrets.ONEHAVERI_SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.ONEHAVERI_SUPABASE_ANON_KEY }}" \
+            -H "Content-Type: application/json"
