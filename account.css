@@ -1,6 +1,6 @@
 /* ===================================================================
    SNEHAKOOTA ACCOUNT WIDGET — styles
-   Version: 4
+   Version: 5
    =================================================================== */
 
 #sk-account-root{
@@ -66,4 +66,22 @@
 .ska-invite-btn:disabled{opacity:.48;cursor:not-allowed}
 .ska-invite-share{background:var(--ska-rust);color:#fff;border-color:var(--ska-rust)}
 .ska-invite-share:hover:not(:disabled){background:#9f4528}
+
+/* ---- Account 2A.3: multi-membership invitation picker ---- */
+.ska-membership-picker{margin-top:.15rem}
+.ska-membership-options{display:flex;flex-direction:column;gap:.45rem;max-height:220px;overflow-y:auto;padding:.05rem .05rem .1rem}
+.ska-membership-option{display:flex;align-items:center;gap:.7rem;width:100%;box-sizing:border-box;border:1px solid rgba(181,80,46,.13);border-radius:11px;background:#fffaf1;padding:.65rem .7rem;cursor:pointer;transition:background .18s ease,border-color .18s ease,box-shadow .18s ease}
+.ska-membership-option:hover{background:rgba(181,80,46,.045);border-color:rgba(181,80,46,.24)}
+.ska-membership-option input{width:17px;height:17px;flex:0 0 17px;margin:0;accent-color:var(--ska-rust);cursor:pointer}
+.ska-membership-option input:checked + .ska-membership-option-text{color:var(--ska-ink)}
+.ska-membership-option input:disabled{cursor:not-allowed}
+.ska-membership-option:has(input:checked){border-color:rgba(181,80,46,.35);box-shadow:0 0 0 2px rgba(181,80,46,.05)}
+.ska-membership-option-text{min-width:0;display:flex;flex-direction:column;gap:2px;color:var(--ska-ink)}
+.ska-membership-option-text strong{font-size:.82rem;font-weight:700;line-height:1.25}
+.ska-membership-option-text small{font-size:.7rem;color:var(--ska-ink-soft);line-height:1.3}
+.ska-general-option{margin-top:.6rem}
+.ska-invite-generate{width:100%;margin-top:.85rem;border:0;border-radius:11px;background:var(--ska-rust);color:#fff;padding:.76rem .85rem;font:700 .84rem 'Work Sans',sans-serif;cursor:pointer;transition:background .18s ease,transform .1s ease,box-shadow .18s ease}
+.ska-invite-generate:hover:not(:disabled){background:#9f4528;transform:translateY(-1px);box-shadow:0 5px 14px rgba(181,80,46,.16)}
+.ska-invite-generate:active:not(:disabled){transform:scale(.98)}
+.ska-invite-generate:disabled{opacity:.48;cursor:not-allowed}
 @media (max-width:520px){.ska-sheet{width:calc(100vw - 28px);bottom:14px}.ska-sheet-top{padding-left:1.1rem;padding-right:1.1rem}.ska-sheet-body{padding-left:1.1rem;padding-right:1.1rem}}
