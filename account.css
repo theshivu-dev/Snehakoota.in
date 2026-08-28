@@ -79,9 +79,22 @@
 .ska-provider-btn.ska-secondary:hover{ background: #9f4528; }
 .ska-provider-btn img,.ska-provider-btn svg{ width: 18px; height: 18px; flex-shrink: 0; }
 
+/* ---- Signed-in account actions ---- */
 .ska-identity{ margin-bottom: 1rem; }
 .ska-identity strong{ display: block; margin: 0; font-family: 'Work Sans', sans-serif; font-size: 1.05rem; font-weight: 700; color: var(--ska-ink); }
 .ska-identity span{ display: none; }
+.ska-action-row{
+  width: 100%; box-sizing: border-box; border: 0; border-top: 1px solid rgba(181,80,46,0.13);
+  border-bottom: 1px solid rgba(181,80,46,0.13); background: transparent; color: var(--ska-ink);
+  min-height: 58px; padding: .65rem .15rem; display: flex; align-items: center; gap: .8rem;
+  text-align: left; cursor: pointer; font-family: 'Work Sans', sans-serif;
+  -webkit-tap-highlight-color: transparent; transition: background .18s ease;
+}
+.ska-action-row:hover,.ska-action-row:focus-visible{ background: rgba(181,80,46,0.045); outline: none; }
+.ska-action-row > svg{ width: 23px; height: 23px; flex: 0 0 23px; fill: none; stroke: var(--ska-rust); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.ska-action-row > span{ min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.ska-action-row strong{ font-size: .9rem; font-weight: 700; line-height: 1.25; color: var(--ska-ink); }
+.ska-action-row small{ font-size: .72rem; line-height: 1.35; color: var(--ska-ink-soft); }
 .ska-signout-btn{ width: 100%; border-radius: 12px; padding: .78rem; background: transparent; border: 1px solid rgba(181,80,46,0.20); color: var(--ska-rust); font: 700 .86rem 'Work Sans', sans-serif; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background .2s ease, transform .1s ease; }
 .ska-signout-btn:hover{ background: rgba(181,80,46,0.05); }
 .ska-signout-btn:active{ transform: scale(.98); }
