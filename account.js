@@ -1,6 +1,6 @@
 /* ===================================================================
    SNEHAKOOTA ACCOUNT WIDGET — logic
-   Version: 7
+   Version: 8
    =================================================================== */
 (function(){
   "use strict";
@@ -17,7 +17,8 @@
   if (!window.supabase) { console.error('account.js: supabase-js must be loaded before this script.'); return; }
   var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, { auth:{ persistSession:true, autoRefreshToken:true, detectSessionInUrl:true, flowType:'pkce', experimental:{passkey:true} } });
 
-  var receiverInvitationContext = { code:null, valid:false, data:null, source:'none' };
+  var receiverInvitationContext = { code:null, valid:false, data:null, source:'none', selectedMembershipIds:[] };
+  var receiverInvitationAutoOpened = false;
 
   function normalizeInvitationCode(value){
     var code=String(value||'').trim().toUpperCase();
@@ -104,6 +105,14 @@
     });
   }
 
+  function maybeAutoOpenInvitation(){
+    if(receiverInvitationAutoOpened||!receiverInvitationContext.valid||typeof openSheet!=='function')return;
+    receiverInvitationAutoOpened=true;
+    window.setTimeout(function(){
+      if(!sheet.classList.contains('ska-show'))openSheet();
+    },0);
+  }
+
   function resolveReceiverInvitationContext(){
     var urlCode=readInvitationCodeFromUrl();
     var stored=loadStoredInvitationContext();
@@ -136,8 +145,10 @@
           source:urlCode?'url':'session'
         };
       }
-      saveInvitationContext(receiverInvitationContext);
-      if(!receiverInvitationContext.valid){
+      if(receiverInvitationContext.valid){
+        saveInvitationContext(receiverInvitationContext);
+        maybeAutoOpenInvitation();
+      }else{
         try{sessionStorage.removeItem(INVITATION_CONTEXT_STORAGE_KEY);}catch(e){}
       }
       if(typeof sheet!=='undefined'&&sheet.classList.contains('ska-show')&&!currentSession){
@@ -147,7 +158,7 @@
     }).catch(function(err){
       console.error('Invitation resolution error:',err);
       receiverInvitationContext={code:code,valid:false,data:null,source:urlCode?'url':'session',selectedMembershipIds:[]};
-      saveInvitationContext(receiverInvitationContext);
+      try{sessionStorage.removeItem(INVITATION_CONTEXT_STORAGE_KEY);}catch(e){}
       if(typeof sheet!=='undefined'&&sheet.classList.contains('ska-show')&&!currentSession){
         renderSignedOut();
       }
@@ -157,9 +168,9 @@
 
   /* Receiver Stage 1 + Stage 2 context foundation. No account,
      membership, invitation-use, or invitation-status mutation occurs here. */
-  resolveReceiverInvitationContext();
+  var invitationResolutionPromise=resolveReceiverInvitationContext();
 
-  var GOOGLE_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M21.35 12.23c0-.72-.06-1.42-.18-2.09H12v3.96h5.23a4.47 4.47 0 0 1-1.94 2.93v2.43h3.14c1.84-1.69 2.92-4.18 2.92-7.23z"/><path fill="#34A853" d="M12 21.5c2.63 0 4.84-.87 6.45-2.37l-3.14-2.43c-.87.58-1.98.92-3.31.92-2.54 0-4.69-1.72-5.46-4.03H3.3v2.5A9.74 9.74 0 0 0 12 21.5z"/><path fill="#FBBC05" d="M6.54 13.59A5.86 5.86 0 0 1 6.23 12c0-.55.11-1.08.31-1.59v-2.5H3.3A9.75 9.75 0 0 0 2.25 12c0 1.57.38 3.05 1.05 4.09l3.24-2.5z"/><path fill="#EA4335" d="M12 6.38c1.43 0 2.71.49 3.72 1.46l2.79-2.79C16.84 3.5 14.63 2.5 12 2.5a9.74 9.74 0 0 0-8.7 5.41l3.24 2.5C7.31 8.1 9.46 6.38 9.46 6.38z"/></svg>';
+  var GOOGLE_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M21.35 12.23c0-.72-.06-1.42-.18-2.09H12v3.96h5.23a4.47 4.47 0 0 1-1.94 2.93v2.43h3.14c-1.84-1.69 2.92-4.18 2.92-7.23z"/><path fill="#34A853" d="M12 21.5c2.63 0 4.84-.87 6.45-2.37l-3.14-2.43c-.87.58-1.98.92-3.31.92-2.54 0-4.69-1.72-5.46-4.03H3.3v2.5A9.74 9.74 0 0 0 12 21.5z"/><path fill="#FBBC05" d="M6.54 13.59A5.86 5.86 0 0 1 6.23 12c0-.55.11-1.08.31-1.59v-2.5H3.3A9.75 9.75 0 0 0 2.25 12c0 1.57.38 3.05 1.05 4.09l3.24-2.5z"/><path fill="#EA4335" d="M12 6.38c1.43 0 2.71.49 3.72 1.46l2.79-2.79C16.84 3.5 14.63 2.5 12 2.5a9.74 9.74 0 0 0-8.7 5.41l3.24 2.5C7.31 8.1 9.46 6.38 9.46 6.38z"/></svg>';
   var PASSKEY_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8.5" cy="8.5" r="3.5"></circle><path d="M11 11l8 8M15 15l2-2M17 17l2-2"></path></svg>';
   var INVITE_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"></path><circle cx="9.5" cy="7" r="4"></circle><path d="M19 8v6M22 11h-6"></path></svg>';
 
@@ -177,7 +188,7 @@
 
   mount.innerHTML='<div class="ska-backdrop" id="skaBackdrop"></div><div class="ska-tray" id="skaTray"><button class="ska-trigger" id="skaTrigger" type="button" aria-label="Account" aria-expanded="false" aria-controls="skaSheet"><span class="ska-icon" id="skaIcon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.2"></circle><path d="M5.5 19c.7-3.1 3-4.8 6.5-4.8s5.8 1.7 6.5 4.8"></path></svg><span class="ska-status" id="skaStatus"></span></span></button></div><div class="ska-sheet" id="skaSheet" role="dialog" aria-modal="true" aria-hidden="true"><div class="ska-sheet-top"><span class="ska-sheet-title">SnehaKoota Account</span><button class="ska-close" id="skaClose" type="button" aria-label="Close">&#10005;</button></div><div class="ska-sheet-body" id="skaBody"></div></div>';
   var trigger=document.getElementById('skaTrigger'),status=document.getElementById('skaStatus'),backdrop=document.getElementById('skaBackdrop'),sheet=document.getElementById('skaSheet'),closeBtn=document.getElementById('skaClose'),body=document.getElementById('skaBody');
-  function openSheet(){backdrop.classList.add('ska-show');sheet.classList.add('ska-show');sheet.setAttribute('aria-hidden','false');trigger.setAttribute('aria-expanded','true');if(!currentSession&&receiverInvitationContext.code&&!receiverInvitationContext.valid){resolveReceiverInvitationContext();}}
+  function openSheet(){backdrop.classList.add('ska-show');sheet.classList.add('ska-show');sheet.setAttribute('aria-hidden','false');trigger.setAttribute('aria-expanded','true');}
   function closeSheet(){backdrop.classList.remove('ska-show');sheet.classList.remove('ska-show');sheet.setAttribute('aria-hidden','true');trigger.setAttribute('aria-expanded','false');}
   trigger.addEventListener('click',function(){if(sheet.classList.contains('ska-show'))closeSheet();else openSheet();}); closeBtn.addEventListener('click',closeSheet); backdrop.addEventListener('click',closeSheet); document.addEventListener('keydown',function(e){if(e.key==='Escape')closeSheet();});
   function displayName(user){var m=(user&&user.user_metadata)||{};return m.full_name||m.name||m.user_name||'SnehaKoota Member';}
@@ -200,6 +211,6 @@
   function renderSignedOut(){body.innerHTML=renderReceiverInvitationContext()+'<h3 class="ska-auth-title">Sign in to SnehaKoota</h3><p class="ska-auth-sub">Save your contributions and come back anytime.</p><div class="ska-providers">'+providers.map(function(p){return '<button type="button" class="ska-provider-btn '+p.style+'" data-provider="'+p.id+'">'+p.icon+'<span>'+p.label+'</span></button>';}).join('')+'</div><div class="ska-message" id="skaMessage"></div>';bindReceiverInvitationContext();}
   function renderSignedIn(session){currentSession=session;var user=session.user;body.innerHTML='<h3 class="ska-auth-title">Signed in</h3><div class="ska-identity"><strong>'+displayName(user)+'</strong><span>'+ (user.email||'Google account')+'</span></div>'+inviteEntry()+'<button type="button" class="ska-provider-btn ska-secondary" id="skaRegisterPasskey">'+PASSKEY_ICON+'<span>Add a passkey to this device</span></button><button type="button" class="ska-signout-btn" id="skaSignOut">Sign out</button><div class="ska-message" id="skaMessage"></div>';var inviteBtn=document.getElementById('skaInviteFriend'),passkeyBtn=document.getElementById('skaRegisterPasskey'),signOutBtn=document.getElementById('skaSignOut'),message=document.getElementById('skaMessage');inviteBtn.addEventListener('click',function(){renderInvitationPanel();});passkeyBtn.addEventListener('click',function(){passkeyBtn.disabled=true;message.textContent='Passkey ಹೊಂದಿಸಲಾಗುತ್ತಿದೆ…';if(!window.PublicKeyCredential||!navigator.credentials){message.textContent='ಈ ಸಾಧನ ಅಥವಾ ಬ್ರೌಸರ್‌ನಲ್ಲಿ Passkey ಬೆಂಬಲವಿಲ್ಲ.';passkeyBtn.disabled=false;return;}supabaseClient.auth.registerPasskey().then(function(res){if(res.error){console.error('Passkey registration error:',res.error);var duplicatePasskey=res.error.name==='InvalidStateError'||res.error.code==='invalid_state'||/already\s*(registered|exists)|credential.*already|already.*credential/i.test(res.error.message||'');if(duplicatePasskey){message.textContent='Passkey is already registered on this device.';passkeyBtn.disabled=false;setTimeout(closeSheet,1400);return;}message.textContent='Passkey ಹೊಂದಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.';passkeyBtn.disabled=false;return;}message.textContent='Passkey ಯಶಸ್ವಿಯಾಗಿ ಸೇರಿಸಲಾಗಿದೆ.';passkeyBtn.disabled=false;setTimeout(closeSheet,1400);});});signOutBtn.addEventListener('click',function(){signOutBtn.disabled=true;message.textContent='ಸೈನ್ ಔಟ್ ಮಾಡಲಾಗುತ್ತಿದೆ…';supabaseClient.auth.signOut().then(function(res){if(res.error){console.error('Sign-out error:',res.error);message.textContent='ಸೈನ್ ಔಟ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.';signOutBtn.disabled=false;return;}updateAccount(null);});});}
   function updateAccount(session){currentSession=session;var signedIn=!!(session&&session.user);trigger.classList.toggle('ska-signed-in',signedIn);status.title=signedIn?'Signed in':'Signed out';if(signedIn)renderSignedIn(session);else renderSignedOut();}
-  var lastAuthState=null;function handleAuthStateChange(event,session){var signedIn=!!(session&&session.user);trigger.classList.toggle('ska-signed-in',signedIn);status.title=signedIn?'Signed in':'Signed out';if(event==='SIGNED_IN'||event==='SIGNED_OUT'||event==='INITIAL_SESSION'||lastAuthState===null||signedIn!==lastAuthState){if(signedIn)renderSignedIn(session);else renderSignedOut();}if(event==='SIGNED_IN')closeSheet();lastAuthState=signedIn;currentSession=session;}
-  supabaseClient.auth.onAuthStateChange(handleAuthStateChange);supabaseClient.auth.getSession().then(function(res){if(res.error){console.error('Initial session error:',res.error);lastAuthState=false;updateAccount(null);return;}var session=res.data.session;lastAuthState=!!(session&&session.user);updateAccount(session);});
+  var lastAuthState=null;function handleAuthStateChange(event,session){var signedIn=!!(session&&session.user);trigger.classList.toggle('ska-signed-in',signedIn);status.title=signedIn?'Signed in':'Signed out';if(event==='SIGNED_IN'||event==='SIGNED_OUT'||event==='INITIAL_SESSION'||lastAuthState===null||signedIn!==lastAuthState){if(signedIn)renderSignedIn(session);else renderSignedOut();}if(event==='SIGNED_IN')closeSheet();lastAuthState=signedIn;currentSession=session;if(event==='SIGNED_IN'&&receiverInvitationContext.valid){maybeAutoOpenInvitation();}}
+  supabaseClient.auth.onAuthStateChange(handleAuthStateChange);supabaseClient.auth.getSession().then(function(res){if(res.error){console.error('Initial session error:',res.error);lastAuthState=false;updateAccount(null);return;}var session=res.data.session;lastAuthState=!!(session&&session.user);updateAccount(session);if(receiverInvitationContext.valid)maybeAutoOpenInvitation();});
 })();
