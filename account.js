@@ -12,11 +12,83 @@
   var INVITATION_MEMBERSHIP_MODE = 'optional';
   var INVITATION_SHOW_GENERAL_OPTION = true;
   var INVITATION_SUCCESS_MESSAGE_MS = 2500;
+  var INVITATION_CONTEXT_STORAGE_KEY = 'snehakoota.invitation.context.v1';
 
   if (!window.supabase) { console.error('account.js: supabase-js must be loaded before this script.'); return; }
   var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, { auth:{ persistSession:true, autoRefreshToken:true, detectSessionInUrl:true, flowType:'pkce', experimental:{passkey:true} } });
 
-  var GOOGLE_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M21.35 12.23c0-.72-.06-1.42-.18-2.09H12v3.96h5.23a4.47 4.47 0 0 1-1.94 2.93v2.43h3.14c1.84-1.69 2.92-4.18 2.92-7.23z"/><path fill="#34A853" d="M12 21.5c2.63 0 4.84-.87 6.45-2.37l-3.14-2.43c-.87.58-1.98.92-3.31.92-2.54 0-4.69-1.72-5.46-4.03H3.3v2.5A9.74 9.74 0 0 0 12 21.5z"/><path fill="#FBBC05" d="M6.54 13.59A5.86 5.86 0 0 1 6.23 12c0-.55.11-1.08.31-1.59v-2.5H3.3A9.75 9.75 0 0 0 2.25 12c0 1.57.38 3.05 1.05 4.09l3.24-2.5z"/><path fill="#EA4335" d="M12 6.38c1.43 0 2.71.49 3.72 1.46l2.79-2.79C16.84 3.5 14.63 2.5 12 2.5a9.74 9.74 0 0 0-8.7 5.41l3.24 2.5C7.31 8.1 9.46 6.38 12 6.38z"/></svg>';
+  var receiverInvitationContext = { code:null, valid:false, data:null, source:'none' };
+
+  function normalizeInvitationCode(value){
+    var code=String(value||'').trim().toUpperCase();
+    return /^[A-Z0-9]{8}$/.test(code)?code:null;
+  }
+
+  function readInvitationCodeFromUrl(){
+    try{
+      return normalizeInvitationCode(new URLSearchParams(window.location.search).get('invite'));
+    }catch(e){
+      return null;
+    }
+  }
+
+  function loadStoredInvitationContext(){
+    try{
+      var raw=sessionStorage.getItem(INVITATION_CONTEXT_STORAGE_KEY);
+      if(!raw)return null;
+      var parsed=JSON.parse(raw);
+      var code=normalizeInvitationCode(parsed&&parsed.code);
+      if(!code)return null;
+      return {code:code,valid:parsed.valid===true,data:parsed.data||null,source:'session'};
+    }catch(e){
+      return null;
+    }
+  }
+
+  function saveInvitationContext(context){
+    try{sessionStorage.setItem(INVITATION_CONTEXT_STORAGE_KEY,JSON.stringify(context));}catch(e){}
+  }
+
+  function resolveReceiverInvitationContext(){
+    var urlCode=readInvitationCodeFromUrl();
+    var stored=loadStoredInvitationContext();
+    var code=urlCode|| (stored&&stored.code) || null;
+
+    if(!code){
+      receiverInvitationContext={code:null,valid:false,data:null,source:'none'};
+      return Promise.resolve(receiverInvitationContext);
+    }
+
+    receiverInvitationContext={code:code,valid:false,data:null,source:urlCode?'url':'session'};
+
+    return supabaseClient.rpc('resolve_invitation',{p_invitation_code:code}).then(function(res){
+      if(res.error){
+        console.error('Invitation resolution error:',res.error);
+        receiverInvitationContext={code:code,valid:false,data:null,source:urlCode?'url':'session'};
+      }else{
+        var data=res.data||{};
+        receiverInvitationContext={
+          code:code,
+          valid:data.success===true&&data.invitation_valid===true,
+          data:data.success===true?data:null,
+          source:urlCode?'url':'session'
+        };
+      }
+      saveInvitationContext(receiverInvitationContext);
+      return receiverInvitationContext;
+    }).catch(function(err){
+      console.error('Invitation resolution error:',err);
+      receiverInvitationContext={code:code,valid:false,data:null,source:urlCode?'url':'session'};
+      saveInvitationContext(receiverInvitationContext);
+      return receiverInvitationContext;
+    });
+  }
+
+  /* Receiver Stage 1: capture/resolve invitation context without changing
+     any account, membership, or invitation-use state. */
+  resolveReceiverInvitationContext();
+
+  var GOOGLE_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M21.35 12.23c0-.72-.06-1.42-.18-2.09H12v3.96h5.23a4.47 4.47 0 0 1-1.94 2.93v2.43h3.14c1.84-1.69 2.92-4.18 2.92-7.23z"/><path fill="#34A853" d="M12 21.5c2.63 0 4.84-.87 6.45-2.37l-3.14-2.43c-.87.58-1.98.92-3.31.92-2.54 0-4.69-1.72-5.46-4.03H3.3v2.5A9.74 9.74 0 0 0 2.25 12c0 1.57.38 3.05 1.05 4.09l3.24-2.5z"/><path fill="#FBBC05" d="M6.54 13.59A5.86 5.86 0 0 1 6.23 12c0-.55.11-1.08.31-1.59v-2.5H3.3A9.75 9.75 0 0 0 2.25 12c0 1.57.38 3.05 1.05 4.09l3.24-2.5z"/><path fill="#EA4335" d="M12 6.38c1.43 0 2.71.49 3.72 1.46l2.79-2.79C16.84 3.5 14.63 2.5 12 2.5a9.74 9.74 0 0 0-8.7 5.41l3.24 2.5C7.31 8.1 9.46 6.38 12 6.38z"/></svg>';
   var PASSKEY_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8.5" cy="8.5" r="3.5"></circle><path d="M11 11l8 8M15 15l2-2M17 17l2-2"></path></svg>';
   var INVITE_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"></path><circle cx="9.5" cy="7" r="4"></circle><path d="M19 8v6M22 11h-6"></path></svg>';
 
