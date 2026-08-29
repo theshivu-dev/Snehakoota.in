@@ -143,3 +143,16 @@ html body .panel-links a[href="#"]:nth-child(5)::before{background-image:url("da
 html body .panel-links a.active::before{filter:sepia(1) saturate(5) hue-rotate(330deg)}
 
 @media (prefers-reduced-motion:reduce){.sk-nav-opener,.sk-nav-opener.sk-nav-pulsing::before,button.bookmark-tab,.bookmark-tab.pulsing::before{animation:none}.sk-nav-panel,.sk-nav-backdrop,.sk-nav-opener,.bookmark-tab{transition:none}}
+
+/* ==========================================================================
+   GLOBAL COMPONENT VISIBILITY CONTROLS
+   --------------------------------------------------------------------------
+   Controls the dynamic display state of layout components across all pages.
+   Setting data-show-strip="false" on the <body> tag overrides base styles 
+   and completely unmounts the red dotted navigation strip from the document 
+   flow, freeing up page layout space without leaving blank gaps.
+   ========================================================================== */
+
+body[data-show-strip="false"] .red-dotted-strip {
+  display: none !important;
+}
