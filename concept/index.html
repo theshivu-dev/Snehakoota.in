@@ -169,6 +169,25 @@
   .wordmark .w-sneha{ color:var(--terracotta); }
   .wordmark .w-koota{ color:var(--green-deep); }
   .wordmark .kn{ display:block; font-style:normal; font-weight:600; font-size:0.42em; color:var(--ink-soft); letter-spacing:0.04em; margin-top:10px; }
+  .wordmark-link{ text-decoration:none; color:inherit; }
+  .wordmark-link:hover .w-sneha, .wordmark-link:hover .w-koota{ opacity:0.82; }
+  .site-link{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    margin-top:16px;
+    font-family:'Inter','Noto Sans Kannada',sans-serif;
+    font-size:0.78rem;
+    letter-spacing:0.06em;
+    color:var(--terracotta-deep);
+    text-decoration:none;
+    border-bottom:1px solid rgba(192,95,55,0.35);
+    padding-bottom:2px;
+    opacity:0;
+    animation:riseIn 1s ease forwards .5s;
+    transition:border-color .2s ease, color .2s ease;
+  }
+  .site-link:hover{ color:var(--terracotta); border-color:var(--terracotta); }
   .tagline{
     font-family:'Inter', sans-serif;
     font-size:0.95rem;
@@ -474,9 +493,10 @@
 <section class="hero">
   <div class="wrap">
     <div class="kn-line">ಸಂಬಂಧಗಳು ಕಾಲದಿಂದ ದೂರವಾಗಬಹುದು; ಮನಸ್ಸುಗಳು ದೂರವಾಗಬೇಕೆಂದಿಲ್ಲ</div>
-    <h1 class="wordmark"><span class="w-sneha">Sneha</span><span class="w-koota">Koota</span><span class="kn">ಸ್ನೇಹಕೂಟ</span></h1>
+    <h1 class="wordmark"><a class="wordmark-link" href="https://snehakoota.in"><span class="w-sneha">Sneha</span><span class="w-koota">Koota</span><span class="kn">ಸ್ನೇಹಕೂಟ</span></a></h1>
     <div class="tagline">Different Paths. One Circle.</div>
     <p class="hero-sub">A quiet idea, still taking shape: that the people who once shared a classroom, a hostel corridor, or a college canteen table shouldn't have to lose each other to time zones and busy calendars.</p>
+    <a class="site-link" href="https://snehakoota.in">snehakoota.in →</a>
     <div class="scroll-cue">begin the story</div>
   </div>
 </section>
@@ -666,7 +686,7 @@
     <div class="closing-kn reveal">SnehaKoota ಒಂದು ದಿನದ ಕಾರ್ಯಕ್ರಮವಾಗಿ ಮಾತ್ರ ನೆನಪಾಗಬಾರದು —<br>ವರ್ಷಗಳ ನಂತರವೂ, "ನಮ್ಮವರಿದ್ದಾರೆ" ಎನ್ನುವ ಭರವಸೆಯಾಗಿ ಉಳಿಯಬೇಕು.</div>
     <div class="closing-en reveal">May SnehaKoota never be remembered as just a day. May it remain, years later, the quiet reassurance that — our people are still there.</div>
     <div class="mark kn" style="letter-spacing:0.02em; text-transform:none; opacity:0.85; font-size:0.85rem;">ಸ್ನೇಹವೇ ನಮ್ಮ ಬಂಧನ • ಕೂಟವೇ ನಮ್ಮ ಶಕ್ತಿ</div>
-    <div class="mark">SnehaKoota — ಸ್ನೇಹಕೂಟ</div>
+    <div class="mark"><a href="https://snehakoota.in" style="color:inherit; text-decoration:none;">SnehaKoota — ಸ್ನೇಹಕೂಟ · snehakoota.in</a></div>
   </div>
 </footer>
 
@@ -678,9 +698,10 @@
 <section class="hero">
   <div class="wrap">
     <div class="kn-line">ಸಂಬಂಧಗಳು ಕಾಲದಿಂದ ದೂರವಾಗಬಹುದು; ಮನಸ್ಸುಗಳು ದೂರವಾಗಬೇಕೆಂದಿಲ್ಲ</div>
-    <h1 class="wordmark"><span class="w-sneha">ಸ್ನೇಹ</span><span class="w-koota">ಕೂಟ</span><span class="kn">SnehaKoota</span></h1>
+    <h1 class="wordmark"><a class="wordmark-link" href="https://snehakoota.in"><span class="w-sneha">ಸ್ನೇಹ</span><span class="w-koota">ಕೂಟ</span><span class="kn">SnehaKoota</span></a></h1>
     <div class="tagline">ಬೇರೆ ಬೇರೆ ದಾರಿಗಳು. ಒಂದೇ ಬಳಗ.</div>
     <p class="hero-sub">ಇದೊಂದು ಸದ್ದಿಲ್ಲದೆ ರೂಪುಗೊಳ್ಳುತ್ತಿರುವ ಆಲೋಚನೆ: ಒಂದು ಕಾಲದಲ್ಲಿ ಒಂದೇ ತರಗತಿ, ಹಾಸ್ಟೆಲ್ ಕಾರಿಡಾರ್, ಅಥವಾ ಕಾಲೇಜಿನ ಕ್ಯಾಂಟೀನ್ ಟೇಬಲ್ ಹಂಚಿಕೊಂಡಿದ್ದ ಜನರು, ಸಮಯದ ವ್ಯತ್ಯಾಸ ಮತ್ತು ಬಿಡುವಿಲ್ಲದ ದಿನಚರಿಗಳ ಕಾರಣಕ್ಕೆ ಒಬ್ಬರನ್ನೊಬ್ಬರು ಕಳೆದುಕೊಳ್ಳಬಾರದು ಎಂಬುದು.</p>
+    <a class="site-link" href="https://snehakoota.in">snehakoota.in →</a>
     <div class="scroll-cue">ಕಥೆಯನ್ನು ಆರಂಭಿಸಿ</div>
   </div>
 </section>
@@ -870,7 +891,7 @@
     <div class="closing-kn reveal">SnehaKoota ಒಂದು ದಿನದ ಕಾರ್ಯಕ್ರಮವಾಗಿ ಮಾತ್ರ ನೆನಪಾಗಬಾರದು —<br>ವರ್ಷಗಳ ನಂತರವೂ, "ನಮ್ಮವರಿದ್ದಾರೆ" ಎನ್ನುವ ಭರವಸೆಯಾಗಿ ಉಳಿಯಬೇಕು.</div>
     <div class="closing-en kn reveal">ಇದು ಕೇವಲ ಒಂದು ಜಾಲತಾಣವಲ್ಲ — ಇದು ನಮ್ಮ ಬಳಗದ ಮನೆ.</div>
     <div class="mark kn" style="letter-spacing:0.02em; text-transform:none; opacity:0.85; font-size:0.85rem;">ಸ್ನೇಹವೇ ನಮ್ಮ ಬಂಧನ • ಕೂಟವೇ ನಮ್ಮ ಶಕ್ತಿ</div>
-    <div class="mark">SnehaKoota — ಸ್ನೇಹಕೂಟ</div>
+    <div class="mark"><a href="https://snehakoota.in" style="color:inherit; text-decoration:none;">SnehaKoota — ಸ್ನೇಹಕೂಟ · snehakoota.in</a></div>
   </div>
 </footer>
 
