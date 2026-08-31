@@ -1,0 +1,226 @@
+/* ===================================================================
+   SNEHAKOOTA MINI-GAME WIDGET — CSS
+   -------------------------------------------------------------------
+   Standalone stylesheet extracted from the original index.html game
+   widget.
+
+   Scope:
+   - Root: #sk-game-root
+   - Component classes: .skg-*
+   - No dependency on Account widget styles.
+
+   The game is intended to be mounted into any page with:
+       <div id="sk-game-root"></div>
+
+   The companion game.js creates the launcher, confirm bubble, panel
+   and game DOM, then wires the registered game module.
+
+   Host page may define these variables:
+       --rust
+       --banyan
+       --marigold
+       --ink
+       --ink-soft
+       --sky-top
+       --sky-bottom
+
+   Sensible fallbacks are provided below.
+   =================================================================== */
+
+#sk-game-root{
+  --skg-rust: var(--rust, #B5502E);
+  --skg-banyan: var(--banyan, #2F5233);
+  --skg-marigold: var(--marigold, #E29B3F);
+  --skg-ink: var(--ink, #2B2118);
+  --skg-ink-soft: var(--ink-soft, #6B5C4C);
+  --skg-sky-top: var(--sky-top, #FFF6E8);
+  --skg-sky-bottom: var(--sky-bottom, #FDE7C8);
+  font-family: 'Work Sans', sans-serif;
+}
+
+/* ---- Launcher ---- */
+.skg-launcher{
+  position:fixed; right:18px; bottom:18px; width:34px; height:34px;
+  border-radius:50%; background:var(--skg-rust); border:none;
+  box-shadow:0 3px 8px rgba(43,33,24,0.22);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; z-index:60;
+  opacity:.62; transition:opacity .2s ease, transform .2s ease;
+  animation:skgNudge 3s ease-in-out 2s 2;
+}
+.skg-launcher:hover, .skg-launcher:focus-visible{ opacity:1; transform:scale(1.08); }
+.skg-launcher svg{ width:15px; height:15px; }
+
+@media (max-width:600px){
+  .skg-launcher{ right:50%; transform:translateX(50%); bottom:16px; }
+}
+
+.skg-launcher.skg-pulsing::before{
+  content:''; position:absolute; inset:-4px; border-radius:50%;
+  box-shadow:0 0 0 0 rgba(181,80,46,0.5);
+  animation:skgPulse 2.4s ease-out infinite;
+}
+
+@keyframes skgPulse{
+  0%{ box-shadow:0 0 0 0 rgba(181,80,46,0.45); }
+  70%{ box-shadow:0 0 0 12px rgba(181,80,46,0); }
+  100%{ box-shadow:0 0 0 0 rgba(181,80,46,0); }
+}
+
+@keyframes skgNudge{
+  0%,100%{ transform:scale(1); } 50%{ transform:scale(1.08); }
+}
+
+@media (max-width:600px){
+  @keyframes skgNudge{
+    0%,100%{ transform:translateX(50%) scale(1); }
+    50%{ transform:translateX(50%) scale(1.08); }
+  }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .skg-launcher{ animation:none; }
+  .skg-launcher.skg-pulsing::before{ animation:none; }
+}
+
+/* Hover hint (desktop) */
+.skg-hint{
+  position:fixed; right:18px; bottom:58px;
+  background:var(--skg-ink); color:var(--skg-sky-top);
+  font-size:.78rem; padding:.5em .9em; border-radius:10px;
+  white-space:nowrap; opacity:0; pointer-events:none;
+  transition:opacity .18s ease; z-index:60;
+}
+.skg-launcher:hover + .skg-hint{ opacity:1; }
+
+@media (max-width:600px){
+  .skg-hint{ display:none; }
+}
+
+/* ---- Backdrop for popover steps ---- */
+.skg-veil{
+  position:fixed; inset:0; background:rgba(43,33,24,0.28);
+  opacity:0; pointer-events:none; transition:opacity .2s ease; z-index:58;
+}
+.skg-veil.skg-show{ opacity:1; pointer-events:auto; }
+
+/* ---- Step 1: "wanna play?" confirm bubble ---- */
+.skg-confirm{
+  position:fixed; right:18px; bottom:62px; z-index:61;
+  background:var(--skg-sky-bottom); border:1px solid rgba(43,33,24,0.12);
+  border-radius:14px; padding:.9rem 1rem; width:220px;
+  box-shadow:0 10px 30px rgba(43,33,24,0.22);
+  transform:translateY(8px) scale(.96); opacity:0; pointer-events:none;
+  transition:transform .2s ease, opacity .2s ease;
+}
+.skg-confirm.skg-show{ transform:translateY(0) scale(1); opacity:1; pointer-events:auto; }
+
+@media (max-width:600px){
+  .skg-confirm{
+    right:50%; transform:translateX(50%) translateY(8px) scale(.96);
+    bottom:62px;
+  }
+  .skg-confirm.skg-show{ transform:translateX(50%) translateY(0) scale(1); }
+}
+
+.skg-confirm p{
+  margin:0 0 .7rem; font-size:.86rem; color:var(--skg-ink); line-height:1.4;
+}
+.skg-confirm .skg-row{ display:flex; gap:.5rem; }
+.skg-confirm button{
+  font-family:inherit; font-size:.78rem; font-weight:600;
+  border-radius:8px; padding:.5rem .7rem; cursor:pointer; border:none;
+}
+.skg-yes{ background:var(--skg-rust); color:var(--skg-sky-top); flex:1; }
+.skg-no{
+  background:none; color:var(--skg-ink-soft);
+  border:1px solid rgba(43,33,24,0.16) !important;
+}
+
+/* ---- Game panel ---- */
+.skg-panel{
+  position:fixed; left:0; right:0; bottom:0; z-index:63;
+  background:var(--skg-sky-top); border-top:1px solid rgba(43,33,24,0.14);
+  border-radius:20px 20px 0 0;
+  box-shadow:0 -10px 30px rgba(43,33,24,0.22);
+  height:45vh; max-height:340px;
+  transform:translateY(100%);
+  transition:transform .3s ease, visibility .3s;
+  visibility:hidden; pointer-events:none;
+  display:flex; flex-direction:column;
+}
+.skg-panel.skg-show{
+  transform:translateY(0); visibility:visible; pointer-events:auto;
+}
+
+@media (min-width:701px){
+  .skg-panel{
+    left:auto; right:18px; width:380px; height:420px; max-height:420px;
+    border-radius:20px; bottom:18px;
+  }
+  .skg-panel.skg-show{ transform:translateY(0); }
+}
+
+.skg-panel-top{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:.7rem .9rem; flex-shrink:0;
+}
+.skg-panel-top .skg-title{
+  font-family:'Fraunces', serif; font-weight:600;
+  font-size:.9rem; color:var(--skg-ink);
+}
+.skg-panel-close{
+  width:28px; height:28px; border-radius:50%; border:none;
+  background:rgba(181,80,46,0.1); cursor:pointer;
+  font-size:.9rem; color:var(--skg-ink-soft);
+}
+
+.skg-game-area{
+  flex:1; display:flex; flex-direction:column; align-items:center;
+  justify-content:center; padding:0 1rem .7rem; gap:.5rem;
+  overflow-y:auto;
+}
+.skg-scores{ display:flex; gap:1.4rem; font-size:.78rem; color:var(--skg-ink-soft); }
+.skg-scores b{ color:var(--skg-rust); font-size:.95rem; }
+
+.skg-feedback{
+  font-size:.8rem; font-weight:600;
+  height:1.1em; color:var(--skg-banyan);
+}
+.skg-feedback.skg-miss{ color:var(--skg-rust); }
+
+/* ---- Game module: tile-merge (word chain) ----
+   Scoped under skg-tm- ; lives inside the same generic #skgGameArea
+   slot as the reflex-tap game, so it never affects launcher/popover
+   positioning above. Safe to lift alongside the rest of the widget. */
+.skg-tm-grid{
+  display:grid; grid-template-columns:repeat(4,1fr);
+  grid-template-rows:repeat(4,1fr); gap:5px; width:100%;
+  max-width:210px; aspect-ratio:1/1; touch-action:none; flex-shrink:0;
+}
+.skg-tm-cell{
+  background:rgba(43,33,24,0.06); border-radius:7px;
+  display:flex; align-items:center; justify-content:center;
+  text-align:center; font-family:'Fraunces', serif;
+  font-weight:600; color:var(--skg-ink); padding:2px;
+  line-height:1.05; overflow:hidden; transition:background .15s ease;
+}
+.skg-tm-t1{ background:rgba(226,155,63,0.20); }
+.skg-tm-t2{ background:rgba(226,155,63,0.38); }
+.skg-tm-t3{ background:rgba(181,80,46,0.30); color:var(--skg-sky-top); }
+.skg-tm-t4{ background:rgba(181,80,46,0.48); color:var(--skg-sky-top); }
+.skg-tm-t5{ background:rgba(47,82,51,0.38); color:var(--skg-sky-top); }
+.skg-tm-t6{ background:rgba(47,82,51,0.6); color:var(--skg-sky-top); }
+.skg-tm-t7{ background:rgba(181,80,46,0.8); color:var(--skg-sky-top); }
+.skg-tm-t8{
+  background:var(--skg-rust); color:var(--skg-sky-top);
+  box-shadow:0 0 10px rgba(181,80,46,0.5);
+}
+.skg-tm-hint{ font-size:.7rem; color:var(--skg-ink-soft); opacity:.75; }
+.skg-tm-restart{
+  font-family:inherit; background:var(--skg-rust); color:var(--skg-sky-top);
+  border:none; border-radius:999px; padding:.55rem 1.1rem;
+  font-size:.82rem; font-weight:600; cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+.skg-tm-restart:active{ transform:scale(.97); }
