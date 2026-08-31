@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SnehaKoota — Game Test</title>
+
+  <!-- =============================================================
+       SNEHAKOOTA GAME COMPONENT TEST PAGE
+       -------------------------------------------------------------
+       This page intentionally tests ONLY:
+       - game.css
+       - the game mount markup
+       - game.js
+
+       It does NOT load:
+       - account.js / account.css
+       - navigation.js / navigation.css
+       - footer.js / footer.css
+       - game-fix.js
+       - game-repair.js
+
+       Purpose: prove that the clean extracted game component can run
+       independently before we alter index.html.
+       ============================================================= -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600&family=Noto+Sans+Kannada:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="game.css?v=1">
+
+  <style>
+    :root{
+      --sky-top:#FFF6E8;
+      --sky-bottom:#FDE7C8;
+      --marigold:#E29B3F;
+      --rust:#B5502E;
+      --banyan:#2F5233;
+      --ink:#2B2118;
+      --ink-soft:#6B5C4C;
+    }
+
+    *{box-sizing:border-box;}
+    html,body{margin:0;min-height:100%;}
+    body{
+      min-height:100vh;
+      font-family:'Work Sans',sans-serif;
+      color:var(--ink);
+      background:linear-gradient(180deg,var(--sky-top) 0%,var(--sky-bottom) 100%);
+    }
+
+    .game-test-content{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:15vh 7vw;
+      text-align:center;
+    }
+
+    .game-test-content h1{
+      margin:0 0 .8rem;
+      font-family:'Fraunces',serif;
+      font-weight:600;
+      font-size:clamp(2rem,6vw,3.2rem);
+    }
+
+    .game-test-content p{
+      max-width:620px;
+      margin:0 auto;
+      color:var(--ink-soft);
+      line-height:1.65;
+    }
+  </style>
+</head>
+<body>
+  <main class="game-test-content">
+    <div>
+      <h1>SnehaKoota Game</h1>
+      <p>Isolated component test. The game icon at the bottom-right should appear without the Account, Navigation, Footer, or repair scripts.</p>
+    </div>
+  </main>
+
+  <!-- =============================================================
+       GAME COMPONENT MOUNT
+       The DOM structure below supplies the elements expected by the
+       extracted game.js runtime.
+       ============================================================= -->
+  <div id="sk-game-root">
+    <button class="skg-launcher skg-pulsing" id="skgLauncher" aria-label="Play a quick game">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#FFF6E8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="2" y="7" width="20" height="11" rx="4"></rect>
+        <path d="M7 11v3M5.5 12.5h3"></path>
+        <circle cx="16" cy="11.5" r="1"></circle>
+        <circle cx="18.5" cy="14" r="1"></circle>
+      </svg>
+    </button>
+
+    <span class="skg-hint">ಸ್ವಲ್ಪ ಆಟ ಆಡೋಣವಾ?</span>
+
+    <div class="skg-veil" id="skgVeil"></div>
+
+    <div class="skg-confirm" id="skgConfirm">
+      <p>ಸ್ವಲ್ಪ ಆಟ ಆಡೋಣವಾ?</p>
+      <div class="skg-row">
+        <button class="skg-no" id="skgNo">ಬೇಡ</button>
+        <button class="skg-yes" id="skgYes">ಹೌದು ▶</button>
+      </div>
+    </div>
+
+    <div class="skg-panel" id="skgPanel" aria-hidden="true">
+      <div class="skg-panel-top">
+        <span class="skg-title" id="skgPanelTitle">⏱ ಸರಿಯಾದ ಸಮಯಕ್ಕೆ ಒತ್ತಿ</span>
+        <button class="skg-panel-close" id="skgClose" aria-label="Close game">&#10005;</button>
+      </div>
+      <div class="skg-game-area" id="skgGameArea"></div>
+    </div>
+  </div>
+
+  <script src="game.js?v=1"></script>
+</body>
+</html>
