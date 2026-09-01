@@ -86,6 +86,34 @@ button, a, input, select, textarea{
     --sk-mobile-gutter:28px;
   }
 }
+/* =========================================================
+   SHARED GLOBAL NOTICE
+   Used for short-lived site-wide confirmations.
+   ========================================================= */
+.ska-global-notice{
+  position:fixed;
+  top:max(16px, var(--sk-safe-top));
+  left:50%;
+  transform:translate(-50%, -10px);
+  z-index:10000;
+  max-width:min(calc(100vw - 32px), 420px);
+  padding:11px 16px;
+  border:1px solid var(--sk-rust-border);
+  border-radius:var(--sk-radius-pill);
+  background:rgba(255,246,232,0.96);
+  color:var(--ink);
+  box-shadow:var(--sk-shadow-soft);
+  font:500 14px/1.35 var(--font-body);
+  text-align:center;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity 180ms ease, transform 180ms ease;
+}
+
+.ska-global-notice.is-visible{
+  opacity:1;
+  transform:translate(-50%, 0);
+}
 
 /* =========================================================
    STAGE 2D-2 — STYLE OWNERSHIP CONTRACT
