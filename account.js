@@ -10,7 +10,7 @@
   var SUPABASE_PUBLISHABLE_KEY='sb_publishable_6_9Fc319vRsSZSksFlhzSw_28-glehH';
   var INVITATION_MEMBERSHIP_MODE='optional';
   var INVITATION_SHOW_GENERAL_OPTION=true;
-  var INVITATION_SUCCESS_MESSAGE_MS=2500;
+  var INVITATION_SUCCESS_MESSAGE_MS=5000;
   var INVITATION_CONTEXT_STORAGE_KEY='snehakoota.invitation.context.v1';
   var INVITATION_AUTH_PENDING_STORAGE_KEY='snehakoota.invitation.auth-pending.v1';
   if(!window.supabase){console.error('account.js: supabase-js must be loaded before this script.');return;}
