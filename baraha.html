@@ -36,13 +36,7 @@
                     <button class="back" id="back">← ಹಿಂದೆ</button>
                     <span class="status">Draft</span>
                 </div>
-                <div class="modes" id="modes">
-                    <button class="mode active" data-mode="ಬರಹ">ಬರಹ</button>
-                    <button class="mode" data-mode="ಕವನ">ಕವನ</button>
-                    <button class="mode" data-mode="ನೆನಪು">ನೆನಪು</button>
-                    <button class="mode" data-mode="ಲೇಖನ">ಲೇಖನ</button>
-                    <button class="mode" data-mode="ಟಿಪ್ಪಣಿ">ಟಿಪ್ಪಣಿ</button>
-                </div>
+                <div class="modes" id="modes"></div>
                 <input id="title" placeholder="ಶೀರ್ಷಿಕೆ" />
                 <textarea id="body" placeholder="ಇಲ್ಲಿ ಬರೆಯಿರಿ…"></textarea>
                 <div class="vis">
@@ -204,6 +198,12 @@
                     .join("");
             }
 
+            function renderEditorModes() {
+                modes.innerHTML = BARAHA_MODES
+                    .map((mode, index) => `<button class="mode${index === 0 ? " active" : ""}" data-mode="${mode.key}">${mode.label}</button>`)
+                    .join("");
+            }
+
             function renderPosts() {
                 feed.innerHTML = BARAHA_POSTS.map((post) => {
                     const category = BARAHA_CATEGORIES.find((item) => item.key === post.category);
@@ -251,6 +251,7 @@
 
             renderCategoryChips();
             renderMembershipOptions();
+            renderEditorModes();
             renderPosts();
 
             fab.addEventListener("click", openSheet);
