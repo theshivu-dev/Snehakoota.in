@@ -7,8 +7,8 @@
     --line: var(--line-idle);
     --soft: var(--sky-bottom);
     --white: #fffdf9;
-    --ui: "Noto Sans Kannada", "Nirmala UI", "Segoe UI", sans-serif;
-    --lit: Georgia, "Noto Serif Kannada", "Nirmala UI", serif;
+    --ui: var(--font-kannada);
+    --lit: var(--font-display), var(--font-kannada), serif;
 }
 
 * {
@@ -17,7 +17,9 @@
 
 body {
     margin: 0;
-    background: #f5efe7;
+    min-height: 100vh;
+    min-height: 100svh;
+    background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-bottom) 100%);
     color: var(--ink);
     font-family: var(--ui);
 }
@@ -36,9 +38,10 @@ button {
 .app {
     width: min(100%, 720px);
     min-height: 100vh;
+    min-height: 100svh;
     margin: auto;
     background: var(--paper);
-    box-shadow: 0 0 40px #00000012;
+    box-shadow: var(--sk-shadow-soft);
 }
 
 .top {
@@ -49,9 +52,9 @@ button {
     justify-content: space-between;
     align-items: center;
     padding: 14px 18px 10px;
-    background: #fff6e8f2;
+    background: rgba(255, 246, 232, 0.95);
     backdrop-filter: blur(12px);
-    border-bottom: 1px solid #dfcdb788;
+    border-bottom: 1px solid var(--line);
 }
 
 .brand {
@@ -73,13 +76,13 @@ button {
 select {
     border: 1px solid var(--line);
     background: var(--paper2);
-    border-radius: 999px;
+    border-radius: var(--sk-radius-pill);
     padding: 8px 10px;
     color: var(--ink);
 }
 
 .hero {
-    padding: 24px 18px 8px;
+    padding: 24px var(--sk-mobile-gutter) 8px;
 }
 
 .eyebrow {
@@ -103,7 +106,7 @@ select {
     display: flex;
     gap: 8px;
     overflow: auto;
-    padding: 15px 18px 8px;
+    padding: 15px var(--sk-mobile-gutter) 8px;
     scrollbar-width: none;
 }
 
@@ -116,7 +119,7 @@ select {
     border: 1px solid var(--line);
     background: transparent;
     color: var(--muted);
-    border-radius: 999px;
+    border-radius: var(--sk-radius-pill);
     padding: 8px 14px;
 }
 
@@ -127,22 +130,22 @@ select {
 }
 
 .sect {
-    padding: 13px 18px 4px;
+    padding: 13px var(--sk-mobile-gutter) 4px;
     font: 18px var(--lit);
 }
 
 .feed {
     display: grid;
     gap: 12px;
-    padding: 8px 18px 100px;
+    padding: 8px var(--sk-mobile-gutter) calc(100px + var(--sk-safe-bottom));
 }
 
 .card {
-    border: 1px solid #dfcdb7bb;
-    border-radius: 16px;
+    border: 1px solid var(--line);
+    border-radius: var(--sk-radius-lg);
     background: var(--white);
     padding: 17px;
-    box-shadow: 0 5px 18px #4a2f1b09;
+    box-shadow: var(--sk-shadow-soft);
 }
 
 .type {
@@ -226,21 +229,21 @@ select {
     position: fixed;
     z-index: 25;
     right: max(18px, calc((100vw - 720px) / 2 + 18px));
-    bottom: 18px;
+    bottom: max(18px, var(--sk-safe-bottom));
     border: 0;
-    border-radius: 999px;
+    border-radius: var(--sk-radius-pill);
     background: var(--red);
     color: #fff;
     padding: 14px 21px;
     font-weight: 700;
-    box-shadow: 0 10px 24px #6c341d40;
+    box-shadow: var(--sk-shadow-game);
 }
 
 .backdrop {
     position: fixed;
     inset: 0;
     z-index: 40;
-    background: #261b1360;
+    background: var(--sk-overlay);
     display: none;
 }
 
@@ -256,13 +259,13 @@ select {
     width: min(100%, 720px);
     background: var(--paper);
     border-radius: 24px 24px 0 0;
-    padding: 10px 18px 24px;
+    padding: 10px var(--sk-mobile-gutter) 24px;
 }
 
 .grab {
     width: 38px;
     height: 4px;
-    border-radius: 9px;
+    border-radius: var(--sk-radius-sm);
     background: #d9c6ae;
     margin: 3px auto 16px;
 }
@@ -297,7 +300,7 @@ select {
     text-align: left;
     border: 1px solid var(--line);
     background: var(--white);
-    border-radius: 16px;
+    border-radius: var(--sk-radius-lg);
     padding: 14px;
 }
 
@@ -316,7 +319,7 @@ select {
 .note {
     margin-top: 14px;
     padding: 11px 13px;
-    border-radius: 12px;
+    border-radius: var(--sk-radius-md);
     background: #f1e7da;
     color: var(--muted);
     font-size: 12px;
@@ -325,7 +328,7 @@ select {
 
 .editor {
     display: none;
-    padding: 18px 18px 100px;
+    padding: 18px var(--sk-mobile-gutter) calc(100px + var(--sk-safe-bottom));
 }
 
 .editor.open {
@@ -361,7 +364,7 @@ select {
     flex: 0 0 auto;
     border: 1px solid var(--line);
     background: transparent;
-    border-radius: 999px;
+    border-radius: var(--sk-radius-pill);
     padding: 8px 13px;
     color: var(--muted);
 }
@@ -416,7 +419,7 @@ select {
     flex: 1;
     border: 1px solid var(--line);
     background: transparent;
-    border-radius: 999px;
+    border-radius: var(--sk-radius-pill);
     padding: 9px 8px;
     color: var(--muted);
 }
@@ -448,7 +451,7 @@ select {
 .publish {
     width: 100%;
     border: 0;
-    border-radius: 999px;
+    border-radius: var(--sk-radius-pill);
     background: var(--red);
     color: #fff;
     padding: 15px;
@@ -464,7 +467,7 @@ select {
     }
 
     .app {
-        border-radius: 28px;
+        border-radius: var(--sk-radius-lg);
         overflow: hidden;
         min-height: calc(100vh - 48px);
     }
