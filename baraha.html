@@ -28,14 +28,7 @@
                     <h1>ಬರೆಯಿರಿ. ನೆನಪಿಡಿ. ಹಂಚಿಕೊಳ್ಳಿ.</h1>
                     <p>ನಿಮ್ಮ ಮಾತು, ನೆನಪು, ಕವನ ಅಥವಾ ಕಥೆ — ನಿಮ್ಮದೇ ಜಾಗದಲ್ಲಿ.</p>
                 </section>
-                <div class="chips" id="chips">
-                    <button class="chip active" data-filter="all">ಎಲ್ಲಾ</button>
-                    <button class="chip" data-filter="baraha">ಬರಹ</button>
-                    <button class="chip" data-filter="poem">ಕವನ</button>
-                    <button class="chip" data-filter="memory">ನೆನಪು</button>
-                    <button class="chip" data-filter="article">ಲೇಖನ</button>
-                    <button class="chip" data-filter="book">ಪುಸ್ತಕ</button>
-                </div>
+                <div class="chips" id="chips"></div>
                 <section>
                     <div class="sect">ಇತ್ತೀಚಿನ ಬರಹಗಳು</div>
                     <div class="feed">
@@ -232,6 +225,13 @@
             const body = document.getElementById("body");
             const publish = document.getElementById("publish");
 
+            function renderCategoryChips() {
+                chips.innerHTML = [
+                    '<button class="chip active" data-filter="all">ಎಲ್ಲಾ</button>',
+                    ...BARAHA_CATEGORIES.map((category) => `<button class="chip" data-filter="${category.key}">${category.label}</button>`)
+                ].join("");
+            }
+
             function openSheet() {
                 backdrop.classList.add("open");
             }
@@ -247,6 +247,8 @@
                 modes.querySelectorAll(".mode").forEach((b) => b.classList.toggle("active", b.dataset.mode === mode));
                 title.focus();
             }
+
+            renderCategoryChips();
 
             fab.addEventListener("click", openSheet);
             close.addEventListener("click", closeSheet);
