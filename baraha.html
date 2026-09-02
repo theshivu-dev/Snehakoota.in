@@ -5,16 +5,16 @@
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <meta name="theme-color" content="#fff6e8" />
         <title>Baraha — Snehakoota Prototype</title>
+        <link rel="stylesheet" href="theme.css" />
         <style>
             :root {
-                --paper: #fff6e8;
+                --paper: var(--sky-top);
                 --paper2: #fffaf2;
-                --red: #b5502e;
-                --green: #2f5233;
-                --ink: #2b2118;
-                --muted: #796a5a;
-                --line: #dfcdb7;
-                --soft: #fde7c8;
+                --red: var(--rust);
+                --green: var(--banyan);
+                --muted: var(--ink-soft);
+                --line: var(--line-idle);
+                --soft: var(--sky-bottom);
                 --white: #fffdf9;
                 --ui: "Noto Sans Kannada", "Nirmala UI", "Segoe UI", sans-serif;
                 --lit: Georgia, "Noto Serif Kannada", "Nirmala UI", serif;
@@ -479,29 +479,21 @@
                     <button class="back" id="back">← ಬರಹಗಳಿಗೆ</button><span class="status">Draft · demo</span>
                 </div>
                 <div class="modes">
-                    <button class="mode active">ಬರಹ</button><button class="mode">ಕವನ</button
-                    ><button class="mode">ನೆನಪು</button><button class="mode">ಲೇಖನ</button
-                    ><button class="mode">ಟಿಪ್ಪಣಿ</button>
+                    <button class="mode active">ಬರಹ</button><button class="mode">ಕವನ</button><button class="mode">ನೆನಪು</button><button class="mode">ಲೇಖನ</button><button class="mode">ಟಿಪ್ಪಣಿ</button>
                 </div>
-                <input placeholder="ಶೀರ್ಷಿಕೆ..." /><textarea
-                    placeholder="ನಿಮ್ಮ ಬರಹವನ್ನು ಇಲ್ಲಿ ಪ್ರಾರಂಭಿಸಿ..."
-                ></textarea>
+                <input placeholder="ಶೀರ್ಷಿಕೆ..." /><textarea placeholder="ನಿಮ್ಮ ಬರಹವನ್ನು ಇಲ್ಲಿ ಪ್ರಾರಂಭಿಸಿ..."></textarea>
                 <div class="vis">
                     <label>ಯಾರು ನೋಡಬಹುದು?</label>
                     <div class="vrow">
-                        <button class="v" data-vis="private">ಖಾಸಗಿ</button
-                        ><button class="v active" data-vis="members">ಸದಸ್ಯರು</button
-                        ><button class="v" data-vis="public">ಸಾರ್ವಜನಿಕ</button>
+                        <button class="v" data-vis="private">ಖಾಸಗಿ</button><button class="v active" data-vis="members">ಸದಸ್ಯರು</button><button class="v" data-vis="public">ಸಾರ್ವಜನಿಕ</button>
                     </div>
                     <div class="members open">
-                        <label><input type="checkbox" checked /> HSHS · 2004</label
-                        ><label><input type="checkbox" /> HSHS · 2012</label>
+                        <label><input type="checkbox" checked /> HSHS · 2004</label><label><input type="checkbox" /> HSHS · 2012</label>
                     </div>
                 </div>
                 <button class="publish" disabled>ಪ್ರಕಟಿಸಿ — demo only</button>
                 <div class="note">
-                    ಇದು local prototype. Supabase ಸಂಪರ್ಕ ಇಲ್ಲ; writing flow ಮತ್ತು visual behaviour ಮಾತ್ರ demo
-                    ಮಾಡಲಾಗುತ್ತಿದೆ.
+                    ಇದು local prototype. Supabase ಸಂಪರ್ಕ ಇಲ್ಲ; writing flow ಮತ್ತು visual behaviour ಮಾತ್ರ demo ಮಾಡಲಾಗುತ್ತಿದೆ.
                 </div>
             </section>
         </div>
@@ -515,14 +507,18 @@
                 </div>
                 <div class="options">
                     <button class="opt" data-mode="ಬರಹ">
-                        <strong>✍ ಬರಹ</strong><small>ಯಾವುದನ್ನಾದರೂ ಮುಕ್ತವಾಗಿ ಬರೆಯಿರಿ</small></button
-                    ><button class="opt" data-mode="ಕವನ">
-                        <strong>🪶 ಕವನ</strong><small>ನಿಮ್ಮ ಪದಗಳಿಗೆ ಒಂದು ಜಾಗ</small></button
-                    ><button class="opt" data-mode="ನೆನಪು">
-                        <strong>💭 ನೆನಪು</strong><small>ಮರೆಯಬಯಸದ ಒಂದು ಕ್ಷಣ</small></button
-                    ><button class="opt" data-mode="ಲೇಖನ">
-                        <strong>📜 ಲೇಖನ</strong><small>ಸ್ವಲ್ಪ ಉದ್ದವಾಗಿ ಹೇಳಬೇಕಾದದ್ದು</small></button
-                    ><button class="opt" data-mode="ಟಿಪ್ಪಣಿ">
+                        <strong>✍ ಬರಹ</strong><small>ಯಾವುದನ್ನಾದರೂ ಮುಕ್ತವಾಗಿ ಬರೆಯಿರಿ</small>
+                    </button>
+                    <button class="opt" data-mode="ಕವನ">
+                        <strong>🪶 ಕವನ</strong><small>ನಿಮ್ಮ ಪದಗಳಿಗೆ ಒಂದು ಜಾಗ</small>
+                    </button>
+                    <button class="opt" data-mode="ನೆನಪು">
+                        <strong>💭 ನೆನಪು</strong><small>ಮರೆಯಬಯಸದ ಒಂದು ಕ್ಷಣ</small>
+                    </button>
+                    <button class="opt" data-mode="ಲೇಖನ">
+                        <strong>📜 ಲೇಖನ</strong><small>ಸ್ವಲ್ಪ ಉದ್ದವಾಗಿ ಹೇಳಬೇಕಾದದ್ದು</small>
+                    </button>
+                    <button class="opt" data-mode="ಟಿಪ್ಪಣಿ">
                         <strong>📝 ಟಿಪ್ಪಣಿ</strong><small>ನಿಮಗಾಗಿ ಮಾತ್ರ ಉಳಿಸಿಕೊಳ್ಳಿ</small>
                     </button>
                 </div>
