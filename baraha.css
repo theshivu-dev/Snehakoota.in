@@ -51,13 +51,15 @@ button {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 14px 18px 10px;
+    gap: 12px;
+    padding: 14px var(--sk-mobile-gutter) 10px;
     background: rgba(255, 246, 232, 0.95);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--line);
 }
 
 .brand {
+    min-width: 0;
     font: 700 22px var(--lit);
 }
 
@@ -69,11 +71,14 @@ button {
     display: flex;
     align-items: center;
     gap: 6px;
+    flex: 0 0 auto;
     font-size: 12px;
     color: var(--muted);
 }
 
 select {
+    min-height: var(--sk-touch-target);
+    max-width: 100%;
     border: 1px solid var(--line);
     background: var(--paper2);
     border-radius: var(--sk-radius-pill);
@@ -93,13 +98,14 @@ select {
 
 .hero h1 {
     margin: 3px 0 5px;
-    font: 700 32px var(--lit);
+    font: 700 32px/1.2 var(--lit);
 }
 
 .hero p {
     margin: 0;
     color: var(--muted);
     font-size: 14px;
+    line-height: 1.5;
 }
 
 .chips {
@@ -116,6 +122,7 @@ select {
 
 .chip {
     flex: 0 0 auto;
+    min-height: var(--sk-touch-target);
     border: 1px solid var(--line);
     background: transparent;
     color: var(--muted);
@@ -193,7 +200,7 @@ select {
 
 .memory {
     display: grid;
-    grid-template-columns: 58px 1fr;
+    grid-template-columns: 58px minmax(0, 1fr);
     gap: 13px;
     align-items: center;
 }
@@ -230,11 +237,12 @@ select {
     z-index: 25;
     right: max(18px, calc((100vw - 720px) / 2 + 18px));
     bottom: max(18px, var(--sk-safe-bottom));
+    min-height: var(--sk-touch-target);
     border: 0;
     border-radius: var(--sk-radius-pill);
     background: var(--red);
     color: #fff;
-    padding: 14px 21px;
+    padding: 10px 21px;
     font-weight: 700;
     box-shadow: var(--sk-shadow-game);
 }
@@ -257,9 +265,11 @@ select {
     bottom: 0;
     transform: translateX(-50%);
     width: min(100%, 720px);
+    max-height: 90svh;
+    overflow-y: auto;
     background: var(--paper);
     border-radius: 24px 24px 0 0;
-    padding: 10px var(--sk-mobile-gutter) 24px;
+    padding: 10px var(--sk-mobile-gutter) calc(24px + var(--sk-safe-bottom));
 }
 
 .grab {
@@ -274,6 +284,7 @@ select {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 12px;
 }
 
 .sheet h3 {
@@ -282,10 +293,11 @@ select {
 }
 
 .close {
+    flex: 0 0 auto;
     border: 1px solid var(--line);
     background: transparent;
-    width: 38px;
-    height: 38px;
+    width: var(--sk-touch-target);
+    height: var(--sk-touch-target);
     border-radius: 50%;
 }
 
@@ -297,6 +309,7 @@ select {
 }
 
 .opt {
+    min-height: 82px;
     text-align: left;
     border: 1px solid var(--line);
     background: var(--white);
@@ -338,9 +351,12 @@ select {
 .etop {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    gap: 12px;
 }
 
 .back {
+    min-height: var(--sk-touch-target);
     border: 0;
     background: none;
     color: var(--red);
@@ -358,10 +374,16 @@ select {
     gap: 8px;
     overflow: auto;
     padding: 14px 0 10px;
+    scrollbar-width: none;
+}
+
+.modes::-webkit-scrollbar {
+    display: none;
 }
 
 .mode {
     flex: 0 0 auto;
+    min-height: var(--sk-touch-target);
     border: 1px solid var(--line);
     background: transparent;
     border-radius: var(--sk-radius-pill);
@@ -417,6 +439,7 @@ select {
 
 .v {
     flex: 1;
+    min-height: var(--sk-touch-target);
     border: 1px solid var(--line);
     background: transparent;
     border-radius: var(--sk-radius-pill);
@@ -450,15 +473,71 @@ select {
 
 .publish {
     width: 100%;
+    min-height: var(--sk-touch-target);
     border: 0;
     border-radius: var(--sk-radius-pill);
     background: var(--red);
     color: #fff;
-    padding: 15px;
+    padding: 11px 15px;
     font-weight: 700;
     margin-top: 16px;
     opacity: 0.45;
     cursor: not-allowed;
+}
+
+@media (max-width: 480px) {
+    .top {
+        padding-top: max(10px, var(--sk-safe-top));
+    }
+
+    .brand {
+        font-size: 20px;
+    }
+
+    .hero {
+        padding-top: 20px;
+    }
+
+    .hero h1 {
+        font-size: 29px;
+    }
+
+    .card {
+        padding: 16px;
+    }
+
+    .memory {
+        grid-template-columns: 52px minmax(0, 1fr);
+        gap: 11px;
+    }
+
+    .memory-art {
+        width: 52px;
+        height: 52px;
+    }
+
+    .options {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 360px) {
+    .ctx span {
+        display: none;
+    }
+
+    .hero h1 {
+        font-size: 27px;
+    }
+
+    .vrow {
+        gap: 5px;
+    }
+
+    .v {
+        padding-inline: 5px;
+        font-size: 13px;
+    }
 }
 
 @media (min-width: 721px) {
