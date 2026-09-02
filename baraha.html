@@ -5,6 +5,9 @@
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <meta name="theme-color" content="#fff6e8" />
         <title>Baraha — Snehakoota Prototype</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet" />
         <link rel="stylesheet" href="theme.css" />
         <link rel="stylesheet" href="baraha.css" />
     </head>
@@ -13,8 +16,7 @@
             <header class="top">
                 <div class="brand"><b>Baraha</b> ಬರಹ</div>
                 <div class="ctx">
-                    <span>ಸದಸ್ಯತ್ವ</span
-                    ><select>
+                    <span>ಸದಸ್ಯತ್ವ</span><select>
                         <option>HSHS · 2004</option>
                         <option>HSHS · 2012</option>
                     </select>
@@ -23,155 +25,183 @@
             <main id="landing">
                 <section class="hero">
                     <div class="eyebrow">ಸ್ನೇಹಕೂಟ</div>
-                    <h1>ಬರಹ</h1>
-                    <p>ಬರೆಯಿರಿ. ನೆನಪಿಡಿ. ಹಂಚಿಕೊಳ್ಳಿ.</p>
+                    <h1>ಬರೆಯಿರಿ. ನೆನಪಿಡಿ. ಹಂಚಿಕೊಳ್ಳಿ.</h1>
+                    <p>ನಿಮ್ಮ ಮಾತು, ನೆನಪು, ಕವನ ಅಥವಾ ಕಥೆ — ನಿಮ್ಮದೇ ಜಾಗದಲ್ಲಿ.</p>
                 </section>
-                <nav class="chips">
-                    <button class="chip active" data-filter="all">ಎಲ್ಲಾ</button
-                    ><button class="chip" data-filter="baraha">ಬರಹ</button
-                    ><button class="chip" data-filter="poem">ಕವನ</button
-                    ><button class="chip" data-filter="memory">ನೆನಪು</button
-                    ><button class="chip" data-filter="article">ಲೇಖನ</button
-                    ><button class="chip" data-filter="book">ಪುಸ್ತಕ</button>
-                </nav>
-                <div class="sect">ಇತ್ತೀಚಿನ ಬರಹಗಳು</div>
-                <section class="feed">
-                    <article class="card" data-category="baraha">
-                        <div class="type">ಬರಹ</div>
-                        <h2>ನಮ್ಮ ಶಾಲೆಯ ದಿನಗಳು</h2>
-                        <p>ಒಂದು ಕಾಲದ ನೆನಪುಗಳು ಮತ್ತೆ ಮನಸ್ಸಿನಲ್ಲಿ...</p>
-                        <div class="meta">Shivalingesh · 2 ದಿನ ಹಿಂದೆ</div>
-                    </article>
-                    <article class="card poem" data-category="poem">
-                        <div class="type">ಕವನ</div>
-                        <h2>ಮತ್ತೊಮ್ಮೆ ಮೊಳೆಯಲ್ಲಿ</h2>
-                        <p>ಮರೆಯಾದೊಂದು ನೆನಪು...<br />ಮತ್ತೆ ಮನದೊಳಗೆ ಅರಳಿದೊಂದು ನಗು...</p>
-                        <div class="meta">Rekha · 3 ದಿನ ಹಿಂದೆ</div>
-                    </article>
-                    <article class="card memory" data-category="memory">
-                        <div class="memory-art">✦</div>
-                        <div>
-                            <div class="type">ನೆನಪು</div>
-                            <h2>ನಮ್ಮ ಮೊದಲ ಸ್ನೇಹಕೂಟ</h2>
-                            <p>ಇಷ್ಟು ವರ್ಷಗಳ ನಂತರ ಮತ್ತೆ ಭೇಟಿಯಾದ ಕ್ಷಣ.</p>
-                            <div class="meta">Suresh · 5 ದಿನ ಹಿಂದೆ</div>
-                        </div>
-                    </article>
-                    <article class="card" data-category="article">
-                        <div class="type">ಲೇಖನ · English</div>
-                        <h2>Why old friendships still matter</h2>
-                        <p>A small reflection on memories, people and the places that shaped us.</p>
-                        <div class="meta">Shivalingesh · 6 ದಿನ ಹಿಂದೆ</div>
-                    </article>
-                    <article class="card book" data-category="book">
-                        <div class="type">ಗ್ರಂಥ · ಅಧ್ಯಾಯ 4</div>
-                        <h2>ಬಂಧಗಳ ಅರ್ಥ</h2>
-                        <p>ಒಂದು ಬರಹದಿಂದ ಆರಂಭವಾದ ಕಥೆ ಈಗ ಪುಸ್ತಕವಾಗುತ್ತಿದೆ...</p>
-                        <div class="meta">4 sections · ಮುಂದುವರಿಯುತ್ತಿದೆ</div>
-                    </article>
+                <div class="chips" id="chips">
+                    <button class="chip active">ಎಲ್ಲಾ</button>
+                    <button class="chip">ಬರಹ</button>
+                    <button class="chip">ಕವನ</button>
+                    <button class="chip">ನೆನಪು</button>
+                    <button class="chip">ಲೇಖನ</button>
+                    <button class="chip">ಪುಸ್ತಕ</button>
+                </div>
+                <section>
+                    <div class="sect">ಇತ್ತೀಚಿನ ಬರಹಗಳು</div>
+                    <div class="feed">
+                        <article class="card">
+                            <div class="type">ಬರಹ · ಸದಸ್ಯರಿಗೆ</div>
+                            <h2>ನಮ್ಮ ಶಾಲೆಯ ದಿನಗಳು</h2>
+                            <p>ಕ್ಲಾಸ್‌ರೂಮ್, ಗಂಟೆ, ಆಟದ ಮೈದಾನ… ಮರೆಯಲಾಗದ ದಿನಗಳ ಕೆಲವು ಪುಟಗಳು.</p>
+                            <div class="meta">ಶಿವ · 2 ದಿನಗಳ ಹಿಂದೆ</div>
+                        </article>
+                        <article class="card poem">
+                            <div class="type">ಕವನ · ಸಾರ್ವಜನಿಕ</div>
+                            <h2>ಮತ್ತೊಮ್ಮೆ ಮೊಳೆಯಲ್ಲಿ</h2>
+                            <p>ಹಳೆಯ ದಾರಿಯಲಿ<br />ಹೊಸ ಹೆಜ್ಜೆಗಳ ಸದ್ದು…</p>
+                            <div class="meta">ರೇಖಾ · 4 ದಿನಗಳ ಹಿಂದೆ</div>
+                        </article>
+                        <article class="card memory">
+                            <div class="memory-art">✦</div>
+                            <div>
+                                <div class="type">ನೆನಪು · ಖಾಸಗಿ</div>
+                                <h2>ನಮ್ಮ ಮೊದಲ ಸ್ನೇಹಕೂಟ</h2>
+                                <p>ಮೊದಲ ಬಾರಿ ಎಲ್ಲರೂ ಮತ್ತೆ ಒಂದೇ ಜಾಗದಲ್ಲಿ ಕೂತ ದಿನ.</p>
+                                <div class="meta">ನೀವು · 1 ವಾರದ ಹಿಂದೆ</div>
+                            </div>
+                        </article>
+                        <article class="card book">
+                            <div class="type">ಪುಸ್ತಕ · ಸದಸ್ಯರಿಗೆ</div>
+                            <h2>Why old friendships still matter</h2>
+                            <p>ಒಂದು ದೊಡ್ಡ ಬರಹದ ಮೊದಲ ಅಧ್ಯಾಯ.</p>
+                            <div class="meta">ವಿನಯ್ · 2 ವಾರಗಳ ಹಿಂದೆ</div>
+                        </article>
+                        <article class="card">
+                            <div class="type">ಲೇಖನ · ಸಾರ್ವಜನಿಕ</div>
+                            <h2>ಬಂಧಗಳ ಅರ್ಥ</h2>
+                            <p>ಸ್ನೇಹ ಎಂದರೆ ಕೇವಲ ನೆನಪುಗಳಲ್ಲ. ಅದು ನಮ್ಮನ್ನು ರೂಪಿಸಿದ ಸಂಬಂಧಗಳ ಕಥೆ.</p>
+                            <div class="meta">ಅನಿಲ್ · 3 ವಾರಗಳ ಹಿಂದೆ</div>
+                        </article>
+                    </div>
                 </section>
             </main>
-            <section class="editor" id="editor">
+            <main class="editor" id="editor">
                 <div class="etop">
-                    <button class="back" id="back">← ಬರಹಗಳಿಗೆ</button><span class="status">Draft · demo</span>
+                    <button class="back" id="back">← ಹಿಂದೆ</button>
+                    <span class="status">Draft</span>
                 </div>
-                <div class="modes">
-                    <button class="mode active">ಬರಹ</button><button class="mode">ಕವನ</button><button class="mode">ನೆನಪು</button><button class="mode">ಲೇಖನ</button><button class="mode">ಟಿಪ್ಪಣಿ</button>
+                <div class="modes" id="modes">
+                    <button class="mode active" data-mode="ಬರಹ">ಬರಹ</button>
+                    <button class="mode" data-mode="ಕವನ">ಕವನ</button>
+                    <button class="mode" data-mode="ನೆನಪು">ನೆನಪು</button>
+                    <button class="mode" data-mode="ಲೇಖನ">ಲೇಖನ</button>
+                    <button class="mode" data-mode="ಟಿಪ್ಪಣಿ">ಟಿಪ್ಪಣಿ</button>
                 </div>
-                <input placeholder="ಶೀರ್ಷಿಕೆ..." /><textarea placeholder="ನಿಮ್ಮ ಬರಹವನ್ನು ಇಲ್ಲಿ ಪ್ರಾರಂಭಿಸಿ..."></textarea>
+                <input id="title" placeholder="ಶೀರ್ಷಿಕೆ" />
+                <textarea id="body" placeholder="ಇಲ್ಲಿ ಬರೆಯಿರಿ…"></textarea>
                 <div class="vis">
                     <label>ಯಾರು ನೋಡಬಹುದು?</label>
-                    <div class="vrow">
-                        <button class="v" data-vis="private">ಖಾಸಗಿ</button><button class="v active" data-vis="members">ಸದಸ್ಯರು</button><button class="v" data-vis="public">ಸಾರ್ವಜನಿಕ</button>
+                    <div class="vrow" id="vis">
+                        <button class="v active" data-v="private">ಖಾಸಗಿ</button>
+                        <button class="v" data-v="members">ಸದಸ್ಯರು</button>
+                        <button class="v" data-v="public">ಸಾರ್ವಜನಿಕ</button>
                     </div>
-                    <div class="members open">
-                        <label><input type="checkbox" checked /> HSHS · 2004</label><label><input type="checkbox" /> HSHS · 2012</label>
+                    <div class="members" id="members">
+                        <label><input type="checkbox" /> HSHS · 2004</label>
+                        <label><input type="checkbox" /> HSHS · 2012</label>
                     </div>
                 </div>
-                <button class="publish" disabled>ಪ್ರಕಟಿಸಿ — demo only</button>
-                <div class="note">
-                    ಇದು local prototype. Supabase ಸಂಪರ್ಕ ಇಲ್ಲ; writing flow ಮತ್ತು visual behaviour ಮಾತ್ರ demo ಮಾಡಲಾಗುತ್ತಿದೆ.
-                </div>
-            </section>
+                <button class="publish" id="publish" disabled>Publish</button>
+            </main>
+            <button class="fab" id="fab">+ ಬರೆಯಿರಿ</button>
         </div>
-        <button class="fab" id="write">+ ಬರೆಯಿರಿ</button>
-        <div class="backdrop" id="sheet">
+        <div class="backdrop" id="backdrop">
             <div class="sheet">
                 <div class="grab"></div>
                 <div class="sheethead">
                     <h3>ಏನು ಬರೆಯಲು ಇಷ್ಟ?</h3>
                     <button class="close" id="close">×</button>
                 </div>
-                <div class="options">
+                <div class="options" id="options">
                     <button class="opt" data-mode="ಬರಹ">
-                        <strong>✍ ಬರಹ</strong><small>ಯಾವುದನ್ನಾದರೂ ಮುಕ್ತವಾಗಿ ಬರೆಯಿರಿ</small>
+                        <strong>ಬರಹ</strong>
+                        <small>ನಿಮ್ಮ ವಿಚಾರ, ಅನುಭವ ಅಥವಾ ಕಥೆ</small>
                     </button>
                     <button class="opt" data-mode="ಕವನ">
-                        <strong>🪶 ಕವನ</strong><small>ನಿಮ್ಮ ಪದಗಳಿಗೆ ಒಂದು ಜಾಗ</small>
+                        <strong>ಕವನ</strong>
+                        <small>ಪದಗಳಲ್ಲಿ ನಿಮ್ಮ ಭಾವನೆ</small>
                     </button>
                     <button class="opt" data-mode="ನೆನಪು">
-                        <strong>💭 ನೆನಪು</strong><small>ಮರೆಯಬಯಸದ ಒಂದು ಕ್ಷಣ</small>
+                        <strong>ನೆನಪು</strong>
+                        <small>ಮರೆಯಲಾಗದ ಒಂದು ಕ್ಷಣ</small>
                     </button>
                     <button class="opt" data-mode="ಲೇಖನ">
-                        <strong>📜 ಲೇಖನ</strong><small>ಸ್ವಲ್ಪ ಉದ್ದವಾಗಿ ಹೇಳಬೇಕಾದದ್ದು</small>
-                    </button>
-                    <button class="opt" data-mode="ಟಿಪ್ಪಣಿ">
-                        <strong>📝 ಟಿಪ್ಪಣಿ</strong><small>ನಿಮಗಾಗಿ ಮಾತ್ರ ಉಳಿಸಿಕೊಳ್ಳಿ</small>
+                        <strong>ಲೇಖನ</strong>
+                        <small>ಸ್ವಲ್ಪ ದೀರ್ಘವಾಗಿ ಬರೆಯಿರಿ</small>
                     </button>
                 </div>
-                <div class="note">Demo: ಆಯ್ಕೆ ಮಾಡಿದ writing mode editor ನಲ್ಲಿ ಕಾಣಿಸುತ್ತದೆ. Publish ಇನ್ನೂ disabled.</div>
+                <div class="note">ಖಾಸಗಿ ಬರಹಗಳು ನಿಮಗೆ ಮಾತ್ರ ಕಾಣುತ್ತವೆ. ಸದಸ್ಯರಿಗೆ ಹಂಚಿದರೆ ಆಯ್ಕೆ ಮಾಡಿದ membership ಗೆ ಮಾತ್ರ ಕಾಣುತ್ತದೆ.</div>
             </div>
         </div>
         <script>
-            (() => {
-                const $ = (s) => document.querySelector(s),
-                    $$ = (s) => [...document.querySelectorAll(s)];
-                const landing = $("#landing"),
-                    editor = $("#editor"),
-                    sheet = $("#sheet"),
-                    write = $("#write"),
-                    members = $(".members");
-                function openEditor(mode) {
-                    sheet.classList.remove("open");
-                    landing.style.display = "none";
-                    editor.classList.add("open");
-                    write.style.display = "none";
-                    $$(".mode").forEach((b) => b.classList.toggle("active", b.textContent.trim() === mode));
-                    editor.querySelector("textarea").style.textAlign = mode === "ಕವನ" ? "center" : "left";
-                }
-                function closeEditor() {
-                    editor.classList.remove("open");
-                    landing.style.display = "";
-                    write.style.display = "";
-                }
-                write.onclick = () => sheet.classList.add("open");
-                $("#close").onclick = () => sheet.classList.remove("open");
-                sheet.onclick = (e) => {
-                    if (e.target === sheet) sheet.classList.remove("open");
-                };
-                $("#back").onclick = closeEditor;
-                $$(".opt").forEach((b) => (b.onclick = () => openEditor(b.dataset.mode)));
-                $$(".mode").forEach((b) => (b.onclick = () => openEditor(b.textContent.trim())));
-                $$(".v").forEach(
-                    (b) =>
-                        (b.onclick = () => {
-                            $$(".v").forEach((x) => x.classList.remove("active"));
-                            b.classList.add("active");
-                            members.classList.toggle("open", b.dataset.vis === "members");
-                        })
-                );
-                $$(".chip").forEach(
-                    (c) =>
-                        (c.onclick = () => {
-                            $$(".chip").forEach((x) => x.classList.remove("active"));
-                            c.classList.add("active");
-                            let f = c.dataset.filter;
-                            $$(".card").forEach(
-                                (x) => (x.style.display = f === "all" || x.dataset.category === f ? "" : "none")
-                            );
-                        })
-                );
-            })();
+            const fab = document.getElementById("fab");
+            const backdrop = document.getElementById("backdrop");
+            const close = document.getElementById("close");
+            const landing = document.getElementById("landing");
+            const editor = document.getElementById("editor");
+            const back = document.getElementById("back");
+            const modes = document.getElementById("modes");
+            const options = document.getElementById("options");
+            const vis = document.getElementById("vis");
+            const members = document.getElementById("members");
+            const title = document.getElementById("title");
+            const body = document.getElementById("body");
+            const publish = document.getElementById("publish");
+
+            function openSheet() {
+                backdrop.classList.add("open");
+            }
+
+            function closeSheet() {
+                backdrop.classList.remove("open");
+            }
+
+            function openEditor(mode) {
+                closeSheet();
+                landing.style.display = "none";
+                editor.classList.add("open");
+                modes.querySelectorAll(".mode").forEach((b) => b.classList.toggle("active", b.dataset.mode === mode));
+                title.focus();
+            }
+
+            fab.addEventListener("click", openSheet);
+            close.addEventListener("click", closeSheet);
+            backdrop.addEventListener("click", (e) => {
+                if (e.target === backdrop) closeSheet();
+            });
+
+            options.addEventListener("click", (e) => {
+                const b = e.target.closest("button");
+                if (b) openEditor(b.dataset.mode);
+            });
+
+            modes.addEventListener("click", (e) => {
+                const b = e.target.closest("button");
+                if (!b) return;
+                modes.querySelectorAll(".mode").forEach((x) => x.classList.remove("active"));
+                b.classList.add("active");
+            });
+
+            vis.addEventListener("click", (e) => {
+                const b = e.target.closest("button");
+                if (!b) return;
+                vis.querySelectorAll(".v").forEach((x) => x.classList.remove("active"));
+                b.classList.add("active");
+                members.classList.toggle("open", b.dataset.v === "members");
+            });
+
+            function check() {
+                publish.disabled = !(title.value.trim() && body.value.trim());
+                publish.style.opacity = publish.disabled ? ".45" : "1";
+                publish.style.cursor = publish.disabled ? "not-allowed" : "pointer";
+            }
+
+            title.addEventListener("input", check);
+            body.addEventListener("input", check);
+            back.addEventListener("click", () => {
+                editor.classList.remove("open");
+                landing.style.display = "block";
+            });
         </script>
     </body>
 </html>
