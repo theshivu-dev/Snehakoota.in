@@ -31,41 +31,7 @@
                 <div class="chips" id="chips"></div>
                 <section>
                     <div class="sect">ಇತ್ತೀಚಿನ ಬರಹಗಳು</div>
-                    <div class="feed">
-                        <article class="card" data-category="baraha">
-                            <div class="type">ಬರಹ · ಸದಸ್ಯರಿಗೆ</div>
-                            <h2>ನಮ್ಮ ಶಾಲೆಯ ದಿನಗಳು</h2>
-                            <p>ಕ್ಲಾಸ್‌ರೂಮ್, ಗಂಟೆ, ಆಟದ ಮೈದಾನ… ಮರೆಯಲಾಗದ ದಿನಗಳ ಕೆಲವು ಪುಟಗಳು.</p>
-                            <div class="meta">ಶಿವ · 2 ದಿನಗಳ ಹಿಂದೆ</div>
-                        </article>
-                        <article class="card poem" data-category="poem">
-                            <div class="type">ಕವನ · ಸಾರ್ವಜನಿಕ</div>
-                            <h2>ಮತ್ತೊಮ್ಮೆ ಮೊಳೆಯಲ್ಲಿ</h2>
-                            <p>ಹಳೆಯ ದಾರಿಯಲಿ<br />ಹೊಸ ಹೆಜ್ಜೆಗಳ ಸದ್ದು…</p>
-                            <div class="meta">ರೇಖಾ · 4 ದಿನಗಳ ಹಿಂದೆ</div>
-                        </article>
-                        <article class="card memory" data-category="memory">
-                            <div class="memory-art">✦</div>
-                            <div>
-                                <div class="type">ನೆನಪು · ಖಾಸಗಿ</div>
-                                <h2>ನಮ್ಮ ಮೊದಲ ಸ್ನೇಹಕೂಟ</h2>
-                                <p>ಮೊದಲ ಬಾರಿ ಎಲ್ಲರೂ ಮತ್ತೆ ಒಂದೇ ಜಾಗದಲ್ಲಿ ಕೂತ ದಿನ.</p>
-                                <div class="meta">ನೀವು · 1 ವಾರದ ಹಿಂದೆ</div>
-                            </div>
-                        </article>
-                        <article class="card book" data-category="book">
-                            <div class="type">ಪುಸ್ತಕ · ಸದಸ್ಯರಿಗೆ</div>
-                            <h2>Why old friendships still matter</h2>
-                            <p>ಒಂದು ದೊಡ್ಡ ಬರಹದ ಮೊದಲ ಅಧ್ಯಾಯ.</p>
-                            <div class="meta">ವಿನಯ್ · 2 ವಾರಗಳ ಹಿಂದೆ</div>
-                        </article>
-                        <article class="card" data-category="article">
-                            <div class="type">ಲೇಖನ · ಸಾರ್ವಜನಿಕ</div>
-                            <h2>ಬಂಧಗಳ ಅರ್ಥ</h2>
-                            <p>ಸ್ನೇಹ ಎಂದರೆ ಕೇವಲ ನೆನಪುಗಳಲ್ಲ. ಅದು ನಮ್ಮನ್ನು ರೂಪಿಸಿದ ಸಂಬಂಧಗಳ ಕಥೆ.</p>
-                            <div class="meta">ಅನಿಲ್ · 3 ವಾರಗಳ ಹಿಂದೆ</div>
-                        </article>
-                    </div>
+                    <div class="feed" id="feed"></div>
                 </section>
             </main>
             <main class="editor" id="editor">
@@ -217,6 +183,7 @@
             const editor = document.getElementById("editor");
             const back = document.getElementById("back");
             const chips = document.getElementById("chips");
+            const feed = document.getElementById("feed");
             const modes = document.getElementById("modes");
             const options = document.getElementById("options");
             const vis = document.getElementById("vis");
@@ -230,6 +197,35 @@
                     '<button class="chip active" data-filter="all">ಎಲ್ಲಾ</button>',
                     ...BARAHA_CATEGORIES.map((category) => `<button class="chip" data-filter="${category.key}">${category.label}</button>`)
                 ].join("");
+            }
+
+            function renderPosts() {
+                feed.innerHTML = BARAHA_POSTS.map((post) => {
+                    const category = BARAHA_CATEGORIES.find((item) => item.key === post.category);
+                    const visibility = BARAHA_VISIBILITY.find((item) => item.key === post.visibility);
+                    const cardClass = post.presentation === "default" ? "card" : `card ${post.presentation}`;
+                    const type = `${category ? category.label : post.category} · ${visibility ? visibility.label : post.visibility}`;
+                    const content = post.content.replace(/\n/g, "<br />");
+
+                    if (post.presentation === "memory") {
+                        return `<article class="${cardClass}" data-category="${post.category}">
+                            <div class="memory-art">✦</div>
+                            <div>
+                                <div class="type">${type}</div>
+                                <h2>${post.title}</h2>
+                                <p>${content}</p>
+                                <div class="meta">${post.author} · ${post.time}</div>
+                            </div>
+                        </article>`;
+                    }
+
+                    return `<article class="${cardClass}" data-category="${post.category}">
+                        <div class="type">${type}</div>
+                        <h2>${post.title}</h2>
+                        <p>${content}</p>
+                        <div class="meta">${post.author} · ${post.time}</div>
+                    </article>`;
+                }).join("");
             }
 
             function openSheet() {
@@ -249,6 +245,7 @@
             }
 
             renderCategoryChips();
+            renderPosts();
 
             fab.addEventListener("click", openSheet);
             close.addEventListener("click", closeSheet);
