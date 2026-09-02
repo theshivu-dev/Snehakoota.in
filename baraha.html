@@ -7,7 +7,7 @@
         <title>Baraha — Snehakoota Prototype</title>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600;9..144,700&family=Noto+Sans+Kannada:wght@400;500;600;700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
         <link rel="stylesheet" href="theme.css" />
         <link rel="stylesheet" href="baraha.css" />
     </head>
@@ -41,11 +41,7 @@
                 <textarea id="body" placeholder="ಇಲ್ಲಿ ಬರೆಯಿರಿ…"></textarea>
                 <div class="vis">
                     <label>ಯಾರು ನೋಡಬಹುದು?</label>
-                    <div class="vrow" id="vis">
-                        <button class="v active" data-v="private">ಖಾಸಗಿ</button>
-                        <button class="v" data-v="members">ಸದಸ್ಯರು</button>
-                        <button class="v" data-v="public">ಸಾರ್ವಜನಿಕ</button>
-                    </div>
+                    <div class="vrow" id="vis"></div>
                     <div class="members" id="members"></div>
                 </div>
                 <button class="publish" id="publish" disabled>Publish</button>
@@ -204,6 +200,12 @@
                     .join("");
             }
 
+            function renderVisibilityOptions() {
+                vis.innerHTML = BARAHA_VISIBILITY
+                    .map((visibility, index) => `<button class="v${index === 0 ? " active" : ""}" data-v="${visibility.key}">${visibility.label}</button>`)
+                    .join("");
+            }
+
             function renderPosts() {
                 feed.innerHTML = BARAHA_POSTS.map((post) => {
                     const category = BARAHA_CATEGORIES.find((item) => item.key === post.category);
@@ -252,6 +254,7 @@
             renderCategoryChips();
             renderMembershipOptions();
             renderEditorModes();
+            renderVisibilityOptions();
             renderPosts();
 
             fab.addEventListener("click", openSheet);
