@@ -125,3 +125,12 @@ html body .panel-links a:nth-child(3)::before{background-image:linear-gradient(v
 html body .panel-links a:nth-child(4)::before{background-image:linear-gradient(var(--rust,#B5502E),var(--rust,#B5502E));clip-path:polygon(15% 18%,85% 18%,85% 82%,15% 82%)}
 .sk-nav-links a:nth-child(5)::before,
 html body .panel-links a:nth-child(5)::before{background-image:linear-gradient(var(--rust,#B5502E),var(--rust,#B5502E));clip-path:polygon(15% 18%,85% 18%,85% 82%,15% 82%)}
+
+/* =========================================================
+   STAGE 4D-2B — INDEX SHARED NAV CONTRACT
+   ---------------------------------------------------------
+   The Index legacy NAV is replaced at runtime by the same shared
+   [data-sk-nav-root] structure used by Story and Samparka.
+   ========================================================= */
+
+@media (prefers-reduced-motion:reduce){.sk-nav-opener,.sk-nav-opener.sk-nav-pulsing::before,button.bookmark-tab,.bookmark-tab.pulsing::before{animation:none}.sk-nav-panel,.sk-nav-backdrop,.sk-nav-opener,.bookmark-tab{transition:none}}
