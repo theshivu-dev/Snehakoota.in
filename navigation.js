@@ -5,6 +5,25 @@
 (function(){
   'use strict';
 
+  /* Shared NAV binding state: OFF means no 7-dot strip and no reserved binding width. */
+  var NAV_BINDING_ENABLED = false;
+
+  function applyBindingState(root,panel){
+    var binding = root.querySelector('.sk-nav-binding');
+    if (!binding) return;
+
+    if (NAV_BINDING_ENABLED){
+      binding.style.display='';
+      panel.style.width='';
+      panel.style.maxWidth='';
+      return;
+    }
+
+    binding.style.display='none';
+    panel.style.width='calc(76% - var(--sk-edge-width,22px))';
+    panel.style.maxWidth='calc(var(--sk-panel-max-width,300px) - var(--sk-edge-width,22px))';
+  }
+
   function makeCollectionsItem(links){
     if (!links || links.querySelector('[data-sk-collections]')) return;
 
@@ -123,6 +142,7 @@
     if (!opener || !closer || !backdrop || !panel) return;
 
     root.dataset.skNavReady='true';
+    applyBindingState(root,panel);
     addCollections(root);
 
     function setOpen(open){
