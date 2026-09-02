@@ -134,6 +134,39 @@
             </div>
         </div>
         <script>
+            // 2.1 — Static data contract.
+            // These structures are UI-facing demo data for now. Supabase mapping comes later.
+            const BARAHA_CATEGORIES = [
+                { key: "baraha", label: "ಬರಹ" },
+                { key: "poem", label: "ಕವನ" },
+                { key: "memory", label: "ನೆನಪು" },
+                { key: "article", label: "ಲೇಖನ" },
+                { key: "book", label: "ಪುಸ್ತಕ" }
+            ];
+
+            const BARAHA_POSTS = [
+                // Contract: id, category, title, content, author, time, visibility, presentation
+            ];
+
+            const BARAHA_MEMBERSHIPS = [
+                { key: "hshs-2004", label: "HSHS · 2004" },
+                { key: "hshs-2012", label: "HSHS · 2012" }
+            ];
+
+            const BARAHA_MODES = [
+                { key: "ಬರಹ", label: "ಬರಹ" },
+                { key: "ಕವನ", label: "ಕವನ" },
+                { key: "ನೆನಪು", label: "ನೆನಪು" },
+                { key: "ಲೇಖನ", label: "ಲೇಖನ" },
+                { key: "ಟಿಪ್ಪಣಿ", label: "ಟಿಪ್ಪಣಿ" }
+            ];
+
+            const BARAHA_VISIBILITY = [
+                { key: "private", label: "ಖಾಸಗಿ" },
+                { key: "members", label: "ಸದಸ್ಯರು" },
+                { key: "public", label: "ಸಾರ್ವಜನಿಕ" }
+            ];
+
             const fab = document.getElementById("fab");
             const backdrop = document.getElementById("backdrop");
             const close = document.getElementById("close");
