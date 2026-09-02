@@ -29,29 +29,29 @@
                     <p>ನಿಮ್ಮ ಮಾತು, ನೆನಪು, ಕವನ ಅಥವಾ ಕಥೆ — ನಿಮ್ಮದೇ ಜಾಗದಲ್ಲಿ.</p>
                 </section>
                 <div class="chips" id="chips">
-                    <button class="chip active">ಎಲ್ಲಾ</button>
-                    <button class="chip">ಬರಹ</button>
-                    <button class="chip">ಕವನ</button>
-                    <button class="chip">ನೆನಪು</button>
-                    <button class="chip">ಲೇಖನ</button>
-                    <button class="chip">ಪುಸ್ತಕ</button>
+                    <button class="chip active" data-filter="all">ಎಲ್ಲಾ</button>
+                    <button class="chip" data-filter="baraha">ಬರಹ</button>
+                    <button class="chip" data-filter="poem">ಕವನ</button>
+                    <button class="chip" data-filter="memory">ನೆನಪು</button>
+                    <button class="chip" data-filter="article">ಲೇಖನ</button>
+                    <button class="chip" data-filter="book">ಪುಸ್ತಕ</button>
                 </div>
                 <section>
                     <div class="sect">ಇತ್ತೀಚಿನ ಬರಹಗಳು</div>
                     <div class="feed">
-                        <article class="card">
+                        <article class="card" data-category="baraha">
                             <div class="type">ಬರಹ · ಸದಸ್ಯರಿಗೆ</div>
                             <h2>ನಮ್ಮ ಶಾಲೆಯ ದಿನಗಳು</h2>
                             <p>ಕ್ಲಾಸ್‌ರೂಮ್, ಗಂಟೆ, ಆಟದ ಮೈದಾನ… ಮರೆಯಲಾಗದ ದಿನಗಳ ಕೆಲವು ಪುಟಗಳು.</p>
                             <div class="meta">ಶಿವ · 2 ದಿನಗಳ ಹಿಂದೆ</div>
                         </article>
-                        <article class="card poem">
+                        <article class="card poem" data-category="poem">
                             <div class="type">ಕವನ · ಸಾರ್ವಜನಿಕ</div>
                             <h2>ಮತ್ತೊಮ್ಮೆ ಮೊಳೆಯಲ್ಲಿ</h2>
                             <p>ಹಳೆಯ ದಾರಿಯಲಿ<br />ಹೊಸ ಹೆಜ್ಜೆಗಳ ಸದ್ದು…</p>
                             <div class="meta">ರೇಖಾ · 4 ದಿನಗಳ ಹಿಂದೆ</div>
                         </article>
-                        <article class="card memory">
+                        <article class="card memory" data-category="memory">
                             <div class="memory-art">✦</div>
                             <div>
                                 <div class="type">ನೆನಪು · ಖಾಸಗಿ</div>
@@ -60,13 +60,13 @@
                                 <div class="meta">ನೀವು · 1 ವಾರದ ಹಿಂದೆ</div>
                             </div>
                         </article>
-                        <article class="card book">
+                        <article class="card book" data-category="book">
                             <div class="type">ಪುಸ್ತಕ · ಸದಸ್ಯರಿಗೆ</div>
                             <h2>Why old friendships still matter</h2>
                             <p>ಒಂದು ದೊಡ್ಡ ಬರಹದ ಮೊದಲ ಅಧ್ಯಾಯ.</p>
                             <div class="meta">ವಿನಯ್ · 2 ವಾರಗಳ ಹಿಂದೆ</div>
                         </article>
-                        <article class="card">
+                        <article class="card" data-category="article">
                             <div class="type">ಲೇಖನ · ಸಾರ್ವಜನಿಕ</div>
                             <h2>ಬಂಧಗಳ ಅರ್ಥ</h2>
                             <p>ಸ್ನೇಹ ಎಂದರೆ ಕೇವಲ ನೆನಪುಗಳಲ್ಲ. ಅದು ನಮ್ಮನ್ನು ರೂಪಿಸಿದ ಸಂಬಂಧಗಳ ಕಥೆ.</p>
@@ -140,6 +140,7 @@
             const landing = document.getElementById("landing");
             const editor = document.getElementById("editor");
             const back = document.getElementById("back");
+            const chips = document.getElementById("chips");
             const modes = document.getElementById("modes");
             const options = document.getElementById("options");
             const vis = document.getElementById("vis");
@@ -188,6 +189,17 @@
                 vis.querySelectorAll(".v").forEach((x) => x.classList.remove("active"));
                 b.classList.add("active");
                 members.classList.toggle("open", b.dataset.v === "members");
+            });
+
+            chips.addEventListener("click", (e) => {
+                const chip = e.target.closest(".chip");
+                if (!chip) return;
+                chips.querySelectorAll(".chip").forEach((x) => x.classList.remove("active"));
+                chip.classList.add("active");
+                const filter = chip.dataset.filter;
+                document.querySelectorAll(".feed .card").forEach((card) => {
+                    card.style.display = filter === "all" || card.dataset.category === filter ? "" : "none";
+                });
             });
 
             function check() {
