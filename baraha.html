@@ -1,3 +1,584 @@
-<!doctype html><html lang="kn"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#fff6e8"><title>Baraha — Snehakoota Prototype</title><style>
-:root{--paper:#fff6e8;--paper2:#fffaf2;--red:#b5502e;--green:#2f5233;--ink:#2b2118;--muted:#796a5a;--line:#dfcdb7;--soft:#fde7c8;--white:#fffdf9;--ui:"Noto Sans Kannada","Nirmala UI","Segoe UI",sans-serif;--lit:Georgia,"Noto Serif Kannada","Nirmala UI",serif}*{box-sizing:border-box}body{margin:0;background:#f5efe7;color:var(--ink);font-family:var(--ui)}button,select,input,textarea{font:inherit}button{cursor:pointer}.app{width:min(100%,720px);min-height:100vh;margin:auto;background:var(--paper);box-shadow:0 0 40px #00000012}.top{position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:14px 18px 10px;background:#fff6e8f2;backdrop-filter:blur(12px);border-bottom:1px solid #dfcdb788}.brand{font:700 22px var(--lit)}.brand b{color:var(--red)}.ctx{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}select{border:1px solid var(--line);background:var(--paper2);border-radius:999px;padding:8px 10px;color:var(--ink)}.hero{padding:24px 18px 8px}.eyebrow{font-size:13px;color:var(--red);font-weight:700}.hero h1{margin:3px 0 5px;font:700 32px var(--lit)}.hero p{margin:0;color:var(--muted);font-size:14px}.chips{display:flex;gap:8px;overflow:auto;padding:15px 18px 8px;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}.chip{flex:0 0 auto;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:999px;padding:8px 14px}.chip.active{background:var(--red);border-color:var(--red);color:#fff}.sect{padding:13px 18px 4px;font:18px var(--lit)}.feed{display:grid;gap:12px;padding:8px 18px 100px}.card{border:1px solid #dfcdb7bb;border-radius:16px;background:var(--white);padding:17px;box-shadow:0 5px 18px #4a2f1b09}.type{font-size:12px;font-weight:700;color:var(--red);margin-bottom:5px}.card h2{margin:0 0 5px;font:700 21px/1.3 var(--lit)}.card p{margin:0;color:var(--muted);line-height:1.6;font-size:14px}.meta{margin-top:11px;color:#8b7b69;font-size:12px}.poem{background:var(--soft);text-align:center}.poem .type{color:var(--green)}.poem h2{font-weight:500}.poem p{font:17px/1.75 var(--lit);color:var(--ink)}.memory{display:grid;grid-template-columns:58px 1fr;gap:13px;align-items:center}.memory-art{width:58px;height:58px;border-radius:13px;background:#ead4ad;display:grid;place-items:center;color:var(--red);font-size:22px}.book{background:var(--green);border-color:var(--green);color:#fff}.book .type,.book p,.book .meta{color:#e8f0df}.book h2{color:#fff}.fab{position:fixed;z-index:25;right:max(18px,calc((100vw - 720px)/2 + 18px));bottom:18px;border:0;border-radius:999px;background:var(--red);color:#fff;padding:14px 21px;font-weight:700;box-shadow:0 10px 24px #6c341d40}.backdrop{position:fixed;inset:0;z-index:40;background:#261b1360;display:none}.backdrop.open{display:block}.sheet{position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:min(100%,720px);background:var(--paper);border-radius:24px 24px 0 0;padding:10px 18px 24px}.grab{width:38px;height:4px;border-radius:9px;background:#d9c6ae;margin:3px auto 16px}.sheethead{display:flex;justify-content:space-between;align-items:center}.sheet h3{margin:0;font:22px var(--lit)}.close{border:1px solid var(--line);background:transparent;width:38px;height:38px;border-radius:50%}.options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}.opt{text-align:left;border:1px solid var(--line);background:var(--white);border-radius:16px;padding:14px}.opt strong{display:block;font:17px var(--lit)}.opt small{display:block;color:var(--muted);margin-top:4px;line-height:1.4}.note{margin-top:14px;padding:11px 13px;border-radius:12px;background:#f1e7da;color:var(--muted);font-size:12px;line-height:1.5}.editor{display:none;padding:18px 18px 100px}.editor.open{display:block}.etop{display:flex;justify-content:space-between}.back{border:0;background:none;color:var(--red);padding:8px 0}.status{font-size:12px;color:var(--muted);padding-top:8px}.modes{display:flex;gap:8px;overflow:auto;padding:14px 0 10px}.mode{flex:0 0 auto;border:1px solid var(--line);background:transparent;border-radius:999px;padding:8px 13px;color:var(--muted)}.mode.active{background:var(--red);color:#fff;border-color:var(--red)}.editor input,.editor textarea{width:100%;border:0;outline:0;background:transparent;color:var(--ink)}.editor input{font:700 28px var(--lit);padding:16px 0 10px;border-bottom:1px solid var(--line)}.editor textarea{resize:none;min-height:320px;font:18px/1.9 var(--lit);padding-top:18px}.vis{border-top:1px solid var(--line);padding-top:15px;margin-top:8px}.vis label{display:block;font-size:12px;color:var(--muted);margin-bottom:8px}.vrow{display:flex;gap:7px}.v{flex:1;border:1px solid var(--line);background:transparent;border-radius:999px;padding:9px 8px;color:var(--muted)}.v.active{background:var(--red);color:#fff;border-color:var(--red)}.members{display:none;margin-top:10px;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--white)}.members.open{display:block}.members label{display:block;padding:6px 0}.publish{width:100%;border:0;border-radius:999px;background:var(--red);color:#fff;padding:15px;font-weight:700;margin-top:16px;opacity:.45;cursor:not-allowed}@media(min-width:721px){body{padding:24px 0}.app{border-radius:28px;overflow:hidden;min-height:calc(100vh - 48px)}}
-</style></head><body><div class="app"><header class="top"><div class="brand"><b>Baraha</b> ಬರಹ</div><div class="ctx"><span>ಸದಸ್ಯತ್ವ</span><select><option>HSHS · 2004</option><option>HSHS · 2012</option></select></div></header><main id="landing"><section class="hero"><div class="eyebrow">ಸ್ನೇಹಕೂಟ</div><h1>ಬರಹ</h1><p>ಬರೆಯಿರಿ. ನೆನಪಿಡಿ. ಹಂಚಿಕೊಳ್ಳಿ.</p></section><nav class="chips"><button class="chip active" data-filter="all">ಎಲ್ಲಾ</button><button class="chip" data-filter="baraha">ಬರಹ</button><button class="chip" data-filter="poem">ಕವನ</button><button class="chip" data-filter="memory">ನೆನಪು</button><button class="chip" data-filter="article">ಲೇಖನ</button><button class="chip" data-filter="book">ಪುಸ್ತಕ</button></nav><div class="sect">ಇತ್ತೀಚಿನ ಬರಹಗಳು</div><section class="feed"><article class="card" data-category="baraha"><div class="type">ಬರಹ</div><h2>ನಮ್ಮ ಶಾಲೆಯ ದಿನಗಳು</h2><p>ಒಂದು ಕಾಲದ ನೆನಪುಗಳು ಮತ್ತೆ ಮನಸ್ಸಿನಲ್ಲಿ...</p><div class="meta">Shivalingesh · 2 ದಿನ ಹಿಂದೆ</div></article><article class="card poem" data-category="poem"><div class="type">ಕವನ</div><h2>ಮತ್ತೊಮ್ಮೆ ಮೊಳೆಯಲ್ಲಿ</h2><p>ಮರೆಯಾದೊಂದು ನೆನಪು...<br>ಮತ್ತೆ ಮನದೊಳಗೆ ಅರಳಿದೊಂದು ನಗು...</p><div class="meta">Rekha · 3 ದಿನ ಹಿಂದೆ</div></article><article class="card memory" data-category="memory"><div class="memory-art">✦</div><div><div class="type">ನೆನಪು</div><h2>ನಮ್ಮ ಮೊದಲ ಸ್ನೇಹಕೂಟ</h2><p>ಇಷ್ಟು ವರ್ಷಗಳ ನಂತರ ಮತ್ತೆ ಭೇಟಿಯಾದ ಕ್ಷಣ.</p><div class="meta">Suresh · 5 ದಿನ ಹಿಂದೆ</div></div></article><article class="card" data-category="article"><div class="type">ಲೇಖನ · English</div><h2>Why old friendships still matter</h2><p>A small reflection on memories, people and the places that shaped us.</p><div class="meta">Shivalingesh · 6 ದಿನ ಹಿಂದೆ</div></article><article class="card book" data-category="book"><div class="type">ಗ್ರಂಥ · ಅಧ್ಯಾಯ 4</div><h2>ಬಂಧಗಳ ಅರ್ಥ</h2><p>ಒಂದು ಬರಹದಿಂದ ಆರಂಭವಾದ ಕಥೆ ಈಗ ಪುಸ್ತಕವಾಗುತ್ತಿದೆ...</p><div class="meta">4 sections · ಮುಂದುವರಿಯುತ್ತಿದೆ</div></article></section></main><section class="editor" id="editor"><div class="etop"><button class="back" id="back">← ಬರಹಗಳಿಗೆ</button><span class="status">Draft · demo</span></div><div class="modes"><button class="mode active">ಬರಹ</button><button class="mode">ಕವನ</button><button class="mode">ನೆನಪು</button><button class="mode">ಲೇಖನ</button><button class="mode">ಟಿಪ್ಪಣಿ</button></div><input placeholder="ಶೀರ್ಷಿಕೆ..."><textarea placeholder="ನಿಮ್ಮ ಬರಹವನ್ನು ಇಲ್ಲಿ ಪ್ರಾರಂಭಿಸಿ..."></textarea><div class="vis"><label>ಯಾರು ನೋಡಬಹುದು?</label><div class="vrow"><button class="v" data-vis="private">ಖಾಸಗಿ</button><button class="v active" data-vis="members">ಸದಸ್ಯರು</button><button class="v" data-vis="public">ಸಾರ್ವಜನಿಕ</button></div><div class="members open"><label><input type="checkbox" checked> HSHS · 2004</label><label><input type="checkbox"> HSHS · 2012</label></div></div><button class="publish" disabled>ಪ್ರಕಟಿಸಿ — demo only</button><div class="note">ಇದು local prototype. Supabase ಸಂಪರ್ಕ ಇಲ್ಲ; writing flow ಮತ್ತು visual behaviour ಮಾತ್ರ demo ಮಾಡಲಾಗುತ್ತಿದೆ.</div></section></div><button class="fab" id="write">+ ಬರೆಯಿರಿ</button><div class="backdrop" id="sheet"><div class="sheet"><div class="grab"></div><div class="sheethead"><h3>ಏನು ಬರೆಯಲು ಇಷ್ಟ?</h3><button class="close" id="close">×</button></div><div class="options"><button class="opt" data-mode="ಬರಹ"><strong>✍ ಬರಹ</strong><small>ಯಾವುದನ್ನಾದರೂ ಮುಕ್ತವಾಗಿ ಬರೆಯಿರಿ</small></button><button class="opt" data-mode="ಕವನ"><strong>🪶 ಕವನ</strong><small>ನಿಮ್ಮ ಪದಗಳಿಗೆ ಒಂದು ಜಾಗ</small></button><button class="opt" data-mode="ನೆನಪು"><strong>💭 ನೆನಪು</strong><small>ಮರೆಯಬಯಸದ ಒಂದು ಕ್ಷಣ</small></button><button class="opt" data-mode="ಲೇಖನ"><strong>📜 ಲೇಖನ</strong><small>ಸ್ವಲ್ಪ ಉದ್ದವಾಗಿ ಹೇಳಬೇಕಾದದ್ದು</small></button><button class="opt" data-mode="ಟಿಪ್ಪಣಿ"><strong>📝 ಟಿಪ್ಪಣಿ</strong><small>ನಿಮಗಾಗಿ ಮಾತ್ರ ಉಳಿಸಿಕೊಳ್ಳಿ</small></button></div><div class="note">Demo: ಆಯ್ಕೆ ಮಾಡಿದ writing mode editor ನಲ್ಲಿ ಕಾಣಿಸುತ್ತದೆ. Publish ಇನ್ನೂ disabled.</div></div></div><script>(()=>{const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];const landing=$('#landing'),editor=$('#editor'),sheet=$('#sheet'),write=$('#write'),members=$('.members');function openEditor(mode){sheet.classList.remove('open');landing.style.display='none';editor.classList.add('open');write.style.display='none';$$('.mode').forEach(b=>b.classList.toggle('active',b.textContent.trim()===mode));editor.querySelector('textarea').style.textAlign=mode==='ಕವನ'?'center':'left'}function closeEditor(){editor.classList.remove('open');landing.style.display='';write.style.display=''}write.onclick=()=>sheet.classList.add('open');$('#close').onclick=()=>sheet.classList.remove('open');sheet.onclick=e=>{if(e.target===sheet)sheet.classList.remove('open')};$('#back').onclick=closeEditor;$$('.opt').forEach(b=>b.onclick=()=>openEditor(b.dataset.mode));$$('.mode').forEach(b=>b.onclick=()=>openEditor(b.textContent.trim()));$$('.v').forEach(b=>b.onclick=()=>{$$('.v').forEach(x=>x.classList.remove('active'));b.classList.add('active');members.classList.toggle('open',b.dataset.vis==='members')});$$('.chip').forEach(c=>c.onclick=()=>{$$('.chip').forEach(x=>x.classList.remove('active'));c.classList.add('active');let f=c.dataset.filter;$$('.card').forEach(x=>x.style.display=f==='all'||x.dataset.category===f?'':'none')})})();</script></body></html>
+<!doctype html>
+<html lang="kn">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <meta name="theme-color" content="#fff6e8" />
+        <title>Baraha — Snehakoota Prototype</title>
+        <style>
+            :root {
+                --paper: #fff6e8;
+                --paper2: #fffaf2;
+                --red: #b5502e;
+                --green: #2f5233;
+                --ink: #2b2118;
+                --muted: #796a5a;
+                --line: #dfcdb7;
+                --soft: #fde7c8;
+                --white: #fffdf9;
+                --ui: "Noto Sans Kannada", "Nirmala UI", "Segoe UI", sans-serif;
+                --lit: Georgia, "Noto Serif Kannada", "Nirmala UI", serif;
+            }
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                margin: 0;
+                background: #f5efe7;
+                color: var(--ink);
+                font-family: var(--ui);
+            }
+            button,
+            select,
+            input,
+            textarea {
+                font: inherit;
+            }
+            button {
+                cursor: pointer;
+            }
+            .app {
+                width: min(100%, 720px);
+                min-height: 100vh;
+                margin: auto;
+                background: var(--paper);
+                box-shadow: 0 0 40px #00000012;
+            }
+            .top {
+                position: sticky;
+                top: 0;
+                z-index: 10;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 14px 18px 10px;
+                background: #fff6e8f2;
+                backdrop-filter: blur(12px);
+                border-bottom: 1px solid #dfcdb788;
+            }
+            .brand {
+                font: 700 22px var(--lit);
+            }
+            .brand b {
+                color: var(--red);
+            }
+            .ctx {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 12px;
+                color: var(--muted);
+            }
+            select {
+                border: 1px solid var(--line);
+                background: var(--paper2);
+                border-radius: 999px;
+                padding: 8px 10px;
+                color: var(--ink);
+            }
+            .hero {
+                padding: 24px 18px 8px;
+            }
+            .eyebrow {
+                font-size: 13px;
+                color: var(--red);
+                font-weight: 700;
+            }
+            .hero h1 {
+                margin: 3px 0 5px;
+                font: 700 32px var(--lit);
+            }
+            .hero p {
+                margin: 0;
+                color: var(--muted);
+                font-size: 14px;
+            }
+            .chips {
+                display: flex;
+                gap: 8px;
+                overflow: auto;
+                padding: 15px 18px 8px;
+                scrollbar-width: none;
+            }
+            .chips::-webkit-scrollbar {
+                display: none;
+            }
+            .chip {
+                flex: 0 0 auto;
+                border: 1px solid var(--line);
+                background: transparent;
+                color: var(--muted);
+                border-radius: 999px;
+                padding: 8px 14px;
+            }
+            .chip.active {
+                background: var(--red);
+                border-color: var(--red);
+                color: #fff;
+            }
+            .sect {
+                padding: 13px 18px 4px;
+                font: 18px var(--lit);
+            }
+            .feed {
+                display: grid;
+                gap: 12px;
+                padding: 8px 18px 100px;
+            }
+            .card {
+                border: 1px solid #dfcdb7bb;
+                border-radius: 16px;
+                background: var(--white);
+                padding: 17px;
+                box-shadow: 0 5px 18px #4a2f1b09;
+            }
+            .type {
+                font-size: 12px;
+                font-weight: 700;
+                color: var(--red);
+                margin-bottom: 5px;
+            }
+            .card h2 {
+                margin: 0 0 5px;
+                font: 700 21px/1.3 var(--lit);
+            }
+            .card p {
+                margin: 0;
+                color: var(--muted);
+                line-height: 1.6;
+                font-size: 14px;
+            }
+            .meta {
+                margin-top: 11px;
+                color: #8b7b69;
+                font-size: 12px;
+            }
+            .poem {
+                background: var(--soft);
+                text-align: center;
+            }
+            .poem .type {
+                color: var(--green);
+            }
+            .poem h2 {
+                font-weight: 500;
+            }
+            .poem p {
+                font: 17px/1.75 var(--lit);
+                color: var(--ink);
+            }
+            .memory {
+                display: grid;
+                grid-template-columns: 58px 1fr;
+                gap: 13px;
+                align-items: center;
+            }
+            .memory-art {
+                width: 58px;
+                height: 58px;
+                border-radius: 13px;
+                background: #ead4ad;
+                display: grid;
+                place-items: center;
+                color: var(--red);
+                font-size: 22px;
+            }
+            .book {
+                background: var(--green);
+                border-color: var(--green);
+                color: #fff;
+            }
+            .book .type,
+            .book p,
+            .book .meta {
+                color: #e8f0df;
+            }
+            .book h2 {
+                color: #fff;
+            }
+            .fab {
+                position: fixed;
+                z-index: 25;
+                right: max(18px, calc((100vw - 720px) / 2 + 18px));
+                bottom: 18px;
+                border: 0;
+                border-radius: 999px;
+                background: var(--red);
+                color: #fff;
+                padding: 14px 21px;
+                font-weight: 700;
+                box-shadow: 0 10px 24px #6c341d40;
+            }
+            .backdrop {
+                position: fixed;
+                inset: 0;
+                z-index: 40;
+                background: #261b1360;
+                display: none;
+            }
+            .backdrop.open {
+                display: block;
+            }
+            .sheet {
+                position: absolute;
+                left: 50%;
+                bottom: 0;
+                transform: translateX(-50%);
+                width: min(100%, 720px);
+                background: var(--paper);
+                border-radius: 24px 24px 0 0;
+                padding: 10px 18px 24px;
+            }
+            .grab {
+                width: 38px;
+                height: 4px;
+                border-radius: 9px;
+                background: #d9c6ae;
+                margin: 3px auto 16px;
+            }
+            .sheethead {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .sheet h3 {
+                margin: 0;
+                font: 22px var(--lit);
+            }
+            .close {
+                border: 1px solid var(--line);
+                background: transparent;
+                width: 38px;
+                height: 38px;
+                border-radius: 50%;
+            }
+            .options {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+                margin-top: 16px;
+            }
+            .opt {
+                text-align: left;
+                border: 1px solid var(--line);
+                background: var(--white);
+                border-radius: 16px;
+                padding: 14px;
+            }
+            .opt strong {
+                display: block;
+                font: 17px var(--lit);
+            }
+            .opt small {
+                display: block;
+                color: var(--muted);
+                margin-top: 4px;
+                line-height: 1.4;
+            }
+            .note {
+                margin-top: 14px;
+                padding: 11px 13px;
+                border-radius: 12px;
+                background: #f1e7da;
+                color: var(--muted);
+                font-size: 12px;
+                line-height: 1.5;
+            }
+            .editor {
+                display: none;
+                padding: 18px 18px 100px;
+            }
+            .editor.open {
+                display: block;
+            }
+            .etop {
+                display: flex;
+                justify-content: space-between;
+            }
+            .back {
+                border: 0;
+                background: none;
+                color: var(--red);
+                padding: 8px 0;
+            }
+            .status {
+                font-size: 12px;
+                color: var(--muted);
+                padding-top: 8px;
+            }
+            .modes {
+                display: flex;
+                gap: 8px;
+                overflow: auto;
+                padding: 14px 0 10px;
+            }
+            .mode {
+                flex: 0 0 auto;
+                border: 1px solid var(--line);
+                background: transparent;
+                border-radius: 999px;
+                padding: 8px 13px;
+                color: var(--muted);
+            }
+            .mode.active {
+                background: var(--red);
+                color: #fff;
+                border-color: var(--red);
+            }
+            .editor input,
+            .editor textarea {
+                width: 100%;
+                border: 0;
+                outline: 0;
+                background: transparent;
+                color: var(--ink);
+            }
+            .editor input {
+                font: 700 28px var(--lit);
+                padding: 16px 0 10px;
+                border-bottom: 1px solid var(--line);
+            }
+            .editor textarea {
+                resize: none;
+                min-height: 320px;
+                font: 18px/1.9 var(--lit);
+                padding-top: 18px;
+            }
+            .vis {
+                border-top: 1px solid var(--line);
+                padding-top: 15px;
+                margin-top: 8px;
+            }
+            .vis label {
+                display: block;
+                font-size: 12px;
+                color: var(--muted);
+                margin-bottom: 8px;
+            }
+            .vrow {
+                display: flex;
+                gap: 7px;
+            }
+            .v {
+                flex: 1;
+                border: 1px solid var(--line);
+                background: transparent;
+                border-radius: 999px;
+                padding: 9px 8px;
+                color: var(--muted);
+            }
+            .v.active {
+                background: var(--red);
+                color: #fff;
+                border-color: var(--red);
+            }
+            .members {
+                display: none;
+                margin-top: 10px;
+                padding: 12px;
+                border: 1px solid var(--line);
+                border-radius: 14px;
+                background: var(--white);
+            }
+            .members.open {
+                display: block;
+            }
+            .members label {
+                display: block;
+                padding: 6px 0;
+            }
+            .publish {
+                width: 100%;
+                border: 0;
+                border-radius: 999px;
+                background: var(--red);
+                color: #fff;
+                padding: 15px;
+                font-weight: 700;
+                margin-top: 16px;
+                opacity: 0.45;
+                cursor: not-allowed;
+            }
+            @media (min-width: 721px) {
+                body {
+                    padding: 24px 0;
+                }
+                .app {
+                    border-radius: 28px;
+                    overflow: hidden;
+                    min-height: calc(100vh - 48px);
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="app">
+            <header class="top">
+                <div class="brand"><b>Baraha</b> ಬರಹ</div>
+                <div class="ctx">
+                    <span>ಸದಸ್ಯತ್ವ</span
+                    ><select>
+                        <option>HSHS · 2004</option>
+                        <option>HSHS · 2012</option>
+                    </select>
+                </div>
+            </header>
+            <main id="landing">
+                <section class="hero">
+                    <div class="eyebrow">ಸ್ನೇಹಕೂಟ</div>
+                    <h1>ಬರಹ</h1>
+                    <p>ಬರೆಯಿರಿ. ನೆನಪಿಡಿ. ಹಂಚಿಕೊಳ್ಳಿ.</p>
+                </section>
+                <nav class="chips">
+                    <button class="chip active" data-filter="all">ಎಲ್ಲಾ</button
+                    ><button class="chip" data-filter="baraha">ಬರಹ</button
+                    ><button class="chip" data-filter="poem">ಕವನ</button
+                    ><button class="chip" data-filter="memory">ನೆನಪು</button
+                    ><button class="chip" data-filter="article">ಲೇಖನ</button
+                    ><button class="chip" data-filter="book">ಪುಸ್ತಕ</button>
+                </nav>
+                <div class="sect">ಇತ್ತೀಚಿನ ಬರಹಗಳು</div>
+                <section class="feed">
+                    <article class="card" data-category="baraha">
+                        <div class="type">ಬರಹ</div>
+                        <h2>ನಮ್ಮ ಶಾಲೆಯ ದಿನಗಳು</h2>
+                        <p>ಒಂದು ಕಾಲದ ನೆನಪುಗಳು ಮತ್ತೆ ಮನಸ್ಸಿನಲ್ಲಿ...</p>
+                        <div class="meta">Shivalingesh · 2 ದಿನ ಹಿಂದೆ</div>
+                    </article>
+                    <article class="card poem" data-category="poem">
+                        <div class="type">ಕವನ</div>
+                        <h2>ಮತ್ತೊಮ್ಮೆ ಮೊಳೆಯಲ್ಲಿ</h2>
+                        <p>ಮರೆಯಾದೊಂದು ನೆನಪು...<br />ಮತ್ತೆ ಮನದೊಳಗೆ ಅರಳಿದೊಂದು ನಗು...</p>
+                        <div class="meta">Rekha · 3 ದಿನ ಹಿಂದೆ</div>
+                    </article>
+                    <article class="card memory" data-category="memory">
+                        <div class="memory-art">✦</div>
+                        <div>
+                            <div class="type">ನೆನಪು</div>
+                            <h2>ನಮ್ಮ ಮೊದಲ ಸ್ನೇಹಕೂಟ</h2>
+                            <p>ಇಷ್ಟು ವರ್ಷಗಳ ನಂತರ ಮತ್ತೆ ಭೇಟಿಯಾದ ಕ್ಷಣ.</p>
+                            <div class="meta">Suresh · 5 ದಿನ ಹಿಂದೆ</div>
+                        </div>
+                    </article>
+                    <article class="card" data-category="article">
+                        <div class="type">ಲೇಖನ · English</div>
+                        <h2>Why old friendships still matter</h2>
+                        <p>A small reflection on memories, people and the places that shaped us.</p>
+                        <div class="meta">Shivalingesh · 6 ದಿನ ಹಿಂದೆ</div>
+                    </article>
+                    <article class="card book" data-category="book">
+                        <div class="type">ಗ್ರಂಥ · ಅಧ್ಯಾಯ 4</div>
+                        <h2>ಬಂಧಗಳ ಅರ್ಥ</h2>
+                        <p>ಒಂದು ಬರಹದಿಂದ ಆರಂಭವಾದ ಕಥೆ ಈಗ ಪುಸ್ತಕವಾಗುತ್ತಿದೆ...</p>
+                        <div class="meta">4 sections · ಮುಂದುವರಿಯುತ್ತಿದೆ</div>
+                    </article>
+                </section>
+            </main>
+            <section class="editor" id="editor">
+                <div class="etop">
+                    <button class="back" id="back">← ಬರಹಗಳಿಗೆ</button><span class="status">Draft · demo</span>
+                </div>
+                <div class="modes">
+                    <button class="mode active">ಬರಹ</button><button class="mode">ಕವನ</button
+                    ><button class="mode">ನೆನಪು</button><button class="mode">ಲೇಖನ</button
+                    ><button class="mode">ಟಿಪ್ಪಣಿ</button>
+                </div>
+                <input placeholder="ಶೀರ್ಷಿಕೆ..." /><textarea
+                    placeholder="ನಿಮ್ಮ ಬರಹವನ್ನು ಇಲ್ಲಿ ಪ್ರಾರಂಭಿಸಿ..."
+                ></textarea>
+                <div class="vis">
+                    <label>ಯಾರು ನೋಡಬಹುದು?</label>
+                    <div class="vrow">
+                        <button class="v" data-vis="private">ಖಾಸಗಿ</button
+                        ><button class="v active" data-vis="members">ಸದಸ್ಯರು</button
+                        ><button class="v" data-vis="public">ಸಾರ್ವಜನಿಕ</button>
+                    </div>
+                    <div class="members open">
+                        <label><input type="checkbox" checked /> HSHS · 2004</label
+                        ><label><input type="checkbox" /> HSHS · 2012</label>
+                    </div>
+                </div>
+                <button class="publish" disabled>ಪ್ರಕಟಿಸಿ — demo only</button>
+                <div class="note">
+                    ಇದು local prototype. Supabase ಸಂಪರ್ಕ ಇಲ್ಲ; writing flow ಮತ್ತು visual behaviour ಮಾತ್ರ demo
+                    ಮಾಡಲಾಗುತ್ತಿದೆ.
+                </div>
+            </section>
+        </div>
+        <button class="fab" id="write">+ ಬರೆಯಿರಿ</button>
+        <div class="backdrop" id="sheet">
+            <div class="sheet">
+                <div class="grab"></div>
+                <div class="sheethead">
+                    <h3>ಏನು ಬರೆಯಲು ಇಷ್ಟ?</h3>
+                    <button class="close" id="close">×</button>
+                </div>
+                <div class="options">
+                    <button class="opt" data-mode="ಬರಹ">
+                        <strong>✍ ಬರಹ</strong><small>ಯಾವುದನ್ನಾದರೂ ಮುಕ್ತವಾಗಿ ಬರೆಯಿರಿ</small></button
+                    ><button class="opt" data-mode="ಕವನ">
+                        <strong>🪶 ಕವನ</strong><small>ನಿಮ್ಮ ಪದಗಳಿಗೆ ಒಂದು ಜಾಗ</small></button
+                    ><button class="opt" data-mode="ನೆನಪು">
+                        <strong>💭 ನೆನಪು</strong><small>ಮರೆಯಬಯಸದ ಒಂದು ಕ್ಷಣ</small></button
+                    ><button class="opt" data-mode="ಲೇಖನ">
+                        <strong>📜 ಲೇಖನ</strong><small>ಸ್ವಲ್ಪ ಉದ್ದವಾಗಿ ಹೇಳಬೇಕಾದದ್ದು</small></button
+                    ><button class="opt" data-mode="ಟಿಪ್ಪಣಿ">
+                        <strong>📝 ಟಿಪ್ಪಣಿ</strong><small>ನಿಮಗಾಗಿ ಮಾತ್ರ ಉಳಿಸಿಕೊಳ್ಳಿ</small>
+                    </button>
+                </div>
+                <div class="note">Demo: ಆಯ್ಕೆ ಮಾಡಿದ writing mode editor ನಲ್ಲಿ ಕಾಣಿಸುತ್ತದೆ. Publish ಇನ್ನೂ disabled.</div>
+            </div>
+        </div>
+        <script>
+            (() => {
+                const $ = (s) => document.querySelector(s),
+                    $$ = (s) => [...document.querySelectorAll(s)];
+                const landing = $("#landing"),
+                    editor = $("#editor"),
+                    sheet = $("#sheet"),
+                    write = $("#write"),
+                    members = $(".members");
+                function openEditor(mode) {
+                    sheet.classList.remove("open");
+                    landing.style.display = "none";
+                    editor.classList.add("open");
+                    write.style.display = "none";
+                    $$(".mode").forEach((b) => b.classList.toggle("active", b.textContent.trim() === mode));
+                    editor.querySelector("textarea").style.textAlign = mode === "ಕವನ" ? "center" : "left";
+                }
+                function closeEditor() {
+                    editor.classList.remove("open");
+                    landing.style.display = "";
+                    write.style.display = "";
+                }
+                write.onclick = () => sheet.classList.add("open");
+                $("#close").onclick = () => sheet.classList.remove("open");
+                sheet.onclick = (e) => {
+                    if (e.target === sheet) sheet.classList.remove("open");
+                };
+                $("#back").onclick = closeEditor;
+                $$(".opt").forEach((b) => (b.onclick = () => openEditor(b.dataset.mode)));
+                $$(".mode").forEach((b) => (b.onclick = () => openEditor(b.textContent.trim())));
+                $$(".v").forEach(
+                    (b) =>
+                        (b.onclick = () => {
+                            $$(".v").forEach((x) => x.classList.remove("active"));
+                            b.classList.add("active");
+                            members.classList.toggle("open", b.dataset.vis === "members");
+                        })
+                );
+                $$(".chip").forEach(
+                    (c) =>
+                        (c.onclick = () => {
+                            $$(".chip").forEach((x) => x.classList.remove("active"));
+                            c.classList.add("active");
+                            let f = c.dataset.filter;
+                            $$(".card").forEach(
+                                (x) => (x.style.display = f === "all" || x.dataset.category === f ? "" : "none")
+                            );
+                        })
+                );
+            })();
+        </script>
+    </body>
+</html>
