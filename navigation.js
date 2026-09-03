@@ -176,6 +176,47 @@
   }
 
   /* =========================================================
+     UNIVERSAL SHARED NAVIGATION
+     ---------------------------------------------------------
+     A page that loads navigation.css + navigation.js may use the
+     canonical shared NAV without embedding NAV markup itself.
+     Existing [data-sk-nav-root] markup is reused unchanged.
+     ========================================================= */
+  function ensureSharedNavigation(){
+    var existing=document.querySelector('[data-sk-nav-root]');
+    if (existing) return existing;
+
+    var root=document.createElement('div');
+    root.setAttribute('data-sk-nav-root','');
+    root.innerHTML=`
+      <div class="sk-nav-backdrop" data-sk-nav-backdrop></div>
+      <nav class="sk-nav-panel" data-sk-nav-panel aria-hidden="true">
+        <div class="sk-nav-binding">
+          <span class="sk-nav-ring"></span><span class="sk-nav-ring"></span><span class="sk-nav-ring"></span>
+          <span class="sk-nav-ring"></span><span class="sk-nav-ring"></span><span class="sk-nav-ring"></span><span class="sk-nav-ring"></span>
+        </div>
+        <div class="sk-nav-body">
+          <div class="sk-nav-top">
+            <span class="sk-nav-brand"><span class="sk-nav-sneha">ಸ್ನೇಹ</span><span class="sk-nav-koota">ಕೂಟ</span></span>
+            <button class="sk-nav-close" data-sk-nav-close aria-label="Close menu">&#10005;</button>
+          </div>
+          <div class="sk-nav-links">
+            <a href="index.html">ಸ್ನೇಹಕೂಟ</a>
+            <a href="story.html">ಪಯಣ</a>
+            <a href="samparka.html">ಸ್ನೇಹಸಂಪರ್ಕ</a>
+            <a href="#" class="disabled">Gallery <span class="sk-nav-tag">(soon)</span></a>
+            <a href="#" class="disabled">Contact <span class="sk-nav-tag">(soon)</span></a>
+          </div>
+        </div>
+      </nav>
+      <button class="sk-nav-opener sk-nav-pulsing" data-sk-nav-opener aria-label="Open menu" aria-expanded="false"></button>
+    `;
+
+    document.body.insertBefore(root,document.body.firstChild);
+    return root;
+  }
+
+  /* =========================================================
      STAGE 4D-2A — INDEX TRUE SHARED-NAV MIGRATION
      ---------------------------------------------------------
      Index previously contained a second, legacy copy of the NAV.
@@ -240,7 +281,8 @@
 
   function boot(){
     isolatePageChrome();
-    document.querySelectorAll('[data-sk-nav-root]').forEach(init);
+    var root=ensureSharedNavigation();
+    init(root);
     initLegacyIndex();
   }
 
