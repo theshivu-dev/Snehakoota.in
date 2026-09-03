@@ -142,6 +142,14 @@ html body .panel-links a[href="#"]:nth-child(5)::before{background-image:url("da
 .sk-nav-links a.active::before,
 html body .panel-links a.active::before{filter:sepia(1) saturate(5) hue-rotate(330deg)}
 
+/* Baraha / in-progress writing */
+.sk-nav-links a[data-sk-baraha]::before,
+html body .panel-links a[data-sk-baraha]::before{background-image:none;width:18px;height:18px;flex-basis:18px;margin-right:.75rem;border:2px solid rgba(181,80,46,.30);border-top-color:var(--rust,#B5502E);border-right-color:transparent;border-radius:50%;box-sizing:border-box;transform:rotate(-28deg);opacity:.72}
+.sk-nav-links a[data-sk-baraha]:hover::before,
+.sk-nav-links a[data-sk-baraha].active::before,
+html body .panel-links a[data-sk-baraha]:hover::before,
+html body .panel-links a[data-sk-baraha].active::before{opacity:1}
+
 @media (prefers-reduced-motion:reduce){.sk-nav-opener,.sk-nav-opener.sk-nav-pulsing::before,button.bookmark-tab,.bookmark-tab.pulsing::before{animation:none}.sk-nav-panel,.sk-nav-backdrop,.sk-nav-opener,.bookmark-tab{transition:none}}
 
 
