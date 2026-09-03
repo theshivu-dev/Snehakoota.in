@@ -1,0 +1,200 @@
+/* =========================================================
+   SNEHAKOOTA — STORY PAGE STYLES
+   Stage 3B
+   ---------------------------------------------------------
+   Page-specific Story presentation lives here.
+   Shared visual tokens come from theme.css.
+   Shared navigation presentation comes from navigation.css.
+   ========================================================= */
+
+html, body{
+  margin:0;
+  padding:0;
+  background:linear-gradient(180deg,var(--sky-top) 0%,var(--sky-bottom) 55%,var(--sky-bottom) 100%);
+  color:var(--ink);
+  font-family:var(--font-kannada,var(--font-body,'Noto Sans Kannada','Work Sans',sans-serif));
+  overflow-x:hidden;
+}
+
+body{ padding-left:var(--sk-edge-width,22px); }
+a{ color:var(--rust); }
+
+/* =========================================================
+   STAGE 3B — STORY-OWNED CHAPTER PROGRESS STRIP
+   ---------------------------------------------------------
+   These four dots are NOT the global site navigation.
+   They jump between Story chapters and therefore remain page-owned.
+   ========================================================= */
+.edge-strip{
+  position:fixed;
+  left:0;
+  top:0;
+  bottom:0;
+  width:var(--sk-edge-width,22px);
+  background:var(--sk-edge-binding,#F5D9AE);
+  border-right:1px solid var(--line-idle,rgba(43,33,24,.16));
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:space-evenly;
+  z-index:20;
+}
+.edge-strip .dot-btn{
+  width:var(--sk-edge-width,22px);
+  height:22px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:none;
+  border:none;
+  padding:0;
+  cursor:pointer;
+}
+.edge-strip .ring{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:rgba(181,80,46,.4);
+  transition:background .2s,transform .2s;
+}
+.edge-strip .dot-btn:hover .ring{ background:rgba(181,80,46,.7); }
+.edge-strip .dot-btn.active .ring{
+  background:var(--rust);
+  transform:scale(1.35);
+}
+
+/* Story-specific top bar */
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:10;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:.9rem 5vw;
+  backdrop-filter:blur(10px);
+  background:rgba(255,246,232,.75);
+  border-bottom:1px solid rgba(43,33,24,.10);
+}
+.topbar .brand{
+  font-family:var(--font-display,'Fraunces',serif);
+  font-weight:600;
+  font-size:1rem;
+  text-decoration:none;
+}
+.topbar .brand .sneha{ color:var(--rust); }
+.topbar .brand .koota{ color:var(--banyan); }
+
+/* Story chapters */
+.chapter{
+  position:relative;
+  max-width:var(--sk-content-max,640px);
+  margin:0 auto;
+  padding:6vh 6vw;
+}
+.chapter + .chapter{ border-top:1px solid rgba(43,33,24,.10); }
+.chapter:first-of-type{ padding-top:7vh; }
+.chapter-label{
+  font-family:var(--font-body,'Work Sans',sans-serif);
+  font-size:.7rem;
+  font-weight:600;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--banyan);
+  margin-bottom:.6rem;
+}
+.chapter h2{
+  font-family:var(--font-display,'Fraunces',serif);
+  font-weight:600;
+  font-size:clamp(1.5rem,6vw,2.1rem);
+  margin:0 0 1.3rem;
+  line-height:1.25;
+}
+.chapter p{
+  font-size:1.05rem;
+  line-height:1.9;
+  color:var(--ink-soft);
+  margin:0 0 1.1rem;
+}
+.chapter p.lede{ color:var(--ink); font-weight:500; }
+
+.steps-list{
+  list-style:none;
+  margin:1.6rem 0 0;
+  padding:0;
+}
+.steps-list li{
+  position:relative;
+  padding-left:1.3rem;
+  margin-bottom:.7rem;
+  font-size:.98rem;
+  color:var(--ink-soft);
+  line-height:1.6;
+}
+.steps-list li::before{
+  content:'—';
+  position:absolute;
+  left:0;
+  color:var(--marigold);
+}
+.steps-list li:last-child{ color:var(--ink); font-weight:500; }
+
+.way-list{
+  list-style:none;
+  margin:1.6rem 0 0;
+  padding:0;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:.6rem;
+}
+.way-list li{
+  background:rgba(255,255,255,.4);
+  border:1px solid rgba(43,33,24,.10);
+  border-radius:var(--sk-radius-md,12px);
+  padding:.7rem .85rem;
+  font-size:.92rem;
+  color:var(--ink);
+  text-align:center;
+}
+
+.closing{
+  text-align:center;
+  background:linear-gradient(180deg,transparent 0%,rgba(226,155,63,.08) 100%);
+}
+.closing p{ color:var(--ink); }
+.cta-wrap{ margin-top:1.6rem; }
+.cta{
+  display:inline-block;
+  padding:.85em 2.1em;
+  background:var(--rust);
+  color:var(--sky-top);
+  text-decoration:none;
+  font-weight:600;
+  font-size:.92rem;
+  border-radius:var(--sk-radius-pill,999px);
+  border:none;
+  cursor:pointer;
+  font-family:var(--font-body,'Work Sans',sans-serif);
+}
+.cta-note{
+  margin-top:.9rem;
+  font-size:.85rem;
+  color:var(--ink-soft);
+  font-style:italic;
+  min-height:1.2em;
+  opacity:0;
+  transition:opacity .3s ease;
+}
+.cta-note.show{ opacity:1; }
+
+footer{
+  text-align:center;
+  padding:5vh 6vw 6vh;
+  font-size:.8rem;
+  color:var(--ink-soft);
+  opacity:.75;
+}
+
+@media (max-width:480px){
+  .chapter{ padding-left:7vw; padding-right:7vw; }
+}
