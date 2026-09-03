@@ -281,9 +281,20 @@
 
   function boot(){
     isolatePageChrome();
-    var root=ensureSharedNavigation();
-    init(root);
-    initLegacyIndex();
+
+    /* Preserve the existing Index legacy adapter until that markup is
+       deliberately removed in the later migration step. */
+    if (document.querySelector('[data-sk-nav-root]')){
+      init(document.querySelector('[data-sk-nav-root]'));
+      return;
+    }
+
+    if (document.querySelector('button.bookmark-tab') && document.querySelector('.side-panel') && document.querySelector('.backdrop')){
+      initLegacyIndex();
+      return;
+    }
+
+    init(ensureSharedNavigation());
   }
 
   if (document.readyState==='loading'){
