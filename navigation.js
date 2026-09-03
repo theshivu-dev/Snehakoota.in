@@ -89,6 +89,23 @@
     makeCollectionsItem(root && root.querySelector('.sk-nav-links'));
   }
 
+  function makeBarahaItem(links){
+    if (!links || links.querySelector('[data-sk-baraha]')) return;
+
+    var story = links.querySelector('a[href="story.html"]');
+    if (!story) return;
+
+    var item = document.createElement('a');
+    item.href = 'baraha.html';
+    item.setAttribute('data-sk-baraha','true');
+    item.textContent = 'ಬರಹ';
+    links.insertBefore(item,story.nextSibling);
+  }
+
+  function addBaraha(root){
+    makeBarahaItem(root && root.querySelector('.sk-nav-links'));
+  }
+
   function markActivePage(root){
     var links = root && root.querySelectorAll('.sk-nav-links a');
     if (!links) return;
@@ -160,6 +177,7 @@
 
     root.dataset.skNavReady='true';
     applyBindingState(root,panel);
+    addBaraha(root);
     markActivePage(root);
     addCollections(root);
 
