@@ -100,7 +100,9 @@
       var href = link.getAttribute('href');
       if (!href || href === '#') return;
       var linkPath = href.split('/').pop() || 'index.html';
-      link.classList.toggle('active', linkPath === path);
+      var isActive = linkPath === path;
+      link.classList.toggle('active', isActive);
+      link.style.fontWeight = isActive ? '600' : '500';
     });
   }
 
