@@ -223,35 +223,6 @@
 </style>
 </head>
 <body>
-     
-<div class="edge-strip" id="edgeStrip" role="button" aria-label="Open menu" tabindex="0">
-  <span class="ring"></span><span class="ring"></span><span class="ring"></span>
-  <span class="ring"></span><span class="ring"></span><span class="ring"></span><span class="ring"></span>
-</div>
-
-<div class="backdrop" id="backdrop"></div>
-
-<nav class="side-panel" aria-hidden="true">
-  <div class="binding">
-    <span class="ring"></span><span class="ring"></span><span class="ring"></span>
-    <span class="ring"></span><span class="ring"></span><span class="ring"></span><span class="ring"></span>
-  </div>
-  <div class="panel-body">
-    <div class="panel-top">
-      <span class="brand" style="font-family:'Fraunces',serif;"><span style="color:var(--rust);">ಸ್ನೇಹ</span><span style="color:var(--banyan);">ಕೂಟ</span></span>
-      <button class="closer" id="closer" aria-label="Close menu">&#10005;</button>
-    </div>
-    <div class="panel-links">
-      <a href="index.html" class="active">ಸ್ನೇಹಕೂಟ</a>
-      <a href="story.html">ಪಯಣ</a>
-      <a href="samparka.html">ಸ್ನೇಹಸಂಪರ್ಕ</a>
-      <a href="#" class="disabled">Gallery <span class="tag">(soon)</span></a>
-      <a href="#" class="disabled">Contact <span class="tag">(soon)</span></a>
-    </div>
-  </div>
-</nav>
-
-<button class="bookmark-tab pulsing" id="opener" aria-label="Open menu" role="button" tabindex="0"></button>
 
 <header class="topbar"></header>
 
@@ -276,23 +247,6 @@
     <p class="kannada">ನಮ್ಮ ಬಳಗ, ಒಂದಾಗುತಿದೆ.</p>
   </div>
 </div>
-
-
-<script>
- // document.getElementById('year').textContent = new Date().getFullYear();
-
-  const body = document.body;
-  const openNav = () => body.classList.add('nav-open');
-  const closeNav = () => body.classList.remove('nav-open');
-  const toggleNav = () => body.classList.toggle('nav-open');
-  document.getElementById('edgeStrip').addEventListener('click', toggleNav);
-  document.getElementById('edgeStrip').addEventListener('keypress', (e) => { if(e.key === 'Enter') toggleNav(); });
-  const openerBtn = document.getElementById('opener');
-  openerBtn.addEventListener('click', () => { toggleNav(); openerBtn.classList.remove('pulsing'); });
-  openerBtn.addEventListener('keypress', (e) => { if (e.key === 'Enter') { toggleNav(); openerBtn.classList.remove('pulsing'); } });
-  document.getElementById('closer').addEventListener('click', closeNav);
-  document.getElementById('backdrop').addEventListener('click', closeNav);
-</script>
 
 <!-- ===================================================================
      SNEHAKOOTA MINI-GAME WIDGET (self-contained, droppable into any page)
