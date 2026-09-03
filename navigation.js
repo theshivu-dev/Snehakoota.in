@@ -89,6 +89,21 @@
     makeCollectionsItem(root && root.querySelector('.sk-nav-links'));
   }
 
+  function markActivePage(root){
+    var links = root && root.querySelectorAll('.sk-nav-links a');
+    if (!links) return;
+
+    var path = window.location.pathname.split('/').pop() || 'index.html';
+    if (path === '') path = 'index.html';
+
+    links.forEach(function(link){
+      var href = link.getAttribute('href');
+      if (!href || href === '#') return;
+      var linkPath = href.split('/').pop() || 'index.html';
+      link.classList.toggle('active', linkPath === path);
+    });
+  }
+
   function isolatePageChrome(){
     /* Samparka's vertical dots are page-progress controls, not global NAV. */
     var edge = document.querySelector('.edge-strip');
@@ -143,6 +158,7 @@
 
     root.dataset.skNavReady='true';
     applyBindingState(root,panel);
+    markActivePage(root);
     addCollections(root);
 
     function setOpen(open){
