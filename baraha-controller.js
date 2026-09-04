@@ -19,6 +19,9 @@
             this.model = options.model || null;
             this.service = options.service || null;
             this.view = options.view || null;
+            this.feedCursor = null;
+            this.hasMorePosts = true;
+            this.feedLoading = false;
         }
 
         async init() {
@@ -29,8 +32,59 @@
             const session = await this.service.getSession();
             this.context.setSession(session);
 
+            await this.loadPosts();
+
             if (this.view && typeof this.view.render === "function") {
                 this.view.render(this.model, this.context);
+            }
+        }
+
+        async loadPosts() {
+            if (this.feedLoading || !this.hasMorePosts) return;
+
+            this.feedLoading = true;
+            try {
+                const result = await this.service.getPosts({
+                    cursor: this.feedCursor,
+                    limit: 20
+                });
+
+                this.model.setPosts(result.posts);
+                this.feedCursor = result.nextCursor;
+                this.hasMorePosts = result.hasMore;
+
+                if (this.view && typeof this.view.renderFeed === "function") {
+                    this.view.renderFeed(this.model, this.context);
+                }
+
+                return result;
+            } finally {
+                this.feedLoading = false;
+            }
+        }
+
+        async loadMorePosts() {
+            if (this.feedLoading || !this.hasMorePosts) return null;
+
+            this.feedLoading = true;
+            try {
+                const result = await this.service.getPosts({
+                    cursor: this.feedCursor,
+                    limit: 20
+                });
+
+                const currentPosts = Array.isArray(this.model.posts) ? this.model.posts : [];
+                this.model.setPosts(currentPosts.concat(result.posts || []));
+                this.feedCursor = result.nextCursor;
+                this.hasMorePosts = result.hasMore;
+
+                if (this.view && typeof this.view.renderFeed === "function") {
+                    this.view.renderFeed(this.model, this.context);
+                }
+
+                return result;
+            } finally {
+                this.feedLoading = false;
             }
         }
 
