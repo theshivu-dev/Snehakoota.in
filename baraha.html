@@ -80,7 +80,15 @@
                 <div class="note">ಖಾಸಗಿ ಬರಹಗಳು ನಿಮಗೆ ಮಾತ್ರ ಕಾಣುತ್ತವೆ. ಸದಸ್ಯರಿಗೆ ಹಂಚಿದರೆ ಆಯ್ಕೆ ಮಾಡಿದ membership ಗೆ ಮಾತ್ರ ಕಾಣುತ್ತದೆ.</div>
             </div>
         </div>
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        <script src="baraha-model.js"></script>
+        <script src="baraha-service.js"></script>
+        <script src="baraha-view.js"></script>
         <script>
+            const SUPABASE_URL = "https://hukfpoxvtutvhjfdzcuh.supabase.co";
+            const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_6_9Fc319vRsSZSksFlhzSw_28-glehH";
+            const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
             // 2.1 — Static data contract.
             // These structures are UI-facing demo data for now. Supabase mapping comes later.
             const BARAHA_CATEGORIES = [
@@ -239,6 +247,20 @@
                 }).join("");
             }
 
+            async function loadLivePosts() {
+                const service = new BarahaService(supabaseClient);
+                const model = new BarahaModel();
+
+                const result = await service.getPosts({ limit: 20 });
+
+                model.setPosts(result.posts);
+
+                const livePosts = BarahaView.postsToUi(model.posts);
+
+                BARAHA_POSTS.push(...livePosts);
+                renderPosts();
+            }
+
             function openSheet() {
                 backdrop.classList.add("open");
             }
@@ -260,6 +282,9 @@
             renderEditorModes();
             renderVisibilityOptions();
             renderPosts();
+            loadLivePosts().catch((error) => {
+                console.error("Baraha live feed load failed:", error);
+            });
 
             fab.addEventListener("click", openSheet);
             close.addEventListener("click", closeSheet);
