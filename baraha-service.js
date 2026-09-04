@@ -12,10 +12,8 @@
  * - Uses an opaque application cursor represented internally as
  *   { created_at, id } for keyset pagination.
  * - Fetches one extra row to determine hasMore without a count query.
- * - Does not perform author/profile enrichment here because author_id has
- *   no direct FK to profiles and profiles are not generally readable under
- *   the current RLS policy. Author resolution can be added later through a
- *   separately approved read path without changing this feed contract.
+ * - Resolves visible author display data in one batched RPC after the feed
+ *   page is fetched; it never performs an author query per post.
  *
  * Database authorization remains the security boundary. This service does
  * not duplicate RLS rules in the frontend.
@@ -86,10 +84,38 @@
             const rows = Array.isArray(result.data) ? result.data : [];
             const hasMore = rows.length > limit;
             const posts = hasMore ? rows.slice(0, limit) : rows;
-            const last = posts.length ? posts[posts.length - 1] : null;
+            const authorIds = Array.from(new Set(
+                posts.map((post) => post.author_id).filter(Boolean)
+            ));
+
+            const authorsById = {};
+            if (authorIds.length) {
+                const authorResult = await this.supabase.rpc(
+                    "baraha_get_author_profiles",
+                    { p_post_ids: posts.map((post) => post.id) }
+                );
+
+                if (authorResult.error) {
+                    throw authorResult.error;
+                }
+
+                (authorResult.data || []).forEach((author) => {
+                    authorsById[author.author_id] = {
+                        id: author.author_id,
+                        displayName: author.display_name || author.full_name || "Member",
+                        avatarUrl: author.avatar_url || null
+                    };
+                });
+            }
+
+            const enrichedPosts = posts.map((post) => Object.assign({}, post, {
+                author: authorsById[post.author_id] || null
+            }));
+
+            const last = enrichedPosts.length ? enrichedPosts[enrichedPosts.length - 1] : null;
 
             return {
-                posts: posts,
+                posts: enrichedPosts,
                 hasMore: hasMore,
                 nextCursor: hasMore && last
                     ? {
