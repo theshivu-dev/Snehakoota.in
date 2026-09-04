@@ -12,8 +12,8 @@
  * - Uses an opaque application cursor represented internally as
  *   { created_at, id } for keyset pagination.
  * - Fetches one extra row to determine hasMore without a count query.
- * - Resolves visible author display data in one batched RPC after the feed
- *   page is fetched; it never performs an author query per post.
+ * - Uses the stored post author display name when available and keeps the
+ *   existing batched profile lookup as a compatibility fallback.
  *
  * Database authorization remains the security boundary. This service does
  * not duplicate RLS rules in the frontend.
@@ -109,7 +109,13 @@
             }
 
             const enrichedPosts = posts.map((post) => Object.assign({}, post, {
-                author: authorsById[post.author_id] || null
+                author: {
+                    id: post.author_id || null,
+                    displayName: post.author_display_name ||
+                        (authorsById[post.author_id] && authorsById[post.author_id].displayName) ||
+                        "Member",
+                    avatarUrl: (authorsById[post.author_id] && authorsById[post.author_id].avatarUrl) || null
+                }
             }));
 
             const last = enrichedPosts.length ? enrichedPosts[enrichedPosts.length - 1] : null;
