@@ -17,6 +17,7 @@
             this.id = data.id || null;
             this.authorId = data.author_id || data.authorId || null;
             this.authorMembershipId = data.author_membership_id || data.authorMembershipId || null;
+            this.authorDisplayName = data.author_display_name || data.authorDisplayName || null;
             this.title = data.title || "";
             this.content = data.content || "";
             this.category = data.category || null;
