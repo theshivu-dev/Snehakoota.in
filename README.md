@@ -1,6 +1,6 @@
 # Snehakoota.in — Project Rules & Development Standards
 
-> **Last updated:** 2026-08-29
+> **Last updated:** 2026-09-04
 >
 > This README is the working contract for AI-assisted development of Snehakoota.in. It records both the stable project rules and the current authenticated/invitation architecture so future sessions can continue without losing decisions already made.
 
@@ -41,6 +41,19 @@ Before modifying a page or shared file:
 ### Mandatory write/commit confirmation
 
 Before creating, modifying, deleting, or committing any repository file, the AI must first show the proposed change and obtain explicit confirmation from the user in chat. A generic question such as “Can you do this?” does not constitute permission to write or commit.
+
+For an explicitly approved multi-step task, that approval covers the stated scope only. If the intended scope expands, stop and obtain confirmation for the expansion.
+
+### Mandatory post-commit validation
+
+After every repository commit:
+
+1. Re-fetch the committed file(s) and confirm the intended content is present.
+2. Compare the commit against its parent and verify that only the approved files/changes were included.
+3. Check for accidental truncation, unrelated edits, missing content, or reverted work.
+4. Report the commit SHA and validation result before proceeding to another change.
+
+Never assume a successful GitHub write means the change is correct.
 
 ---
 
@@ -210,6 +223,8 @@ Privileged server-side operations may use a secure backend/Edge Function. Servic
 Supabase/PostgreSQL RLS is part of the security model. Frontend visibility is UX only and must not be the security boundary.
 
 Application authorization should be represented in database relationships and server-side logic.
+
+Authentication is required for user-specific/member/private operations; public Baraha content may remain anonymously readable according to RLS.
 
 ---
 
@@ -643,8 +658,14 @@ Make the smallest appropriate change.
 ### Step 5 — Verify
 Check HTML, JavaScript, assets, responsive behaviour, duplicate controls, regression risk and (for Supabase) authorization, RLS/grants, configuration dependencies, error handling and persistence order.
 
-### Step 6 — Report
-State changed files, main changes, assumptions, browser/device tests still needed and intentionally deferred work.
+### Step 6 — Commit
+Commit only the approved change. Keep commits focused enough that the owner can understand and safely revert them.
+
+### Step 7 — Post-commit validation
+Re-fetch the committed file(s), compare the commit with its parent, verify the exact changed-file set and confirm there was no truncation, accidental revert or unrelated change.
+
+### Step 8 — Update this README when a decision becomes durable
+If a decision changes architecture, security, data ownership, lifecycle, development rules, or another future-session assumption, update this README as part of the same controlled workflow. Record the new decision rather than relying on conversation history alone.
 
 ---
 
@@ -678,14 +699,492 @@ Technology should serve:
 - Simplicity.
 - Long-term maintainability.
 
-The site is intentionally **open to people at the account level**. Membership is the deeper community relationship and follows its own consent, approval and lifecycle rules.
+---
+
+## 25. Delta since the previous README update — 2026-08-29
+
+The previous README was last updated on 2026-08-29. The following durable decisions were made after that point and are now recorded here so future sessions do not depend on conversation history.
+
+### Baraha backend foundation is now established
+
+Baraha is no longer only a UI prototype at the architecture level. Its PostgreSQL foundation and security model are established and should be treated as the current backend foundation unless explicitly reopened.
+
+The current `baraha_posts` foundation includes:
+
+- `id`
+- `author_id`
+- `author_membership_id`
+- `title`
+- `content`
+- `category`
+- `content_status`
+- `visibility`
+- `collection_key`
+- `collection_part`
+- `collection_order`
+- `created_at`
+- `updated_at`
+
+The normalized `baraha_post_memberships` relationship supports multiple membership contexts per post.
+
+Baraha lifecycle states are:
+
+`draft`, `published`, `hide`, `archived`.
+
+Normal users do not physically delete posts; normal deletion is represented by `archived`. Owner-level physical deletion remains an exceptional/firefighter capability.
+
+Matching active admins may moderate a matching post from `published → hide`, with database protection that prevents unauthorized content/identity changes through the moderation path.
+
+### Baraha authorization and public access
+
+Supabase RLS/database rules remain the actual security boundary.
+
+Authentication is required for user-specific/member/private Baraha operations, while published public Baraha content may remain anonymously readable according to RLS.
+
+Frontend visibility or button state is never considered authorization.
+
+### Baraha membership is contextual, not identity
+
+A Baraha post may carry an author membership context, but `author_id` remains the durable ownership identity. Membership context does not replace the authenticated user identity.
+
+Multiple memberships per user remain a permanent architectural requirement.
+
+### Baraha architecture is deliberately modular
+
+The current Baraha application boundary is:
+
+```text
+Supabase / Auth
+      ↓
+BarahaService
+      ↓
+BarahaController
+   ↙        ↘
+Context     Model
+      \      /
+        View
+          ↓
+     baraha.html
+```
+
+This is a lightweight application architecture, not a new framework.
 
 ---
 
-## 25. Working instruction for future AI sessions
+## 26. Baraha application architecture
 
-Treat this README as the baseline project contract.
+### Purpose
 
-If a current user request conflicts with this README, the user's explicit current request takes priority, but the AI should point out the conflict before making a potentially destructive or architectural change.
+Baraha is being developed as a self-contained modular application inside the static Snehakoota frontend. The goal is to provide clear boundaries now so individual capabilities can be changed later without rewriting unrelated parts of the page.
 
-When uncertain, **inspect the existing repository first and ask rather than guessing**.
+The architecture intentionally resembles a small MVC/application module and may use PBO/PAI-style thinking for UI lifecycle, but it does not introduce a large generic framework.
+
+### Layers and responsibilities
+
+#### View — `baraha.html` / future `BarahaView`
+
+The View is responsible for:
+
+- presenting Baraha UI;
+- collecting user interaction;
+- UI-only validation and presentation state;
+- rendering data supplied by the application layer;
+- showing loading, empty, unavailable and error states.
+
+The View must not directly query Supabase, implement database authorization, or become the source of business/data truth.
+
+The existing HTML can remain the visual/template surface while the architecture evolves toward a clearer `BarahaView` object where useful.
+
+#### Controller — `BarahaController`
+
+The Controller is the application doorway for user commands and coordinates the flow between View, Model, Context and Service.
+
+Conceptual commands include:
+
+```text
+SELECT_CATEGORY
+SELECT_MEMBERSHIP
+OPEN_POST
+LOAD_MORE
+NEW_POST
+SAVE_DRAFT
+PUBLISH_POST
+HIDE_POST
+```
+
+The exact command catalogue may evolve. The important rule is that user actions enter the application through the Controller rather than embedding business/data operations directly in HTML handlers.
+
+The Controller must not contain raw Supabase table/RPC implementation details.
+
+#### Model — `BarahaModel`
+
+The Model owns Baraha application/domain state, not DOM state and not authentication authority.
+
+The planned structure is:
+
+```text
+BarahaModel
+├── feed
+│   ├── items
+│   ├── loading
+│   ├── hasMore
+│   └── nextCursor
+├── selectedPost
+├── categories / modes / visibility options
+├── selectedCategory / filters
+└── editor
+    ├── mode
+    ├── title
+    ├── content
+    ├── visibility
+    └── selected memberships
+```
+
+Feed, post and editor state may be refined independently as the application grows.
+
+#### Context — `BarahaContext`
+
+Context represents the user's current Baraha operating context:
+
+- current `session`;
+- current `user`;
+- available `memberships[]`;
+- `currentMembership`.
+
+Authentication state is derived from the session rather than maintained as an unrelated second authority.
+
+`currentMembership` means the membership context in which the user is mentally/operationally working. It is not a replacement for authorization.
+
+Context does not independently decide whether an operation is allowed. Supabase/database authorization remains authoritative.
+
+#### Service — `BarahaService`
+
+**BarahaService is the only Baraha application layer responsible for communicating with Supabase.**
+
+It owns the Baraha data boundary and exposes meaningful Baraha operations rather than leaking raw table/query details to the Controller or View.
+
+The service catalogue is expected to include concepts such as:
+
+```text
+READ
+├── getMyMemberships()
+├── getPostList()
+├── getPost()
+└── getCollection()
+
+WRITE
+├── createPost()
+├── updatePost()
+├── publishPost()
+├── archivePost()
+└── setPostMemberships()
+
+MODERATION
+└── hidePost()
+```
+
+This is a conceptual service contract, not a promise that every method is implemented immediately.
+
+The Service may use tables, RPCs, views or other Supabase mechanisms internally. That implementation detail must not leak into Controller/View contracts.
+
+### Service + Supabase are the read/write authority
+
+The fundamental rule is:
+
+```text
+UI/View
+   ↓
+Controller
+   ↓
+BarahaService
+   ↓
+Supabase
+```
+
+The UI, Controller, Model and Context are application helpers/state holders. They are **not independent authorities for Baraha data**.
+
+For reads, the Service asks Supabase for the authoritative data available to the current viewer.
+
+For writes, the Service requests the operation from Supabase, where RLS/RPC/database rules remain the final authority.
+
+The frontend must never reproduce Supabase authorization merely to decide whether an operation is truly allowed.
+
+### Authentication and public feed boundary
+
+A public Baraha post may be readable without authentication if current RLS permits it.
+
+Authentication is required where the operation is user-specific or depends on member/private access.
+
+Therefore the architecture must not use “authenticated = can read Baraha” as a blanket rule. The Service asks Supabase for the current viewer's permitted result.
+
+### Feed contract
+
+The main feed is a viewer-relative representation of content the current viewer is allowed to read.
+
+Default ordering is:
+
+```text
+created_at DESC
+id DESC
+```
+
+The feed uses cursor/keyset pagination rather than page numbers.
+
+The conceptual result contract is:
+
+```js
+{
+  items: [...],
+  nextCursor: "...",
+  hasMore: true
+}
+```
+
+Initial loading, loading more and refreshing are distinct states.
+
+A refresh is represented by a new first-page request rather than by silently reordering the existing scroll position.
+
+Stale asynchronous responses must be discarded when the feed context/request identity has changed.
+
+### `getPostList()` contract
+
+The planned Service contract is:
+
+```js
+getPostList({
+  limit,
+  cursor,
+  category?,
+  membershipId?
+})
+```
+
+`membershipId` is a feed/filter context, not an authorization mechanism.
+
+No explicit `userId` parameter is required for authority. Supabase Auth/session and database rules identify the current user.
+
+No hard-coded status filter is required for the base feed; Supabase/RLS determines which rows are actually visible to the current viewer.
+
+The feed may initially retrieve full post content and derive a short card preview in the presentation layer. A later implementation can switch to a lighter representation without inventing a permanent `summary` database field solely for the current UI.
+
+### Single-post/deep-link contract
+
+Every post is independently addressable by stable `baraha_posts.id`.
+
+Initial deep-link form:
+
+`baraha.html?post=<id>`
+
+The same Baraha application can initially handle both feed and reading. A future dedicated reading route/page can be introduced without changing post identity or the core Service boundary.
+
+An inaccessible, hidden or deleted direct post must result in a meaningful unavailable state rather than a blank page.
+
+### Collections
+
+A Collection is a future grouping of individual posts into a book, article set, series or similar structure.
+
+A post belongs to zero or one Collection.
+
+Existing `collection_key`, `collection_part` and `collection_order` are deliberate database foundation for future grouping/order. Collection UI and execution are not being implemented merely because the columns exist.
+
+The guiding use case is **write first, club later**.
+
+### Membership selector
+
+The Baraha membership selector has two related but distinct meanings:
+
+- **Current operating membership** — “Where am I operating?”
+- **Feed/filter membership** — “Which membership's content am I asking to see?”
+
+They may coincide in the current UI, but the architecture must not collapse these concepts permanently.
+
+A membership can legitimately have zero Baraha posts.
+
+Operations that require membership use an active/valid membership according to Supabase. Base feed retrieval does not require a current membership when RLS allows the requested content.
+
+### Author identity and future author resolution
+
+`baraha_posts.author_id` is the durable ownership identity.
+
+The current demo author names are presentation-only mock values and are not the identity source.
+
+Author display is deliberately separated from ownership/security identity.
+
+The Service should provide a replaceable author-resolution capability such as:
+
+```text
+readAuthor(id)
+readAuthors(ids[])
+```
+
+Batch resolution is preferred when several feed items need author information so that the application does not create avoidable N+1 lookups.
+
+The resolver may determine whether an author has relevant membership context today and may later resolve profile/display information from a different safe Supabase destination. Controller, Model and View should not need to change when that underlying destination evolves.
+
+The preferred implementation is a safe Supabase-side resolver/query/RPC/view rather than exposing arbitrary membership-table reads to the browser simply to classify authors.
+
+No arbitrary author resolver is required to be implemented now; the architectural boundary is what is being fixed.
+
+### Profile visibility and consent — future
+
+Display names, avatars and other profile information are separate from `author_id` ownership.
+
+When profile identity becomes a real UI/data requirement, appropriate visibility, privacy and consent rules will be defined and connected through the existing author-resolution boundary.
+
+No profile redesign is required for the current Baraha foundation.
+
+### Error and lifecycle model
+
+State belongs to the relevant Model area rather than one giant global state:
+
+```text
+Model.feed.state
+Model.post.state
+Model.editor.state
+```
+
+Expected outcomes such as empty data, not found, not accessible and validation failure must remain distinguishable from technical failures such as network/Supabase errors.
+
+A failed operation must not silently become an idle/blank state.
+
+A lightweight future MessageHandler/ErrorHandler may classify technical/application errors and convert them into user-facing messages, but a large global error framework is not required now.
+
+Post lifecycle remains subject to current Supabase truth; the Model must not assume a previously fetched state is permanently authoritative.
+
+### Supabase remains the security boss
+
+Baraha architecture does not move authorization into JavaScript.
+
+The frontend may hide/disable UI controls for usability, but that is only presentation. RLS, database functions, triggers and server-side rules are the actual security boundary.
+
+Where a business rule can change independently of the UI, it belongs at the Service/Supabase boundary rather than being duplicated across pages.
+
+---
+
+## 27. Baraha implementation roadmap and architecture maintenance
+
+The Baraha architecture is intended to support incremental implementation without breaking the existing static site.
+
+### Current implementation stage
+
+The following Baraha-specific scaffolding exists:
+
+- `baraha-context.js` — application/session context container; no Supabase calls.
+- `baraha-model.js` — Baraha domain/application state container.
+- `baraha-service.js` — Service boundary; Supabase access belongs here.
+- `baraha-controller.js` — application coordinator; does not own raw Supabase queries.
+- `baraha.html` — current visual/template surface with static demo data.
+
+These files are architectural foundation/scaffolding. They should not be expanded into a large framework merely to make the architecture look complete.
+
+### Safe implementation order
+
+The intended direction is:
+
+```text
+architecture decision
+      ↓
+README / durable contract
+      ↓
+small module change
+      ↓
+inspect + implement
+      ↓
+commit
+      ↓
+post-commit compare/validation
+      ↓
+continue
+```
+
+The current Baraha UI should remain static-first until the View/Controller/Model boundaries are stable enough to wire real data safely.
+
+### Change one capability at a time
+
+Future Baraha work should prefer changing one capability or boundary at a time, for example:
+
+- feed loading;
+- membership context;
+- post reading;
+- author resolution;
+- editor/save;
+- publishing;
+- moderation;
+- collection support.
+
+A change to one capability should not require rewriting unrelated modules.
+
+### Architecture is revisitable, not frozen forever
+
+This architecture is a durable starting boundary, not a claim that every method or class is permanent.
+
+If future requirements show that a boundary is wrong or too small, first document the proposed architectural change, inspect its impact on Supabase and existing modules, then change the smallest affected boundary and update this README.
+
+Do not bypass the architecture by placing a quick Supabase query directly into a page just because it is faster for one feature.
+
+### README is the continuity mechanism
+
+The README is intentionally treated as a living architecture and development contract.
+
+When a decision becomes durable, record it here. When a durable decision is superseded, update the relevant section rather than accumulating contradictory rules elsewhere.
+
+Future AI sessions should use this README plus the current repository/Supabase state as the starting point, not assume that old conversation text is still the latest authority.
+
+---
+
+## 28. Current Baraha status — foundation vs implementation
+
+### Backend foundation — established
+
+- [x] `baraha_posts` schema foundation.
+- [x] `baraha_post_memberships` normalized membership bridge.
+- [x] Post lifecycle states.
+- [x] Owner exceptional delete/security path.
+- [x] Matching-admin moderation boundary.
+- [x] Database-level protection of moderation changes.
+- [x] RLS-based viewer-relative read access.
+- [x] Multiple membership support.
+- [x] Collection foundation fields reserved for future use.
+
+### Application architecture — established
+
+- [x] View / Controller / Model / Context / Service boundary.
+- [x] Service as the only Baraha application layer communicating with Supabase.
+- [x] Supabase as authoritative source for read/write, identity, membership and authorization.
+- [x] Viewer-relative feed concept.
+- [x] Cursor pagination contract.
+- [x] Single-post/deep-link concept.
+- [x] Collection concept and future boundary.
+- [x] Membership selector semantics.
+- [x] Author-resolution extension point.
+- [x] Error/loading/lifecycle model.
+
+### Still implementation work
+
+- [ ] Replace static demo feed with Service-backed feed.
+- [ ] Wire current membership context to real memberships.
+- [ ] Implement real post reading/deep links.
+- [ ] Implement author resolution through an approved safe Supabase mechanism.
+- [ ] Implement create/update/save/publish operations through Service.
+- [ ] Implement membership bridge writes through Service.
+- [ ] Implement moderation UI through Service/database rules.
+- [ ] Add end-to-end authenticated/member/private/public tests.
+- [ ] Add collection execution/UI only when the product requirement becomes active.
+
+The existence of a checked backend foundation does **not** mean the UI should jump directly to full CRUD. Continue in small, validated stages.
+
+---
+
+## 29. Current project philosophy
+
+Snehakoota is a community project first and a technology project second.
+
+Technology should serve:
+
+- Friends.
+- Community participation.
+- Easy discovery.
+- Good storytelling.
+- Trust.
+- Simplicity.
+- Long-term maintainability.
