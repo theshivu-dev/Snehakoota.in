@@ -88,9 +88,11 @@
             const SUPABASE_URL = "https://hukfpoxvtutvhjfdzcuh.supabase.co";
             const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_6_9Fc319vRsSZSksFlhzSw_28-glehH";
             const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+            const barahaService = new BarahaService(supabaseClient);
+            const barahaModel = new BarahaModel();
 
             // 2.1 — Static data contract.
-            // These structures are UI-facing demo data for now. Supabase mapping comes later.
+            // Categories remain UI-facing vocabulary. Memberships are loaded from Supabase below.
             const BARAHA_CATEGORIES = [
                 { key: "baraha", label: "ಬರಹ" },
                 { key: "poem", label: "ಕವನ" },
@@ -153,10 +155,7 @@
                 }
             ];
 
-            const BARAHA_MEMBERSHIPS = [
-                { key: "hshs-2004", label: "HSHS · 2004" },
-                { key: "hshs-2012", label: "HSHS · 2012" }
-            ];
+            let BARAHA_MEMBERSHIPS = [];
 
             const BARAHA_MODES = [
                 { key: "ಬರಹ", label: "ಬರಹ" },
@@ -247,15 +246,37 @@
                 }).join("");
             }
 
+            async function loadMemberships() {
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (!session) {
+                    renderMembershipOptions();
+                    return;
+                }
+
+                const memberships = await barahaService.getMemberships();
+                barahaModel.setMemberships(memberships);
+
+                BARAHA_MEMBERSHIPS = memberships
+                    .filter((membership) => membership.status === "active")
+                    .map((membership) => ({
+                        key: String(membership.id),
+                        label: `${membership.school?.name || "School"} · ${membership.batch?.year || "Batch"}`,
+                        id: membership.id,
+                        schoolId: membership.schoolId,
+                        batchId: membership.batchId,
+                        membershipType: membership.membershipType,
+                        status: membership.status
+                    }));
+
+                renderMembershipOptions();
+            }
+
             async function loadLivePosts() {
-                const service = new BarahaService(supabaseClient);
-                const model = new BarahaModel();
+                const result = await barahaService.getPosts({ limit: 20 });
 
-                const result = await service.getPosts({ limit: 20 });
+                barahaModel.setPosts(result.posts);
 
-                model.setPosts(result.posts);
-
-                const livePosts = BarahaView.postsToUi(model.posts);
+                const livePosts = BarahaView.postsToUi(barahaModel.posts);
 
                 BARAHA_POSTS.push(...livePosts);
                 renderPosts();
@@ -282,6 +303,9 @@
             renderEditorModes();
             renderVisibilityOptions();
             renderPosts();
+            loadMemberships().catch((error) => {
+                console.error("Baraha memberships load failed:", error);
+            });
             loadLivePosts().catch((error) => {
                 console.error("Baraha live feed load failed:", error);
             });
