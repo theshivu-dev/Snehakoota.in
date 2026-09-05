@@ -256,8 +256,9 @@ select {
 }
 
 /* Baraha owns this backdrop. Shared navigation also has a legacy
-   .backdrop adapter, so restore Baraha's open state explicitly. */
-html body .backdrop.open {
+   .backdrop adapter. Keep the Baraha open state scoped more specifically
+   so the shared navigation's generic selector cannot suppress it. */
+html body:not(.nav-open) .backdrop.open {
     opacity: 1 !important;
     pointer-events: auto !important;
 }
