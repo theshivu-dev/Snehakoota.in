@@ -37,7 +37,31 @@
         }
 
         async getMemberships() {
-            throw new Error("BarahaService.getMemberships is not wired to Supabase yet.");
+            if (!this.supabase) {
+                throw new Error("BarahaService.getMemberships requires a Supabase client.");
+            }
+
+            const result = await this.supabase.rpc("get_my_memberships");
+            if (result.error) {
+                throw result.error;
+            }
+
+            return (Array.isArray(result.data) ? result.data : []).map((membership) => ({
+                id: membership.membership_id || null,
+                schoolId: membership.school_id || null,
+                batchId: membership.batch_id || null,
+                membershipType: membership.membership_type || null,
+                status: membership.status || null,
+                school: {
+                    id: membership.school_id || null,
+                    name: membership.school_name || ""
+                },
+                batch: {
+                    id: membership.batch_id || null,
+                    year: membership.batch_year || null
+                },
+                createdAt: membership.created_at || null
+            }));
         }
 
         async getPosts(options) {
