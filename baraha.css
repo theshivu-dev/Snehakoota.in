@@ -243,7 +243,7 @@ select {
     box-shadow: var(--sk-shadow-game);
 }
 
-.backdrop {
+.baraha-backdrop {
     position: fixed;
     inset: 0;
     z-index: 40;
@@ -251,16 +251,8 @@ select {
     display: none;
 }
 
-.backdrop.open {
+.baraha-backdrop.open {
     display: block;
-}
-
-/* Baraha owns this backdrop. Shared navigation also has a legacy
-   .backdrop adapter. Keep the Baraha open state scoped more specifically
-   so the shared navigation's generic selector cannot suppress it. */
-html body:not(.nav-open) .backdrop.open {
-    opacity: 1 !important;
-    pointer-events: auto !important;
 }
 
 .sheet {
