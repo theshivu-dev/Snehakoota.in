@@ -255,6 +255,13 @@ select {
     display: block;
 }
 
+/* Baraha owns this backdrop. Shared navigation also has a legacy
+   .backdrop adapter, so restore Baraha's open state explicitly. */
+html body .backdrop.open {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
 .sheet {
     position: absolute;
     left: 50%;
