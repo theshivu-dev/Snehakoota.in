@@ -17,6 +17,20 @@
         book: "book"
     };
 
+    const CATEGORY_LABELS = {
+        baraha: "ಬರಹ",
+        poem: "ಕವನ",
+        memory: "ನೆನಪು",
+        article: "ಲೇಖನ",
+        book: "ಪುಸ್ತಕ"
+    };
+
+    const VISIBILITY_LABELS = {
+        private: "ಖಾಸಗಿ",
+        members: "ಸದಸ್ಯರು",
+        public: "ಸಾರ್ವಜನಿಕ"
+    };
+
     function formatRelativeTime(createdAt) {
         if (!createdAt) return "";
 
@@ -60,16 +74,21 @@
 
         const author = post.author || {};
         const category = post.category || null;
+        const visibility = post.visibility || null;
+        const displayTime = post.displayTime || post.time || formatRelativeTime(post.createdAt);
 
         return {
             id: post.id,
             category: category,
+            categoryLabel: CATEGORY_LABELS[category] || category || "",
             title: post.title,
             content: post.content,
-            author: author.displayName || post.authorDisplayName || "Member",
-            time: formatRelativeTime(post.createdAt),
-            visibility: post.visibility,
-            presentation: PRESENTATION_BY_CATEGORY[category] || "default"
+            author: author.displayName || post.authorDisplayName || post.author || "Member",
+            time: displayTime,
+            displayTime: displayTime,
+            visibility: visibility,
+            visibilityLabel: VISIBILITY_LABELS[visibility] || visibility || "",
+            presentation: post.presentation || PRESENTATION_BY_CATEGORY[category] || "default"
         };
     }
 
@@ -80,6 +99,7 @@
 
     window.BarahaView = {
         postToUi: postToUi,
-        postsToUi: postsToUi
+        postsToUi: postsToUi,
+        formatRelativeTime: formatRelativeTime
     };
 })(window);
