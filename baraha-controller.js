@@ -93,6 +93,31 @@
             return this.model.currentPost;
         }
 
+        preparePostPayload(editorData) {
+            const data = editorData || {};
+            const categoryMap = {
+                "ಬರಹ": "baraha",
+                "ಕವನ": "poem",
+                "ನೆನಪು": "memory",
+                "ಲೇಖನ": "article"
+            };
+            const category = categoryMap[data.category] || data.category || null;
+            const visibility = data.visibility || "private";
+            const membershipIds = visibility === "members"
+                ? (Array.isArray(data.membershipIds) ? data.membershipIds.filter(Boolean) : [])
+                : [];
+
+            return {
+                id: data.id || null,
+                title: typeof data.title === "string" ? data.title.trim() : "",
+                content: typeof data.content === "string" ? data.content.trim() : "",
+                category,
+                visibility,
+                membershipIds,
+                authorMembershipId: data.authorMembershipId || null
+            };
+        }
+
         async loadMorePosts() {
             if (this.feedLoading || !this.hasMorePosts) return null;
 
