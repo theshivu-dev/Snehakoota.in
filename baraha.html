@@ -52,6 +52,21 @@
             </main>
             <button class="fab" id="fab">+ ಬರೆಯಿರಿ</button>
         </div>
+        <section class="baraha-reader" id="barahaReader" aria-hidden="true" aria-label="ಬರಹ ಓದುಗ">
+            <div class="baraha-reader__panel" role="dialog" aria-modal="true" aria-labelledby="barahaReaderTitle">
+                <header class="baraha-reader__header">
+                    <button class="baraha-reader__close" id="barahaReaderClose" type="button" aria-label="ಮುಚ್ಚಿ">← <span>ಹಿಂದೆ</span></button>
+                    <div class="baraha-reader__actions" id="barahaReaderHeaderActions"></div>
+                </header>
+                <div class="baraha-reader__body" id="barahaReaderBody" tabindex="-1">
+                    <div class="baraha-reader__meta" id="barahaReaderMeta"></div>
+                    <h1 class="baraha-reader__title" id="barahaReaderTitle"></h1>
+                    <div class="baraha-reader__author" id="barahaReaderAuthor"></div>
+                    <div class="baraha-reader__content" id="barahaReaderContent"></div>
+                    <footer class="baraha-reader__footer" id="barahaReaderFooter"></footer>
+                </div>
+            </div>
+        </section>
         <div class="baraha-backdrop" id="backdrop">
             <div class="sheet">
                 <div class="grab"></div>
@@ -84,6 +99,7 @@
         <script src="baraha-model.js"></script>
         <script src="baraha-service.js"></script>
         <script src="baraha-view.js"></script>
+        <script src="baraha-reader.js"></script>
         <script>
             const SUPABASE_URL = "https://hukfpoxvtutvhjfdzcuh.supabase.co";
             const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_6_9Fc319vRsSZSksFlhzSw_28-glehH";
