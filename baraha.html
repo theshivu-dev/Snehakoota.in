@@ -116,7 +116,20 @@
                 model: barahaModel,
                 service: barahaService
             });
-            const barahaReader = new BarahaReader();
+            let readerOpenedFromUrl = false;
+            const barahaReader = new BarahaReader({
+                onClose: () => {
+                    if (!readerOpenedFromUrl) return;
+                    const url = new URL(window.location.href);
+                    if (!url.searchParams.has("post")) {
+                        readerOpenedFromUrl = false;
+                        return;
+                    }
+                    url.searchParams.delete("post");
+                    window.history.replaceState(window.history.state, "", url.toString());
+                    readerOpenedFromUrl = false;
+                }
+            });
 
             // 2.1 — Static data contract.
             // Categories remain UI-facing vocabulary. Memberships are loaded from Supabase below.
@@ -380,6 +393,7 @@
 
                 try {
                     const currentPost = await barahaController.openPost(post);
+                    readerOpenedFromUrl = false;
                     barahaReader.open(currentPost);
                 } catch (error) {
                     console.error("Baraha post open failed:", error);
@@ -397,7 +411,10 @@
                         ? await barahaController.openPost(demoPost)
                         : await barahaController.openPost(postId);
 
-                    if (currentPost) barahaReader.open(currentPost);
+                    if (currentPost) {
+                        readerOpenedFromUrl = true;
+                        barahaReader.open(currentPost);
+                    }
                 } catch (error) {
                     console.error("Baraha direct post open failed:", error);
                 }
