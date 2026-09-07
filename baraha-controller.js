@@ -116,6 +116,22 @@
             };
         }
 
+        async populatePublishingContext(postData) {
+            if (!this.service || typeof this.service.getCurrentAuthorContext !== "function") {
+                throw new Error("BarahaController requires a service with getCurrentAuthorContext().");
+            }
+
+            const post = Object.assign({}, postData || {});
+            const author = await this.service.getCurrentAuthorContext();
+
+            return Object.assign(post, {
+                authorId: author.authorId,
+                authorDisplayName: author.authorDisplayName,
+                authorMembershipId: post.authorMembershipId || null,
+                contentStatus: "published"
+            });
+        }
+
         preparePostPayload(editorData) {
             const data = editorData || {};
             const categoryMap = {
