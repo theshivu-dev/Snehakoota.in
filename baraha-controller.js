@@ -93,6 +93,29 @@
             return this.model.currentPost;
         }
 
+        validatePostPayload(editorData) {
+            const data = editorData || {};
+            const errors = [];
+
+            if (!String(data.title || "").trim()) {
+                errors.push("title");
+            }
+
+            if (!String(data.content || "").trim()) {
+                errors.push("content");
+            }
+
+            if (data.visibility === "members"
+                && (!Array.isArray(data.membershipIds) || !data.membershipIds.filter(Boolean).length)) {
+                errors.push("membershipIds");
+            }
+
+            return {
+                valid: errors.length === 0,
+                errors
+            };
+        }
+
         preparePostPayload(editorData) {
             const data = editorData || {};
             const categoryMap = {
@@ -110,7 +133,7 @@
             return {
                 id: data.id || null,
                 title: typeof data.title === "string" ? data.title.trim() : "",
-                content: typeof data.content === "string" ? data.content.trim() : "",
+                content: typeof data.content === "string" ? data.content : "",
                 category,
                 visibility,
                 membershipIds,
