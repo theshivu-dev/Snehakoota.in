@@ -33,6 +33,8 @@
             this.context.setSession(session);
 
             await this.loadMemberships();
+            this.feedCursor = null;
+            this.hasMorePosts = true;
             const posts = await this.loadPosts();
 
             if (this.view && typeof this.view.render === "function") {
