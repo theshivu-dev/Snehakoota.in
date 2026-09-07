@@ -32,11 +32,36 @@
             const session = await this.service.getSession();
             this.context.setSession(session);
 
-            await this.loadPosts();
+            await this.loadMemberships();
+            const posts = await this.loadPosts();
 
             if (this.view && typeof this.view.render === "function") {
                 this.view.render(this.model, this.context);
             }
+
+            return {
+                session,
+                memberships: this.context.memberships,
+                posts
+            };
+        }
+
+        async loadMemberships() {
+            if (!this.context || !this.model || !this.service) {
+                throw new Error("BarahaController requires context, model and service.");
+            }
+
+            if (!this.context.session) {
+                this.context.setMemberships([]);
+                this.model.setMemberships([]);
+                return [];
+            }
+
+            const memberships = await this.service.getMemberships();
+            this.context.setMemberships(memberships);
+            this.model.setMemberships(memberships);
+
+            return this.context.memberships;
         }
 
         async refreshPosts() {
