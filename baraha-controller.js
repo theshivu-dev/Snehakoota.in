@@ -39,6 +39,12 @@
             }
         }
 
+        async refreshPosts() {
+            this.feedCursor = null;
+            this.hasMorePosts = true;
+            return this.loadPosts();
+        }
+
         async loadPosts() {
             if (this.feedLoading || !this.hasMorePosts) return;
 
