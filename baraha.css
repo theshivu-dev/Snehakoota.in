@@ -139,7 +139,7 @@ select {
 
 .feed {
     display: grid;
-    gap: 12px;
+    gap: 8px;
     padding: 4px var(--sk-mobile-gutter) calc(100px + var(--sk-safe-bottom));
 }
 
@@ -147,7 +147,7 @@ select {
     border: 1px solid var(--line);
     border-radius: var(--sk-radius-lg);
     background: var(--white);
-    padding: 17px;
+    padding: 12px 14px;
     box-shadow: var(--sk-shadow-soft);
 }
 
@@ -155,12 +155,12 @@ select {
     font-size: 12px;
     font-weight: 700;
     color: var(--red);
-    margin-bottom: 5px;
+    margin-bottom: 2px;
 }
 
 .card h2 {
-    margin: 0 0 5px;
-    font: 700 21px/1.3 var(--lit);
+    margin: 0 0 3px;
+    font: 700 20px/1.25 var(--lit);
 }
 
 .card p {
@@ -171,9 +171,20 @@ select {
 }
 
 .meta {
-    margin-top: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 4px;
     color: #8b7b69;
     font-size: 12px;
+}
+
+.card-open-cue {
+    flex: 0 0 auto;
+    color: var(--red);
+    font-size: 16px;
+    line-height: 1;
 }
 
 .poem {
@@ -196,14 +207,14 @@ select {
 
 .memory {
     display: grid;
-    grid-template-columns: 58px minmax(0, 1fr);
-    gap: 13px;
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: 10px;
     align-items: center;
 }
 
 .memory-art {
-    width: 58px;
-    height: 58px;
+    width: 48px;
+    height: 48px;
     border-radius: 13px;
     background: #ead4ad;
     display: grid;
@@ -499,17 +510,17 @@ select {
     }
 
     .card {
-        padding: 16px;
+        padding: 12px;
     }
 
     .memory {
-        grid-template-columns: 52px minmax(0, 1fr);
-        gap: 11px;
+        grid-template-columns: 44px minmax(0, 1fr);
+        gap: 9px;
     }
 
     .memory-art {
-        width: 52px;
-        height: 52px;
+        width: 44px;
+        height: 44px;
     }
 
     .options {
