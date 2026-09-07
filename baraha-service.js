@@ -36,6 +36,38 @@
             return result && result.data ? result.data.session : null;
         }
 
+        async getCurrentAuthorContext() {
+            if (!this.supabase) {
+                throw new Error("BarahaService.getCurrentAuthorContext requires a Supabase client.");
+            }
+
+            const userResult = await this.supabase.auth.getUser();
+            if (userResult.error) {
+                throw userResult.error;
+            }
+
+            const user = userResult.data ? userResult.data.user : null;
+            if (!user) {
+                throw new Error("Publishing requires an authenticated user.");
+            }
+
+            const profileResult = await this.supabase
+                .from("profiles")
+                .select("display_name, full_name")
+                .eq("id", user.id)
+                .maybeSingle();
+
+            if (profileResult.error) {
+                throw profileResult.error;
+            }
+
+            const profile = profileResult.data || {};
+            return {
+                authorId: user.id,
+                authorDisplayName: profile.display_name || profile.full_name || null
+            };
+        }
+
         async getMemberships() {
             if (!this.supabase) {
                 throw new Error("BarahaService.getMemberships requires a Supabase client.");
