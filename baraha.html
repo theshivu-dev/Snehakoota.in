@@ -142,7 +142,7 @@
             ];
 
             // 2.2 — Existing demo posts moved into the static layer.
-            const BARAHA_POSTS = [
+            const BARAHA_STATIC_POSTS = [
                 {
                     id: "demo-1",
                     category: "baraha",
@@ -194,6 +194,9 @@
                     presentation: "default"
                 }
             ];
+
+            let BARAHA_POSTS = BARAHA_STATIC_POSTS.slice();
+            let barahaFeedInitialization = 0;
 
             let BARAHA_MEMBERSHIPS = [];
 
@@ -325,14 +328,17 @@
                 renderMembershipOptions();
             }
 
-            async function loadLivePosts() {
-                const result = await barahaService.getPosts({ limit: 20 });
+            async function initializeBarahaFeed() {
+                const initializationId = ++barahaFeedInitialization;
 
-                barahaModel.setPosts(result.posts);
+                BARAHA_POSTS = BARAHA_STATIC_POSTS.slice();
+                renderPosts();
 
-                const livePosts = BarahaView.postsToUi(barahaModel.posts);
+                const result = await barahaController.refreshPosts();
+                if (initializationId !== barahaFeedInitialization) return;
 
-                BARAHA_POSTS.push(...livePosts);
+                const livePosts = BarahaView.postsToUi(result?.posts || barahaModel.posts || []);
+                BARAHA_POSTS = BARAHA_STATIC_POSTS.concat(livePosts);
                 renderPosts();
             }
 
@@ -356,14 +362,20 @@
             renderMembershipOptions();
             renderEditorModes();
             renderVisibilityOptions();
-            renderPosts();
+            initializeBarahaFeed().catch((error) => {
+                console.error("Baraha feed initialization failed:", error);
+            }).finally(() => {
+                openPostFromUrl();
+            });
             loadMemberships().catch((error) => {
                 console.error("Baraha memberships load failed:", error);
             });
-            loadLivePosts().catch((error) => {
-                console.error("Baraha live feed load failed:", error);
-            }).finally(() => {
-                openPostFromUrl();
+
+            window.addEventListener("pageshow", (event) => {
+                if (!event.persisted) return;
+                initializeBarahaFeed().catch((error) => {
+                    console.error("Baraha feed restore failed:", error);
+                });
             });
 
             fab.addEventListener("click", openSheet);
