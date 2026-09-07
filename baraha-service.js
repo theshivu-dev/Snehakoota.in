@@ -64,6 +64,70 @@
             }));
         }
 
+        async enrichPosts(posts) {
+            const rows = Array.isArray(posts) ? posts : [];
+            const authorIds = Array.from(new Set(
+                rows.map((post) => post.author_id).filter(Boolean)
+            ));
+
+            const authorsById = {};
+            if (authorIds.length) {
+                const authorResult = await this.supabase.rpc(
+                    "baraha_get_author_profiles",
+                    { p_post_ids: rows.map((post) => post.id) }
+                );
+
+                if (authorResult.error) {
+                    throw authorResult.error;
+                }
+
+                (authorResult.data || []).forEach((author) => {
+                    authorsById[author.author_id] = {
+                        id: author.author_id,
+                        displayName: author.display_name || author.full_name || "Member",
+                        avatarUrl: author.avatar_url || null
+                    };
+                });
+            }
+
+            return rows.map((post) => Object.assign({}, post, {
+                author: {
+                    id: post.author_id || null,
+                    displayName: post.author_display_name ||
+                        (authorsById[post.author_id] && authorsById[post.author_id].displayName) ||
+                        "Member",
+                    avatarUrl: (authorsById[post.author_id] && authorsById[post.author_id].avatarUrl) || null
+                }
+            }));
+        }
+
+        async getPostById(postId) {
+            if (!this.supabase) {
+                throw new Error("BarahaService.getPostById requires a Supabase client.");
+            }
+
+            if (postId === null || postId === undefined || postId === "") {
+                throw new Error("BarahaService.getPostById requires a post ID.");
+            }
+
+            const result = await this.supabase
+                .from("baraha_posts")
+                .select("*")
+                .eq("id", postId)
+                .maybeSingle();
+
+            if (result.error) {
+                throw result.error;
+            }
+
+            if (!result.data) {
+                return null;
+            }
+
+            const posts = await this.enrichPosts([result.data]);
+            return posts[0] || null;
+        }
+
         async getPosts(options) {
             if (!this.supabase) {
                 throw new Error("BarahaService.getPosts requires a Supabase client.");
@@ -108,39 +172,7 @@
             const rows = Array.isArray(result.data) ? result.data : [];
             const hasMore = rows.length > limit;
             const posts = hasMore ? rows.slice(0, limit) : rows;
-            const authorIds = Array.from(new Set(
-                posts.map((post) => post.author_id).filter(Boolean)
-            ));
-
-            const authorsById = {};
-            if (authorIds.length) {
-                const authorResult = await this.supabase.rpc(
-                    "baraha_get_author_profiles",
-                    { p_post_ids: posts.map((post) => post.id) }
-                );
-
-                if (authorResult.error) {
-                    throw authorResult.error;
-                }
-
-                (authorResult.data || []).forEach((author) => {
-                    authorsById[author.author_id] = {
-                        id: author.author_id,
-                        displayName: author.display_name || author.full_name || "Member",
-                        avatarUrl: author.avatar_url || null
-                    };
-                });
-            }
-
-            const enrichedPosts = posts.map((post) => Object.assign({}, post, {
-                author: {
-                    id: post.author_id || null,
-                    displayName: post.author_display_name ||
-                        (authorsById[post.author_id] && authorsById[post.author_id].displayName) ||
-                        "Member",
-                    avatarUrl: (authorsById[post.author_id] && authorsById[post.author_id].avatarUrl) || null
-                }
-            }));
+            const enrichedPosts = await this.enrichPosts(posts);
 
             const last = enrichedPosts.length ? enrichedPosts[enrichedPosts.length - 1] : null;
 

@@ -63,6 +63,20 @@
             }
         }
 
+        async loadPostById(postId) {
+            if (!this.service || typeof this.service.getPostById !== "function") {
+                throw new Error("BarahaController requires a service with getPostById().");
+            }
+
+            const post = await this.service.getPostById(postId);
+
+            if (this.model && typeof this.model.setCurrentPost === "function") {
+                this.model.setCurrentPost(post);
+            }
+
+            return this.model ? this.model.currentPost : post;
+        }
+
         async loadMorePosts() {
             if (this.feedLoading || !this.hasMorePosts) return null;
 

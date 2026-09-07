@@ -51,6 +51,7 @@
     class BarahaModel {
         constructor() {
             this.posts = [];
+            this.currentPost = null;
             this.memberships = [];
             this.categories = [];
             this.modes = [];
@@ -61,6 +62,12 @@
 
         setPosts(rows) {
             this.posts = Array.isArray(rows) ? rows.map((row) => row instanceof BarahaPost ? row : new BarahaPost(row)) : [];
+        }
+
+        setCurrentPost(row) {
+            this.currentPost = row
+                ? (row instanceof BarahaPost ? row : new BarahaPost(row))
+                : null;
         }
 
         setMemberships(rows) {
