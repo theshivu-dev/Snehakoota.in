@@ -228,6 +228,24 @@
             const body = document.getElementById("body");
             const publish = document.getElementById("publish");
 
+            function collectEditorData() {
+                const activeMode = modes.querySelector(".mode.active");
+                const activeVisibility = vis.querySelector(".v.active");
+                const selectedMembershipIds = activeVisibility?.dataset.v === "members"
+                    ? Array.from(members.querySelectorAll('input[type="checkbox"]:checked'), (input) => input.value)
+                    : [];
+
+                return {
+                    id: null,
+                    title: title.value,
+                    content: body.value,
+                    category: activeMode?.dataset.mode || null,
+                    visibility: activeVisibility?.dataset.v || "private",
+                    membershipIds: selectedMembershipIds,
+                    authorMembershipId: membershipSelect.value || null
+                };
+            }
+
             function renderCategoryChips() {
                 chips.innerHTML = [
                     '<button class="chip active" data-filter="all">ಎಲ್ಲಾ</button>',
