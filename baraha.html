@@ -101,6 +101,7 @@
             </div>
         </div>
         <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        <script src="baraha-context.js"></script>
         <script src="baraha-model.js"></script>
         <script src="baraha-service.js"></script>
         <script src="baraha-view.js"></script>
@@ -111,8 +112,10 @@
             const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_6_9Fc319vRsSZSksFlhzSw_28-glehH";
             const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
             const barahaService = new BarahaService(supabaseClient);
+            const barahaContext = new BarahaContext();
             const barahaModel = new BarahaModel();
             const barahaController = new BarahaController({
+                context: barahaContext,
                 model: barahaModel,
                 service: barahaService
             });
@@ -303,17 +306,8 @@
                 }).join("");
             }
 
-            async function loadMemberships() {
-                const { data: { session } } = await supabaseClient.auth.getSession();
-                if (!session) {
-                    renderMembershipOptions();
-                    return;
-                }
-
-                const memberships = await barahaService.getMemberships();
-                barahaModel.setMemberships(memberships);
-
-                BARAHA_MEMBERSHIPS = memberships
+            function syncMembershipOptions(memberships) {
+                BARAHA_MEMBERSHIPS = (Array.isArray(memberships) ? memberships : [])
                     .filter((membership) => membership.status === "active")
                     .map((membership) => ({
                         key: String(membership.id),
@@ -328,16 +322,17 @@
                 renderMembershipOptions();
             }
 
-            async function initializeBarahaFeed() {
+            async function initializeBaraha() {
                 const initializationId = ++barahaFeedInitialization;
 
                 BARAHA_POSTS = BARAHA_STATIC_POSTS.slice();
                 renderPosts();
 
-                const result = await barahaController.refreshPosts();
+                const result = await barahaController.init();
                 if (initializationId !== barahaFeedInitialization) return;
 
-                const livePosts = BarahaView.postsToUi(result?.posts || barahaModel.posts || []);
+                syncMembershipOptions(result?.memberships || barahaContext.memberships);
+                const livePosts = BarahaView.postsToUi(result?.posts?.posts || barahaModel.posts || []);
                 BARAHA_POSTS = BARAHA_STATIC_POSTS.concat(livePosts);
                 renderPosts();
             }
@@ -362,19 +357,16 @@
             renderMembershipOptions();
             renderEditorModes();
             renderVisibilityOptions();
-            initializeBarahaFeed().catch((error) => {
-                console.error("Baraha feed initialization failed:", error);
+            initializeBaraha().catch((error) => {
+                console.error("Baraha initialization failed:", error);
             }).finally(() => {
                 openPostFromUrl();
-            });
-            loadMemberships().catch((error) => {
-                console.error("Baraha memberships load failed:", error);
             });
 
             window.addEventListener("pageshow", (event) => {
                 if (!event.persisted) return;
-                initializeBarahaFeed().catch((error) => {
-                    console.error("Baraha feed restore failed:", error);
+                initializeBaraha().catch((error) => {
+                    console.error("Baraha restore failed:", error);
                 });
             });
 
