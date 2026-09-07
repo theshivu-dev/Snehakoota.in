@@ -132,10 +132,14 @@
             const preparedPost = this.preparePostPayload(editorData);
             const publishingPost = await this.populatePublishingContext(preparedPost);
             const post = await this.service.createPost(publishingPost);
+            const publishedPost = await this.service.enrichPosts([post]);
+            const modelPost = this.model && typeof this.model.addPost === "function"
+                ? this.model.addPost(publishedPost[0] || post)
+                : (publishedPost[0] || post);
 
             return {
                 published: true,
-                post
+                post: modelPost
             };
         }
 
