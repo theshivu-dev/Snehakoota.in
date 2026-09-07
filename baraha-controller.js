@@ -116,6 +116,29 @@
             };
         }
 
+        async publishPost(editorData) {
+            if (!this.service || typeof this.service.createPost !== "function") {
+                throw new Error("BarahaController requires a service with createPost().");
+            }
+
+            const validation = this.validatePostPayload(editorData);
+            if (!validation.valid) {
+                return {
+                    published: false,
+                    validation
+                };
+            }
+
+            const preparedPost = this.preparePostPayload(editorData);
+            const publishingPost = await this.populatePublishingContext(preparedPost);
+            const post = await this.service.createPost(publishingPost);
+
+            return {
+                published: true,
+                post
+            };
+        }
+
         async populatePublishingContext(postData) {
             if (!this.service || typeof this.service.getCurrentAuthorContext !== "function") {
                 throw new Error("BarahaController requires a service with getCurrentAuthorContext().");
