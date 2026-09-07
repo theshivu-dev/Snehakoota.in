@@ -245,15 +245,13 @@
                     const visibility = BARAHA_VISIBILITY.find((item) => item.key === post.visibility);
                     const cardClass = post.presentation === "default" ? "card" : `card ${post.presentation}`;
                     const type = `${category ? category.label : post.category} · ${visibility ? visibility.label : post.visibility}`;
-                    const content = post.content.replace(/\n/g, "<br />");
-
                     if (post.presentation === "memory") {
                         return `<article class="${cardClass}" data-category="${post.category}" data-post-id="${post.id}" tabindex="0">
                             <div class="memory-art">✦</div>
                             <div>
                                 <div class="type">${type}</div>
                                 <h2>${post.title}</h2>
-                                <p>${content}</p>
+                                <p class="baraha-read-more">ಮುಂದೆ ಓದಿ →</p>
                                 <div class="meta">${post.author} · ${post.time}</div>
                             </div>
                         </article>`;
@@ -262,7 +260,7 @@
                     return `<article class="${cardClass}" data-category="${post.category}" data-post-id="${post.id}" tabindex="0">
                         <div class="type">${type}</div>
                         <h2>${post.title}</h2>
-                        <p>${content}</p>
+                        <p class="baraha-read-more">ಮುಂದೆ ಓದಿ →</p>
                         <div class="meta">${post.author} · ${post.time}</div>
                     </article>`;
                 }).join("");
