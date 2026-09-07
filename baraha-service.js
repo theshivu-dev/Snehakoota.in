@@ -270,9 +270,6 @@
             return createdPost;
         }
 
-        async publishPost() {
-            throw new Error("BarahaService.publishPost is not wired to Supabase yet.");
-        }
     }
 
     window.BarahaService = BarahaService;
