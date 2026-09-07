@@ -251,8 +251,7 @@
                             <div>
                                 <div class="type">${type}</div>
                                 <h2>${post.title}</h2>
-                                <p class="baraha-read-more">ಮುಂದೆ ಓದಿ →</p>
-                                <div class="meta">${post.author} · ${post.time}</div>
+                                <div class="meta"><span>${post.author} · ${post.time}</span><span class="card-open-cue" aria-hidden="true">→</span></div>
                             </div>
                         </article>`;
                     }
@@ -260,8 +259,7 @@
                     return `<article class="${cardClass}" data-category="${post.category}" data-post-id="${post.id}" tabindex="0">
                         <div class="type">${type}</div>
                         <h2>${post.title}</h2>
-                        <p class="baraha-read-more">ಮುಂದೆ ಓದಿ →</p>
-                        <div class="meta">${post.author} · ${post.time}</div>
+                        <div class="meta"><span>${post.author} · ${post.time}</span><span class="card-open-cue" aria-hidden="true">→</span></div>
                     </article>`;
                 }).join("");
             }
