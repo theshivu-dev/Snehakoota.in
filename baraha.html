@@ -331,6 +331,8 @@
             });
             loadLivePosts().catch((error) => {
                 console.error("Baraha live feed load failed:", error);
+            }).finally(() => {
+                openPostFromUrl();
             });
 
             fab.addEventListener("click", openSheet);
@@ -381,6 +383,23 @@
                     barahaReader.open(currentPost);
                 } catch (error) {
                     console.error("Baraha post open failed:", error);
+                }
+            }
+
+            async function openPostFromUrl() {
+                const postId = new URLSearchParams(window.location.search).get("post");
+                if (!postId) return;
+
+                const demoPost = BARAHA_POSTS.find((post) => String(post.id) === String(postId));
+
+                try {
+                    const currentPost = demoPost
+                        ? await barahaController.openPost(demoPost)
+                        : await barahaController.openPost(postId);
+
+                    if (currentPost) barahaReader.open(currentPost);
+                } catch (error) {
+                    console.error("Baraha direct post open failed:", error);
                 }
             }
 
