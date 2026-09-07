@@ -1,0 +1,13 @@
+/* Baraha reader presentation component. No Supabase calls belong here. */
+(function(window){
+"use strict";
+class BarahaReader{
+ constructor(options){options=options||{};this.root=options.root||document.getElementById("barahaReader");this.panel=options.panel||(this.root&&this.root.querySelector(".baraha-reader__panel"));this.closeButton=options.closeButton||document.getElementById("barahaReaderClose");this.meta=options.meta||document.getElementById("barahaReaderMeta");this.title=options.title||document.getElementById("barahaReaderTitle");this.author=options.author||document.getElementById("barahaReaderAuthor");this.content=options.content||document.getElementById("barahaReaderContent");this.footer=options.footer||document.getElementById("barahaReaderFooter");this.headerActions=options.headerActions||document.getElementById("barahaReaderHeaderActions");this.currentPost=null;if(!this.root||!this.panel)throw new Error("BarahaReader requires the reader panel shell.");if(this.closeButton)this.closeButton.addEventListener("click",()=>this.close());this.root.addEventListener("click",(event)=>{if(event.target===this.root)this.close();});}
+ render(post){this.currentPost=post||null;if(!post){this.clear();return;}const author=post.author&&typeof post.author==="object"?post.author.displayName:null;const authorName=author||post.authorDisplayName||"Member";const metaParts=[post.category||"",post.visibility||""].filter(Boolean);const authorParts=[authorName,post.displayTime||""].filter(Boolean);this.panel.classList.remove("is-poem","is-memory","is-book");if(post.presentation)this.panel.classList.add("is-"+post.presentation);this.meta.textContent=metaParts.join(" · ");this.title.textContent=post.title||"";this.author.textContent=authorParts.join(" · ");this.content.textContent=post.content||"";this.footer.innerHTML="";this.headerActions.innerHTML="";}
+ open(post){if(post)this.render(post);if(!this.currentPost)throw new Error("BarahaReader.open requires a post.");this.root.classList.add("is-open");this.root.setAttribute("aria-hidden","false");this.panel.scrollTop=0;document.body.classList.add("baraha-reader-open");const body=document.getElementById("barahaReaderBody");if(body)body.focus();}
+ close(){this.root.classList.remove("is-open");this.root.setAttribute("aria-hidden","true");document.body.classList.remove("baraha-reader-open");}
+ clear(){this.currentPost=null;this.meta.textContent="";this.title.textContent="";this.author.textContent="";this.content.textContent="";this.footer.innerHTML="";this.headerActions.innerHTML="";this.panel.classList.remove("is-poem","is-memory","is-book");}
+ isOpen(){return this.root.classList.contains("is-open");}
+}
+window.BarahaReader=BarahaReader;
+})(window);
