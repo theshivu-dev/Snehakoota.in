@@ -87,6 +87,14 @@
                 : null;
         }
 
+        addPost(row) {
+            const post = row instanceof BarahaPost ? row : new BarahaPost(row);
+            this.posts = [post].concat(
+                (Array.isArray(this.posts) ? this.posts : []).filter((item) => item.id !== post.id)
+            );
+            return post;
+        }
+
         setMemberships(rows) {
             this.memberships = Array.isArray(rows) ? rows.map((row) => row instanceof BarahaMembership ? row : new BarahaMembership(row)) : [];
         }
