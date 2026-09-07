@@ -63,6 +63,24 @@
             }
         }
 
+        async openPost(postOrId) {
+            if (!this.model || typeof this.model.setCurrentPost !== "function") {
+                throw new Error("BarahaController requires a model with setCurrentPost().");
+            }
+
+            if (postOrId && typeof postOrId === "object") {
+                this.model.setCurrentPost(postOrId);
+                return this.model.currentPost;
+            }
+
+            if (postOrId === null || postOrId === undefined || postOrId === "") {
+                this.model.setCurrentPost(null);
+                return null;
+            }
+
+            return this.loadPostById(postOrId);
+        }
+
         async loadPostById(postId) {
             if (!this.service || typeof this.service.getPostById !== "function") {
                 throw new Error("BarahaController requires a service with getPostById().");
@@ -70,11 +88,9 @@
 
             const post = await this.service.getPostById(postId);
 
-            if (this.model && typeof this.model.setCurrentPost === "function") {
-                this.model.setCurrentPost(post);
-            }
+            this.model.setCurrentPost(post);
 
-            return this.model ? this.model.currentPost : post;
+            return this.model.currentPost;
         }
 
         async loadMorePosts() {

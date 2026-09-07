@@ -15,9 +15,18 @@
         constructor(data) {
             data = data || {};
             this.id = data.id || null;
-            this.authorId = data.author_id || data.authorId || null;
+            const authorData = data.author || null;
+            const authorObject = authorData && typeof authorData === "object" ? authorData : null;
+            const authorText = typeof authorData === "string" ? authorData : null;
+
+            this.authorId = data.author_id || data.authorId || (authorObject && authorObject.id) || null;
             this.authorMembershipId = data.author_membership_id || data.authorMembershipId || null;
-            this.authorDisplayName = data.author_display_name || data.authorDisplayName || null;
+            this.authorDisplayName =
+                data.author_display_name ||
+                data.authorDisplayName ||
+                (authorObject && authorObject.displayName) ||
+                authorText ||
+                null;
             this.title = data.title || "";
             this.content = data.content || "";
             this.category = data.category || null;
@@ -28,7 +37,15 @@
             this.collectionOrder = data.collection_order || data.collectionOrder || null;
             this.createdAt = data.created_at || data.createdAt || null;
             this.updatedAt = data.updated_at || data.updatedAt || null;
-            this.author = data.author || null;
+            this.displayTime = data.time || data.displayTime || null;
+            this.presentation = data.presentation || null;
+            this.author = authorObject || (this.authorDisplayName
+                ? {
+                    id: this.authorId,
+                    displayName: this.authorDisplayName,
+                    avatarUrl: null
+                }
+                : null);
             this.memberships = Array.isArray(data.memberships) ? data.memberships : [];
         }
     }
