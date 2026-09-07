@@ -220,8 +220,54 @@
             };
         }
 
-        async createPost() {
-            throw new Error("BarahaService.createPost is not wired to Supabase yet.");
+        async createPost(postData) {
+            if (!this.supabase) {
+                throw new Error("BarahaService.createPost requires a Supabase client.");
+            }
+
+            const post = postData || {};
+            const insertData = {
+                author_id: post.authorId,
+                author_membership_id: post.authorMembershipId || null,
+                title: post.title,
+                content: post.content,
+                category: post.category || null,
+                content_status: post.contentStatus || "published",
+                visibility: post.visibility || "private",
+                author_display_name: post.authorDisplayName || null
+            };
+
+            const postResult = await this.supabase
+                .from("baraha_posts")
+                .insert(insertData)
+                .select("*")
+                .single();
+
+            if (postResult.error) {
+                throw postResult.error;
+            }
+
+            const createdPost = postResult.data;
+            const membershipIds = createdPost.visibility === "members"
+                ? Array.from(new Set(
+                    (Array.isArray(post.membershipIds) ? post.membershipIds : []).filter(Boolean)
+                ))
+                : [];
+
+            if (membershipIds.length) {
+                const membershipResult = await this.supabase
+                    .from("baraha_post_memberships")
+                    .insert(membershipIds.map((membershipId) => ({
+                        post_id: createdPost.id,
+                        membership_id: membershipId
+                    })));
+
+                if (membershipResult.error) {
+                    throw membershipResult.error;
+                }
+            }
+
+            return createdPost;
         }
 
         async publishPost() {
