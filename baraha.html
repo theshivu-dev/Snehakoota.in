@@ -99,6 +99,7 @@
         <script src="baraha-model.js"></script>
         <script src="baraha-service.js"></script>
         <script src="baraha-view.js"></script>
+        <script src="baraha-controller.js"></script>
         <script src="baraha-reader.js"></script>
         <script>
             const SUPABASE_URL = "https://hukfpoxvtutvhjfdzcuh.supabase.co";
@@ -106,6 +107,11 @@
             const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
             const barahaService = new BarahaService(supabaseClient);
             const barahaModel = new BarahaModel();
+            const barahaController = new BarahaController({
+                model: barahaModel,
+                service: barahaService
+            });
+            const barahaReader = new BarahaReader();
 
             // 2.1 — Static data contract.
             // Categories remain UI-facing vocabulary. Memberships are loaded from Supabase below.
@@ -242,7 +248,7 @@
                     const content = post.content.replace(/\n/g, "<br />");
 
                     if (post.presentation === "memory") {
-                        return `<article class="${cardClass}" data-category="${post.category}">
+                        return `<article class="${cardClass}" data-category="${post.category}" data-post-id="${post.id}" tabindex="0">
                             <div class="memory-art">✦</div>
                             <div>
                                 <div class="type">${type}</div>
@@ -253,7 +259,7 @@
                         </article>`;
                     }
 
-                    return `<article class="${cardClass}" data-category="${post.category}">
+                    return `<article class="${cardClass}" data-category="${post.category}" data-post-id="${post.id}" tabindex="0">
                         <div class="type">${type}</div>
                         <h2>${post.title}</h2>
                         <p>${content}</p>
@@ -361,6 +367,33 @@
                 document.querySelectorAll(".feed .card").forEach((card) => {
                     card.style.display = filter === "all" || card.dataset.category === filter ? "" : "none";
                 });
+            });
+
+            async function openPostFromFeed(postId) {
+                const livePost = barahaModel.posts.find((post) => String(post.id) === String(postId));
+                const post = livePost || BARAHA_POSTS.find((item) => String(item.id) === String(postId));
+
+                if (!post) return;
+
+                try {
+                    const currentPost = await barahaController.openPost(post);
+                    barahaReader.open(currentPost);
+                } catch (error) {
+                    console.error("Baraha post open failed:", error);
+                }
+            }
+
+            feed.addEventListener("click", (e) => {
+                const card = e.target.closest(".card[data-post-id]");
+                if (card) openPostFromFeed(card.dataset.postId);
+            });
+
+            feed.addEventListener("keydown", (e) => {
+                if (e.key !== "Enter" && e.key !== " ") return;
+                const card = e.target.closest(".card[data-post-id]");
+                if (!card) return;
+                e.preventDefault();
+                openPostFromFeed(card.dataset.postId);
             });
 
             function check() {
