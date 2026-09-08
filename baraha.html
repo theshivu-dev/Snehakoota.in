@@ -352,6 +352,16 @@
                 return BARAHA_MODES.some((item) => item.key === mode) ? mode : null;
             }
 
+            // Reader and editor are mutually exclusive panel routes. Existing post
+            // routes keep their established priority if a malformed URL contains both.
+            function normalizePanelRoute() {
+                const url = new URL(window.location.href);
+                if (!url.searchParams.has("post") || !url.searchParams.has("write")) return;
+
+                url.searchParams.delete("write");
+                window.history.replaceState(window.history.state, "", url.toString());
+            }
+
             function updateWriteUrl(mode, { replace = false } = {}) {
                 const url = new URL(window.location.href);
                 url.searchParams.set("write", mode);
@@ -411,6 +421,8 @@
             renderMembershipOptions();
             renderEditorModes();
             renderVisibilityOptions();
+            normalizePanelRoute();
+
             initializeBaraha().catch((error) => {
                 console.error("Baraha initialization failed:", error);
             }).finally(() => {
