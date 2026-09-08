@@ -271,8 +271,27 @@
                     .join("");
 
                 members.innerHTML = BARAHA_MEMBERSHIPS
-                    .map((membership) => `<label><input type="checkbox" value="${membership.key}" checked /> ${membership.label}</label>`)
+                    .map((membership) => `<label><input type="checkbox" value="${membership.key}" /> ${membership.label}</label>`)
                     .join("");
+
+                // The author membership is the natural initial posting context.
+                // Target memberships remain independently selectable afterwards.
+                ensureAuthorMembershipTargetSelected();
+            }
+
+            // Keeps the author membership present as an initial target without
+            // clearing any additional targets the user may already have selected.
+            function ensureAuthorMembershipTargetSelected() {
+                const authorMembershipId = membershipSelect.value;
+                if (!authorMembershipId) return;
+
+                const authorTarget = Array.from(
+                    members.querySelectorAll('input[type="checkbox"]')
+                ).find((input) => input.value === authorMembershipId);
+
+                if (authorTarget) {
+                    authorTarget.checked = true;
+                }
             }
 
             function renderEditorModes() {
@@ -510,6 +529,12 @@
                 if (!b || b.disabled) return;
                 modes.querySelectorAll(".mode").forEach((x) => x.classList.remove("active"));
                 b.classList.add("active");
+            });
+
+            // Changing author context adds the matching target membership without
+            // overwriting any other target memberships already chosen by the user.
+            membershipSelect.addEventListener("change", () => {
+                ensureAuthorMembershipTargetSelected();
             });
 
             vis.addEventListener("click", (e) => {
