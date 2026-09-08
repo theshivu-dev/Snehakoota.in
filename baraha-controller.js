@@ -33,6 +33,7 @@
             this.context.setSession(session);
 
             await this.loadMemberships();
+            await this.loadCapabilities();
             this.feedCursor = null;
             this.hasMorePosts = true;
             const posts = await this.loadPosts();
@@ -44,6 +45,7 @@
             return {
                 session,
                 memberships: this.context.memberships,
+                capabilities: this.context.capabilities,
                 posts
             };
         }
@@ -64,6 +66,34 @@
             this.model.setMemberships(memberships);
 
             return this.context.memberships;
+        }
+
+        async loadCapabilities() {
+            if (!this.context || !this.service) {
+                throw new Error("BarahaController requires context and service.");
+            }
+
+            const remoteCapabilities = await this.service.getCapabilities();
+            const activeMemberships = (Array.isArray(this.context.memberships)
+                ? this.context.memberships
+                : [])
+                .filter((membership) => membership.status === "active");
+            const isAuthenticated = Boolean(remoteCapabilities && remoteCapabilities.isAuthenticated);
+            const isOwner = Boolean(remoteCapabilities && remoteCapabilities.isOwner);
+            const canWrite = isAuthenticated && (isOwner || activeMemberships.length > 0);
+
+            const capabilities = {
+                isAuthenticated,
+                isOwner,
+                activeMemberships,
+                canWrite,
+                canPublishPrivate: canWrite,
+                canPublishPublic: canWrite,
+                canPublishMembers: canWrite
+            };
+
+            this.context.setCapabilities(capabilities);
+            return this.context.capabilities;
         }
 
         async refreshPosts() {
