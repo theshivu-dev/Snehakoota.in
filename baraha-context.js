@@ -18,11 +18,37 @@
             this.user = null;
             this.memberships = [];
             this.currentMembership = null;
+            this.capabilities = {
+                isAuthenticated: false,
+                isOwner: false,
+                activeMemberships: [],
+                canWrite: false,
+                canPublishPrivate: false,
+                canPublishPublic: false,
+                canPublishMembers: false
+            };
         }
 
         setSession(session) {
             this.session = session || null;
             this.user = session && session.user ? session.user : null;
+        }
+
+        setCapabilities(capabilities) {
+            const data = capabilities || {};
+            const activeMemberships = Array.isArray(data.activeMemberships)
+                ? data.activeMemberships
+                : [];
+
+            this.capabilities = {
+                isAuthenticated: Boolean(data.isAuthenticated),
+                isOwner: Boolean(data.isOwner),
+                activeMemberships,
+                canWrite: Boolean(data.canWrite),
+                canPublishPrivate: Boolean(data.canPublishPrivate),
+                canPublishPublic: Boolean(data.canPublishPublic),
+                canPublishMembers: Boolean(data.canPublishMembers)
+            };
         }
 
         setMemberships(memberships) {
@@ -45,6 +71,7 @@
             this.user = null;
             this.memberships = [];
             this.currentMembership = null;
+            this.setCapabilities(null);
         }
     }
 
