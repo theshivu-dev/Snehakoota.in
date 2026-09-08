@@ -712,3 +712,15 @@ select {
         stroke-linejoin:round;
     }
 }
+
+
+/* Capability-driven unavailable state. The controls remain visible for product
+ * exploration while clearly preventing interactions the current user cannot use. */
+.mode:disabled,
+.v:disabled,
+#membershipSelect:disabled,
+#title:disabled,
+#body:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
