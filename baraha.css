@@ -254,6 +254,11 @@ select {
     box-shadow: var(--sk-shadow-game);
 }
 
+/* The writing state owns the viewport; do not leave the landing FAB active behind it. */
+.editor.open ~ .fab {
+    display: none;
+}
+
 .baraha-backdrop {
     position: fixed;
     inset: 0;
@@ -616,6 +621,50 @@ select {
 @media (min-width:721px){.baraha-reader{align-items:stretch}.baraha-reader__panel{width:min(720px,100vw)}.baraha-reader__return{display:none}}
 
 @media (max-width:720px){
+    /* Match the reader's reachable return affordance for long writing sessions. */
+    .editor .etop {
+        justify-content: flex-end;
+    }
+
+    .editor .back {
+        position: fixed;
+        left: 0;
+        bottom: max(18px,calc(12px + var(--sk-safe-bottom)));
+        z-index: 26;
+        width: 76px;
+        min-width: 76px;
+        height: 52px;
+        min-height: 52px;
+        padding: 0 12px 0 20px;
+        border: 0;
+        background: rgba(255,246,232,.94);
+        color: rgba(181,80,46,.72);
+        display: grid;
+        place-items: center;
+        font-size: 0;
+        clip-path: polygon(0 50%,18px 0,100% 0,100% 100%,18px 100%);
+        filter: drop-shadow(0 4px 10px rgba(43,33,24,.12));
+        -webkit-tap-highlight-color: transparent;
+        transition: background .18s ease,color .18s ease,transform .18s ease;
+    }
+
+    .editor .back::before {
+        content: "←";
+        font-size: 25px;
+        line-height: 1;
+    }
+
+    .editor .back:hover,
+    .editor .back:focus-visible {
+        background: rgba(253,231,200,.98);
+        color: var(--red);
+        outline: none;
+    }
+
+    .editor .back:active {
+        transform: translateX(-2px);
+    }
+
     body.baraha-reader-open #sk-account-root,
     body.baraha-reader-open [data-sk-nav-root]{
         visibility:hidden;
