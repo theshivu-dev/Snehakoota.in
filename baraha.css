@@ -429,29 +429,29 @@ select {
 
 .vis {
     border-top: 1px solid var(--line);
-    padding-top: 15px;
-    margin-top: 8px;
+    padding-top: 10px;
+    margin-top: 6px;
 }
 
 .vis label {
     display: block;
     font-size: 12px;
     color: var(--muted);
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 
 .vrow {
     display: flex;
-    gap: 7px;
+    gap: 6px;
 }
 
 .v {
     flex: 1;
-    min-height: var(--sk-touch-target);
+    min-height: 40px;
     border: 1px solid var(--line);
     background: transparent;
     border-radius: var(--sk-radius-pill);
-    padding: 9px 8px;
+    padding: 7px 8px;
     color: var(--muted);
 }
 
@@ -463,20 +463,35 @@ select {
 
 .members {
     display: none;
-    margin-top: 10px;
-    padding: 12px;
+    flex-wrap: wrap;
+    gap: 6px 8px;
+    margin-top: 8px;
+    padding: 8px 10px;
     border: 1px solid var(--line);
-    border-radius: 14px;
+    border-radius: var(--sk-radius-md);
     background: var(--white);
 }
 
 .members.open {
-    display: block;
+    display: flex;
 }
 
 .members label {
-    display: block;
-    padding: 6px 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    width: auto;
+    min-height: 28px;
+    padding: 0;
+    font-size: 13px;
+    color: var(--ink);
+}
+
+.members input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: var(--green);
 }
 
 .publish {
