@@ -311,34 +311,35 @@ select {
 .options {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-top: 16px;
+    gap: 8px;
+    margin-top: 12px;
 }
 
 .opt {
-    min-height: 82px;
+    min-height: 72px;
     text-align: left;
     border: 1px solid var(--line);
     background: var(--white);
     border-radius: var(--sk-radius-lg);
-    padding: 14px;
+    padding: 11px 12px;
 }
 
 .opt strong {
     display: block;
     font: 17px var(--lit);
+    color: var(--green);
 }
 
 .opt small {
     display: block;
     color: var(--muted);
-    margin-top: 4px;
-    line-height: 1.4;
+    margin-top: 3px;
+    line-height: 1.35;
 }
 
 .note {
-    margin-top: 14px;
-    padding: 11px 13px;
+    margin-top: 12px;
+    padding: 10px 12px;
     border-radius: var(--sk-radius-md);
     background: #f1e7da;
     color: var(--muted);
@@ -523,9 +524,6 @@ select {
         height: 44px;
     }
 
-    .options {
-        grid-template-columns: 1fr;
-    }
 }
 
 @media (max-width: 360px) {
