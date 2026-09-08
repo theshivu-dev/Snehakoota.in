@@ -329,6 +329,35 @@
                 renderMembershipOptions();
             }
 
+            // Applies writing interaction state without changing controller or
+            // publish responsibilities. The editor remains explorable even when
+            // writing is not currently permitted.
+            function applyWritingCapabilityState(capabilities) {
+                const canWrite = Boolean(capabilities?.canWrite);
+
+                membershipSelect.disabled = !canWrite;
+                title.disabled = !canWrite;
+                body.disabled = !canWrite;
+
+                modes.querySelectorAll(".mode").forEach((button) => {
+                    button.disabled = !canWrite;
+                });
+            }
+
+            // Keeps visibility rendering separate from capability state. Buttons are
+            // enabled only when the resolved capability snapshot permits that scope.
+            function applyVisibilityCapabilityState(capabilities) {
+                const visibilityCapabilities = {
+                    private: Boolean(capabilities?.canPublishPrivate),
+                    members: Boolean(capabilities?.canPublishMembers),
+                    public: Boolean(capabilities?.canPublishPublic)
+                };
+
+                vis.querySelectorAll(".v").forEach((button) => {
+                    button.disabled = !visibilityCapabilities[button.dataset.v];
+                });
+            }
+
             // Single UI gate for Baraha capability state. Capability rules are
             // resolved before this point; UI rendering only consumes the snapshot.
             function applyBarahaCapabilities(capabilities) {
@@ -337,6 +366,8 @@
                     : [];
 
                 syncMembershipOptions(activeMemberships);
+                applyWritingCapabilityState(capabilities);
+                applyVisibilityCapabilityState(capabilities);
             }
 
             async function initializeBaraha() {
@@ -476,14 +507,14 @@
 
             modes.addEventListener("click", (e) => {
                 const b = e.target.closest("button");
-                if (!b) return;
+                if (!b || b.disabled) return;
                 modes.querySelectorAll(".mode").forEach((x) => x.classList.remove("active"));
                 b.classList.add("active");
             });
 
             vis.addEventListener("click", (e) => {
                 const b = e.target.closest("button");
-                if (!b) return;
+                if (!b || b.disabled) return;
                 vis.querySelectorAll(".v").forEach((x) => x.classList.remove("active"));
                 b.classList.add("active");
                 members.classList.toggle("open", b.dataset.v === "members");
