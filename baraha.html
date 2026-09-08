@@ -260,6 +260,12 @@
             }
 
             function renderMembershipOptions() {
+                if (!BARAHA_MEMBERSHIPS.length) {
+                    membershipSelect.innerHTML = '<option value="">ಸದಸ್ಯತ್ವ ಲಭ್ಯವಿಲ್ಲ</option>';
+                    members.innerHTML = "";
+                    return;
+                }
+
                 membershipSelect.innerHTML = BARAHA_MEMBERSHIPS
                     .map((membership) => `<option value="${membership.key}">${membership.label}</option>`)
                     .join("");
@@ -306,9 +312,10 @@
                 }).join("");
             }
 
+            // Writing memberships come from the capability snapshot. This function
+            // only adapts that already-approved list to the existing UI format.
             function syncMembershipOptions(memberships) {
                 BARAHA_MEMBERSHIPS = (Array.isArray(memberships) ? memberships : [])
-                    .filter((membership) => membership.status === "active")
                     .map((membership) => ({
                         key: String(membership.id),
                         label: `${membership.school?.name || "School"} · ${membership.batch?.year || "Batch"}`,
@@ -322,6 +329,16 @@
                 renderMembershipOptions();
             }
 
+            // Single UI gate for Baraha capability state. Capability rules are
+            // resolved before this point; UI rendering only consumes the snapshot.
+            function applyBarahaCapabilities(capabilities) {
+                const activeMemberships = Array.isArray(capabilities?.activeMemberships)
+                    ? capabilities.activeMemberships
+                    : [];
+
+                syncMembershipOptions(activeMemberships);
+            }
+
             async function initializeBaraha() {
                 const initializationId = ++barahaFeedInitialization;
 
@@ -331,7 +348,7 @@
                 const result = await barahaController.init();
                 if (initializationId !== barahaFeedInitialization) return;
 
-                syncMembershipOptions(result?.memberships || barahaContext.memberships);
+                applyBarahaCapabilities(result?.capabilities || barahaContext.capabilities);
                 const livePosts = BarahaView.postsToUi(result?.posts?.posts || barahaModel.posts || []);
                 BARAHA_POSTS = BARAHA_STATIC_POSTS.concat(livePosts);
                 renderPosts();
