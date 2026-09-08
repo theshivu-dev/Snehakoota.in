@@ -68,6 +68,24 @@
             };
         }
 
+        // Reads the small, authoritative Baraha capability snapshot.
+        // Membership data remains owned by getMemberships() to avoid duplicate queries.
+        async getCapabilities() {
+            if (!this.supabase) {
+                throw new Error("BarahaService.getCapabilities requires a Supabase client.");
+            }
+
+            const result = await this.supabase.rpc("baraha_get_capabilities");
+            if (result.error) {
+                throw result.error;
+            }
+
+            return result.data || {
+                isAuthenticated: false,
+                isOwner: false
+            };
+        }
+
         async getMemberships() {
             if (!this.supabase) {
                 throw new Error("BarahaService.getMemberships requires a Supabase client.");
