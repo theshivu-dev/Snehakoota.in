@@ -226,48 +226,28 @@
             }
 
             const post = postData || {};
-            const insertData = {
-                author_id: post.authorId,
-                author_membership_id: post.authorMembershipId || null,
-                title: post.title,
-                content: post.content,
-                category: post.category || null,
-                content_status: post.contentStatus || "published",
-                visibility: post.visibility || "private",
-                author_display_name: post.authorDisplayName || null
-            };
 
-            const postResult = await this.supabase
-                .from("baraha_posts")
-                .insert(insertData)
-                .select("*")
-                .single();
+            // The database owns publication status and membership-link changes.
+            // This existing service boundary only forwards the publish request
+            // through the controlled RPC.
+            const result = await this.supabase.rpc("baraha_publish_post", {
+                p_post_id: post.id || null,
+                p_title: post.title,
+                p_content: post.content,
+                p_category: post.category || null,
+                p_visibility: post.visibility || "private",
+                p_author_membership_id: post.authorMembershipId || null,
+                p_author_display_name: post.authorDisplayName || null,
+                p_membership_ids: Array.isArray(post.membershipIds)
+                    ? post.membershipIds.filter(Boolean)
+                    : []
+            });
 
-            if (postResult.error) {
-                throw postResult.error;
+            if (result.error) {
+                throw result.error;
             }
 
-            const createdPost = postResult.data;
-            const membershipIds = createdPost.visibility === "members"
-                ? Array.from(new Set(
-                    (Array.isArray(post.membershipIds) ? post.membershipIds : []).filter(Boolean)
-                ))
-                : [];
-
-            if (membershipIds.length) {
-                const membershipResult = await this.supabase
-                    .from("baraha_post_memberships")
-                    .insert(membershipIds.map((membershipId) => ({
-                        post_id: createdPost.id,
-                        membership_id: membershipId
-                    })));
-
-                if (membershipResult.error) {
-                    throw membershipResult.error;
-                }
-            }
-
-            return createdPost;
+            return result.data;
         }
 
     }
