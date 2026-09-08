@@ -187,8 +187,7 @@
             return Object.assign(post, {
                 authorId: author.authorId,
                 authorDisplayName: author.authorDisplayName,
-                authorMembershipId: post.authorMembershipId || null,
-                contentStatus: "published"
+                authorMembershipId: post.authorMembershipId || null
             });
         }
 
