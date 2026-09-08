@@ -345,12 +345,66 @@
                 backdrop.classList.remove("open");
             }
 
+            // Write navigation is page-local UI state. The chooser stays transient;
+            // only a valid editor mode is reflected in the URL and restored.
+            function getWriteModeFromUrl() {
+                const mode = new URL(window.location.href).searchParams.get("write");
+                return BARAHA_MODES.some((item) => item.key === mode) ? mode : null;
+            }
+
+            function updateWriteUrl(mode, { replace = false } = {}) {
+                const url = new URL(window.location.href);
+                url.searchParams.set("write", mode);
+                url.searchParams.delete("post");
+
+                if (replace) {
+                    window.history.replaceState(window.history.state, "", url.toString());
+                    return;
+                }
+
+                window.history.pushState({ barahaWriteMode: mode }, "", url.toString());
+            }
+
+            function clearWriteUrl() {
+                const url = new URL(window.location.href);
+                if (!url.searchParams.has("write")) return;
+
+                url.searchParams.delete("write");
+                window.history.replaceState(window.history.state, "", url.toString());
+            }
+
+            // Single editor entry gate for chooser, refresh and direct URLs.
             function openEditor(mode) {
                 closeSheet();
                 landing.style.display = "none";
                 editor.classList.add("open");
                 modes.querySelectorAll(".mode").forEach((b) => b.classList.toggle("active", b.dataset.mode === mode));
                 title.focus();
+            }
+
+            // Single editor exit gate. UI restoration and write-route cleanup stay together.
+            function closeEditor({ clearUrl = true } = {}) {
+                editor.classList.remove("open");
+                landing.style.display = "block";
+                if (clearUrl) clearWriteUrl();
+            }
+
+            function restoreWriteEditorFromUrl() {
+                const mode = getWriteModeFromUrl();
+                if (!mode) return false;
+
+                openEditor(mode);
+                return true;
+            }
+
+            function syncWriteEditorWithUrl() {
+                if (new URL(window.location.href).searchParams.has("post")) {
+                    closeEditor({ clearUrl: false });
+                    return;
+                }
+
+                if (restoreWriteEditorFromUrl()) return;
+                closeEditor({ clearUrl: false });
             }
 
             renderCategoryChips();
@@ -360,7 +414,11 @@
             initializeBaraha().catch((error) => {
                 console.error("Baraha initialization failed:", error);
             }).finally(() => {
-                openPostFromUrl();
+                if (new URL(window.location.href).searchParams.has("post")) {
+                    openPostFromUrl();
+                } else {
+                    restoreWriteEditorFromUrl();
+                }
             });
 
             window.addEventListener("pageshow", (event) => {
@@ -378,7 +436,13 @@
 
             options.addEventListener("click", (e) => {
                 const b = e.target.closest("button");
-                if (b) openEditor(b.dataset.mode);
+                if (!b) return;
+
+                const mode = b.dataset.mode;
+                if (!BARAHA_MODES.some((item) => item.key === mode)) return;
+
+                updateWriteUrl(mode);
+                openEditor(mode);
             });
 
             modes.addEventListener("click", (e) => {
@@ -464,8 +528,13 @@
             title.addEventListener("input", check);
             body.addEventListener("input", check);
             back.addEventListener("click", () => {
-                editor.classList.remove("open");
-                landing.style.display = "block";
+                closeEditor();
+            });
+
+            // Browser Back/Forward restores the same write state without creating
+            // another editor path or disturbing the existing post reader route.
+            window.addEventListener("popstate", () => {
+                syncWriteEditorWithUrl();
             });
         </script>
        <div id="sk-account-root"></div>
