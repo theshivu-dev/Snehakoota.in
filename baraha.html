@@ -9,7 +9,7 @@
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600;9..144,700&family=Noto+Sans+Kannada:wght@400;500;600;700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
         <link rel="stylesheet" href="theme.css" />
-        <link rel="stylesheet" href="baraha.css?v=8" />
+        <link rel="stylesheet" href="baraha.css?v=9" />
          <link rel="stylesheet" href="footer.css">
 <script src="footer.js" defer></script>
         <link rel="stylesheet" href="navigation.css?v=7">
@@ -100,6 +100,16 @@
                 <div class="note">ಖಾಸಗಿ ಬರಹಗಳು ನಿಮಗೆ ಮಾತ್ರ ಕಾಣುತ್ತವೆ. ಸದಸ್ಯರಿಗೆ ಹಂಚಿದರೆ ಆಯ್ಕೆ ಮಾಡಿದ membership ಗೆ ಮಾತ್ರ ಕಾಣುತ್ತದೆ.</div>
             </div>
         </div>
+        <section class="baraha-publish-confirmation" id="publishConfirmation" aria-hidden="true">
+            <div class="baraha-publish-confirmation__card" role="dialog" aria-modal="true" aria-labelledby="publishConfirmationTitle" aria-describedby="publishConfirmationContext">
+                <h2 id="publishConfirmationTitle">ನಿಮ್ಮ ಬರಹ ಪ್ರಕಟಿಸಲು ಸಿದ್ಧವಾಗಿದೆ</h2>
+                <p id="publishConfirmationContext"></p>
+                <div class="baraha-publish-confirmation__actions">
+                    <button class="baraha-publish-confirmation__cancel" id="publishCancel" type="button">ಬೇಡ</button>
+                    <button class="baraha-publish-confirmation__confirm" id="publishConfirm" type="button">ಹೌದು, ಪ್ರಕಟಿಸಿ</button>
+                </div>
+            </div>
+        </section>
         <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
         <script src="baraha-context.js"></script>
         <script src="baraha-model.js"></script>
@@ -235,6 +245,10 @@
             const title = document.getElementById("title");
             const body = document.getElementById("body");
             const publish = document.getElementById("publish");
+            const publishConfirmation = document.getElementById("publishConfirmation");
+            const publishConfirmationContext = document.getElementById("publishConfirmationContext");
+            const publishCancel = document.getElementById("publishCancel");
+            const publishConfirm = document.getElementById("publishConfirm");
 
             function collectEditorData() {
                 const activeMode = modes.querySelector(".mode.active");
@@ -657,6 +671,32 @@
                 publish.style.cursor = publish.disabled ? "not-allowed" : "pointer";
             }
 
+            function getPublishConfirmationContext() {
+                const visibility = vis.querySelector(".v.active")?.dataset.v;
+
+                const contextByVisibility = {
+                    public: "ಸಾರ್ವಜನಿಕವಾಗಿ ಪ್ರಕಟಿಸಲಾಗುತ್ತದೆ",
+                    members: "ಸದಸ್ಯರೊಂದಿಗೆ ಹಂಚಿಕೊಳ್ಳಲಾಗುತ್ತದೆ",
+                    private: "ಖಾಸಗಿಯಾಗಿ ಉಳಿಯುತ್ತದೆ"
+                };
+
+                return contextByVisibility[visibility] || "";
+            }
+
+            function openPublishConfirmation() {
+                if (publishInProgress || publish.disabled) return;
+
+                publishConfirmationContext.textContent = getPublishConfirmationContext();
+                publishConfirmation.classList.add("is-open");
+                publishConfirmation.setAttribute("aria-hidden", "false");
+                publishConfirm.focus();
+            }
+
+            function closePublishConfirmation() {
+                publishConfirmation.classList.remove("is-open");
+                publishConfirmation.setAttribute("aria-hidden", "true");
+            }
+
             async function publishFromEditor() {
                 if (publishInProgress || publish.disabled) return;
 
@@ -686,7 +726,27 @@
 
             title.addEventListener("input", check);
             body.addEventListener("input", check);
-            publish.addEventListener("click", publishFromEditor);
+            publish.addEventListener("click", openPublishConfirmation);
+            publishCancel.addEventListener("click", () => {
+                closePublishConfirmation();
+                publish.focus();
+            });
+            publishConfirm.addEventListener("click", async () => {
+                if (publishInProgress) return;
+                closePublishConfirmation();
+                await publishFromEditor();
+            });
+            publishConfirmation.addEventListener("click", (event) => {
+                if (event.target !== publishConfirmation) return;
+                closePublishConfirmation();
+                publish.focus();
+            });
+            document.addEventListener("keydown", (event) => {
+                if (event.key !== "Escape" || !publishConfirmation.classList.contains("is-open")) return;
+                event.preventDefault();
+                closePublishConfirmation();
+                publish.focus();
+            });
             back.addEventListener("click", () => {
                 closeEditor();
             });
