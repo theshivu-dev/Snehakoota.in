@@ -208,7 +208,9 @@
                 { key: "ಕವನ", label: "ಕವನ" },
                 { key: "ನೆನಪು", label: "ನೆನಪು" },
                 { key: "ಲೇಖನ", label: "ಲೇಖನ" },
-                { key: "ಟಿಪ್ಪಣಿ", label: "ಟಿಪ್ಪಣಿ" }
+                // Reserved for future long-form book support. It remains visible in
+                // the editor vocabulary but is intentionally unavailable for writing.
+                { key: "book", label: "ಪುಸ್ತಕ", disabled: true }
             ];
 
             const BARAHA_VISIBILITY = [
@@ -296,7 +298,7 @@
 
             function renderEditorModes() {
                 modes.innerHTML = BARAHA_MODES
-                    .map((mode, index) => `<button class="mode${index === 0 ? " active" : ""}" data-mode="${mode.key}">${mode.label}</button>`)
+                    .map((mode, index) => `<button class="mode${index === 0 ? " active" : ""}" data-mode="${mode.key}"${mode.disabled ? " disabled aria-disabled=\"true\"" : ""}>${mode.label}</button>`)
                     .join("");
             }
 
@@ -417,7 +419,7 @@
             // only a valid editor mode is reflected in the URL and restored.
             function getWriteModeFromUrl() {
                 const mode = new URL(window.location.href).searchParams.get("write");
-                return BARAHA_MODES.some((item) => item.key === mode) ? mode : null;
+                return BARAHA_MODES.some((item) => item.key === mode && !item.disabled) ? mode : null;
             }
 
             // Reader and editor are mutually exclusive panel routes. Existing post
@@ -541,7 +543,7 @@
                 if (!b) return;
 
                 const mode = b.dataset.mode;
-                if (!BARAHA_MODES.some((item) => item.key === mode)) return;
+                if (!BARAHA_MODES.some((item) => item.key === mode && !item.disabled)) return;
 
                 updateWriteUrl(mode);
                 openEditor(mode);
