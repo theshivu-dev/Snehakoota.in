@@ -467,6 +467,28 @@
                 if (clearUrl) clearWriteUrl();
             }
 
+            // A successful publish consumes the submitted draft. Keep this separate
+            // from closeEditor() so Back, validation failures, and publish failures
+            // continue preserving the user's unfinished content.
+            function resetEditorAfterSuccessfulPublish() {
+                title.value = "";
+                body.value = "";
+
+                const defaultVisibility = Array.from(vis.querySelectorAll(".v"))
+                    .find((button) => !button.disabled);
+
+                vis.querySelectorAll(".v").forEach((button) => {
+                    button.classList.toggle("active", button === defaultVisibility);
+                });
+                members.classList.toggle("open", defaultVisibility?.dataset.v === "members");
+
+                members.querySelectorAll('input[type="checkbox"]').forEach((input) => {
+                    input.checked = false;
+                });
+                ensureAuthorMembershipTargetSelected();
+                check();
+            }
+
             function restoreWriteEditorFromUrl() {
                 const mode = getWriteModeFromUrl();
                 if (!mode) return false;
@@ -650,6 +672,7 @@
                     const livePosts = BarahaView.postsToUi(barahaModel.posts || []);
                     BARAHA_POSTS = BARAHA_STATIC_POSTS.concat(livePosts);
                     renderPosts();
+                    resetEditorAfterSuccessfulPublish();
                     closeEditor();
                 } catch (error) {
                     console.error("Baraha publish failed:", error);
