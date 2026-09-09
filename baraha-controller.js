@@ -114,7 +114,7 @@
                     limit: 20
                 });
 
-                this.model.setPosts(result.posts);
+                this.model.setLivePosts(result.posts);
                 this.feedCursor = result.nextCursor;
                 this.hasMorePosts = result.hasMore;
 
@@ -141,6 +141,15 @@
             if (postOrId === null || postOrId === undefined || postOrId === "") {
                 this.model.setCurrentPost(null);
                 return null;
+            }
+
+            const localPost = typeof this.model.findPostById === "function"
+                ? this.model.findPostById(postOrId)
+                : null;
+
+            if (localPost) {
+                this.model.setCurrentPost(localPost);
+                return this.model.currentPost;
             }
 
             return this.loadPostById(postOrId);
@@ -198,8 +207,8 @@
             const publishingPost = await this.populatePublishingContext(preparedPost);
             const post = await this.service.createPost(publishingPost);
             const publishedPost = await this.service.enrichPosts([post]);
-            const modelPost = this.model && typeof this.model.addPost === "function"
-                ? this.model.addPost(publishedPost[0] || post)
+            const modelPost = this.model && typeof this.model.addLivePost === "function"
+                ? this.model.addLivePost(publishedPost[0] || post)
                 : (publishedPost[0] || post);
 
             return {
@@ -258,8 +267,7 @@
                     limit: 20
                 });
 
-                const currentPosts = Array.isArray(this.model.posts) ? this.model.posts : [];
-                this.model.setPosts(currentPosts.concat(result.posts || []));
+                this.model.appendLivePosts(result.posts || []);
                 this.feedCursor = result.nextCursor;
                 this.hasMorePosts = result.hasMore;
 
