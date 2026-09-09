@@ -785,7 +785,7 @@
             // Auth state is published globally by the shared account widget. Baraha
             // already owns a complete initialization path, so reuse it to rebuild
             // membership-dependent capabilities and feed data for the current session.
-            window.addEventListener("sk:auth-state", () => {
+            document.addEventListener("sk:auth-state", () => {
                 initializeBaraha().catch((error) => {
                     console.error("Baraha auth-state refresh failed:", error);
                 });
