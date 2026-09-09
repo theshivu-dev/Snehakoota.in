@@ -48,7 +48,7 @@
                     <div class="vrow" id="vis"></div>
                     <div class="members" id="members"></div>
                 </div>
-                <button class="publish" id="publish" disabled>Publish</button>
+                <button class="publish" id="publish" disabled>ಪ್ರಕಟಿಸಿ</button>
             </main>
             <button class="fab" id="fab">+ ಬರೆಯಿರಿ</button>
         </div>
@@ -613,6 +613,8 @@
                 openPostFromFeed(card.dataset.postId);
             });
 
+            let publishInProgress = false;
+
             function check() {
                 const canWrite = Boolean(barahaContext.capabilities?.canWrite);
                 const hasContent = Boolean(title.value.trim() && body.value.trim());
@@ -622,7 +624,7 @@
                 ).length > 0;
 
                 const requiresMembershipTarget = activeVisibility === "members";
-                publish.disabled = !(
+                publish.disabled = publishInProgress || !(
                     canWrite &&
                     hasContent &&
                     (!requiresMembershipTarget || hasMembershipTarget)
@@ -631,8 +633,35 @@
                 publish.style.cursor = publish.disabled ? "not-allowed" : "pointer";
             }
 
+            async function publishFromEditor() {
+                if (publishInProgress || publish.disabled) return;
+
+                publishInProgress = true;
+                check();
+
+                try {
+                    const result = await barahaController.publishPost(collectEditorData());
+                    if (!result?.published) {
+                        return;
+                    }
+
+                    // The controller owns the submitted post in the model. Rebuild the
+                    // existing page feed from that model without assuming its status is public.
+                    const livePosts = BarahaView.postsToUi(barahaModel.posts || []);
+                    BARAHA_POSTS = BARAHA_STATIC_POSTS.concat(livePosts);
+                    renderPosts();
+                    closeEditor();
+                } catch (error) {
+                    console.error("Baraha publish failed:", error);
+                } finally {
+                    publishInProgress = false;
+                    check();
+                }
+            }
+
             title.addEventListener("input", check);
             body.addEventListener("input", check);
+            publish.addEventListener("click", publishFromEditor);
             back.addEventListener("click", () => {
                 closeEditor();
             });
