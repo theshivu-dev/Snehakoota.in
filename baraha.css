@@ -809,3 +809,55 @@ select {
         font-size: 22px;
     }
 }
+
+
+/* Publish completion moment: intentionally compact and icon-free so the
+ * Snehakoota identity comes from the existing paper palette and typography. */
+.baraha-publish-success {
+    position: fixed;
+    inset: 0;
+    z-index: 71;
+    display: none;
+    place-items: center;
+    padding: var(--sk-mobile-gutter);
+    pointer-events: none;
+}
+
+.baraha-publish-success.is-open {
+    display: grid;
+}
+
+.baraha-publish-success__card {
+    width: min(100%, 360px);
+    border: 1px solid var(--line);
+    border-radius: var(--sk-radius-lg);
+    background: var(--paper2);
+    box-shadow: var(--sk-shadow-game);
+    padding: 22px 26px;
+    text-align: center;
+    animation: baraha-publish-success-in 180ms ease-out both;
+}
+
+.baraha-publish-success__card p {
+    margin: 0;
+    color: var(--ink);
+    font: 700 24px/1.4 var(--lit);
+}
+
+@keyframes baraha-publish-success-in {
+    from {
+        opacity: 0;
+        transform: translateY(6px) scale(.985);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .baraha-publish-success__card {
+        animation: none;
+    }
+}
