@@ -80,7 +80,9 @@
                 .filter((membership) => membership.status === "active");
             const isAuthenticated = Boolean(remoteCapabilities && remoteCapabilities.isAuthenticated);
             const isOwner = Boolean(remoteCapabilities && remoteCapabilities.isOwner);
-            const canWrite = isAuthenticated && (isOwner || activeMemberships.length > 0);
+            // Current normal Baraha UI requires authentication and at least one active membership.
+            // OWNER remains available in the capability snapshot for future owner-specific UI.
+            const canWrite = isAuthenticated && activeMemberships.length > 0;
 
             const capabilities = {
                 isAuthenticated,
