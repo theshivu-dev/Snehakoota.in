@@ -1,6 +1,6 @@
 /* ===================================================================
    SNEHAKOOTA ACCOUNT WIDGET — logic
-   Version: 10.1
+   Version: 10.2
    =================================================================== */
 (function(){
   "use strict";
@@ -11,6 +11,7 @@
   var INVITATION_MEMBERSHIP_MODE='optional';
   var INVITATION_SHOW_GENERAL_OPTION=true;
   var INVITATION_SUCCESS_MESSAGE_MS=5000;
+  var AUTH_SUCCESS_MESSAGE_MS=2600;
   var INVITATION_CONTEXT_STORAGE_KEY='snehakoota.invitation.context.v1';
   var INVITATION_AUTH_PENDING_STORAGE_KEY='snehakoota.invitation.auth-pending.v1';
   if(!window.supabase){console.error('account.js: supabase-js must be loaded before this script.');return;}
@@ -71,6 +72,7 @@
   var trigger=document.getElementById('skaTrigger'),status=document.getElementById('skaStatus'),backdrop=document.getElementById('skaBackdrop'),sheet=document.getElementById('skaSheet'),closeBtn=document.getElementById('skaClose'),body=document.getElementById('skaBody');
   function openSheet(){backdrop.classList.add('ska-show');sheet.classList.add('ska-show');sheet.setAttribute('aria-hidden','false');trigger.setAttribute('aria-expanded','true');}
   function closeSheet(){backdrop.classList.remove('ska-show');sheet.classList.remove('ska-show');sheet.setAttribute('aria-hidden','true');trigger.setAttribute('aria-expanded','false');}
+  function showAuthSuccessNotice(){var notice=document.createElement('div');notice.className='ska-auth-notice';notice.setAttribute('role','status');notice.textContent='Signed in successfully.';document.body.appendChild(notice);window.requestAnimationFrame(function(){notice.classList.add('is-visible');});window.setTimeout(function(){notice.classList.remove('is-visible');window.setTimeout(function(){if(notice.parentNode)notice.parentNode.removeChild(notice);},200);},AUTH_SUCCESS_MESSAGE_MS);}
   trigger.addEventListener('click',function(){if(sheet.classList.contains('ska-show'))closeSheet();else openSheet();});closeBtn.addEventListener('click',closeSheet);backdrop.addEventListener('click',closeSheet);document.addEventListener('keydown',function(e){if(e.key==='Escape')closeSheet();});
   function displayName(user){var m=(user&&user.user_metadata)||{};return m.full_name||m.name||m.user_name||'SnehaKoota Member';}
   function inviteEntry(){return '<button type="button" class="ska-action-row" id="skaInviteFriend">'+INVITE_ICON+'<span><strong>Invite a friend</strong><small>Share SnehaKoota with your friends</small></span></button>';}
@@ -103,6 +105,6 @@
   window.SK_AUTH.session = session;
   document.dispatchEvent(new CustomEvent('sk:auth-state', { detail: { signedIn: signedIn, session: session } }));
   }
-  var lastAuthState=null;function handleAuthStateChange(event,session){var signedIn=!!(session&&session.user);var previousSignedIn=lastAuthState;lastAuthState=signedIn;currentSession=session;trigger.classList.toggle('ska-signed-in',signedIn);status.title=signedIn?'Signed in':'Signed out';if((event==='SIGNED_IN'||event==='INITIAL_SESSION')&&signedIn&&hasInvitationAuthPending()){beginAuthenticatedInvitationProcessing();return;}if(event==='SIGNED_OUT'){updateAccount(null);return;}if(event==='INITIAL_SESSION'||previousSignedIn===null||signedIn!==previousSignedIn){updateAccount(session);}if(event==='SIGNED_IN'&&receiverInvitationContext.valid)maybeAutoOpenInvitation();}
+  var lastAuthState=null;function handleAuthStateChange(event,session){var signedIn=!!(session&&session.user);var previousSignedIn=lastAuthState;var isNewSignIn=event==='SIGNED_IN'&&signedIn&&previousSignedIn===false;lastAuthState=signedIn;currentSession=session;trigger.classList.toggle('ska-signed-in',signedIn);status.title=signedIn?'Signed in':'Signed out';if((event==='SIGNED_IN'||event==='INITIAL_SESSION')&&signedIn&&hasInvitationAuthPending()){beginAuthenticatedInvitationProcessing();return;}if(event==='SIGNED_OUT'){updateAccount(null);return;}if(event==='INITIAL_SESSION'||previousSignedIn===null||signedIn!==previousSignedIn){updateAccount(session);}if(isNewSignIn){closeSheet();showAuthSuccessNotice();}if(event==='SIGNED_IN'&&receiverInvitationContext.valid)maybeAutoOpenInvitation();}
   supabaseClient.auth.onAuthStateChange(handleAuthStateChange);supabaseClient.auth.getSession().then(function(res){if(res.error){console.error('Initial session error:',res.error);lastAuthState=false;updateAccount(null);return;}var session=res.data.session;var signedIn=!!(session&&session.user);lastAuthState=signedIn;updateAccount(session);if(signedIn&&hasInvitationAuthPending()&&(receiverInvitationContext.valid||loadStoredInvitationContext()))beginAuthenticatedInvitationProcessing();else if(receiverInvitationContext.valid)maybeAutoOpenInvitation();});
 })();
