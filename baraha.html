@@ -128,7 +128,13 @@
             const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
             const barahaService = new BarahaService(supabaseClient);
             const barahaContext = new BarahaContext();
-            const barahaModel = new BarahaModel();
+            // Feed ownership lives in BarahaModel. This flag only configures
+            // whether the model should include its optional local seed posts.
+            const BARAHA_MODEL_CONFIG = {
+                includeStaticPosts: true
+            };
+
+            const barahaModel = new BarahaModel(BARAHA_MODEL_CONFIG);
             const barahaController = new BarahaController({
                 context: barahaContext,
                 model: barahaModel,
@@ -158,80 +164,6 @@
                 { key: "article", label: "ಲೇಖನ" },
                 { key: "book", label: "ಪುಸ್ತಕ" }
             ];
-
-            // 2.2 — Existing demo posts moved into the static layer.
-            const BARAHA_STATIC_POSTS = [
-                {
-                    id: "demo-1",
-                    category: "baraha",
-                    title: "ನಮ್ಮ ಶಾಲೆಯ ದಿನಗಳು",
-                    content: "ಕ್ಲಾಸ್‌ರೂಮ್, ಗಂಟೆ, ಆಟದ ಮೈದಾನ… ಮರೆಯಲಾಗದ ದಿನಗಳ ಕೆಲವು ಪುಟಗಳು.",
-                    author: "ಶಿವ",
-                    time: "2 ದಿನಗಳ ಹಿಂದೆ",
-                    visibility: "members",
-                    presentation: "default"
-                },
-                {
-                    id: "demo-2",
-                    category: "poem",
-                    title: "ಮತ್ತೊಮ್ಮೆ ಮೊಳೆಯಲ್ಲಿ",
-                    content: "ಹಳೆಯ ದಾರಿಯಲಿ\nಹೊಸ ಹೆಜ್ಜೆಗಳ ಸದ್ದು…",
-                    author: "ರೇಖಾ",
-                    time: "4 ದಿನಗಳ ಹಿಂದೆ",
-                    visibility: "public",
-                    presentation: "poem"
-                },
-                {
-                    id: "demo-3",
-                    category: "memory",
-                    title: "ನಮ್ಮ ಮೊದಲ ಸ್ನೇಹಕೂಟ",
-                    content: "ಮೊದಲ ಬಾರಿ ಎಲ್ಲರೂ ಮತ್ತೆ ಒಂದೇ ಜಾಗದಲ್ಲಿ ಕೂತ ದಿನ.",
-                    author: "ನೀವು",
-                    time: "1 ವಾರದ ಹಿಂದೆ",
-                    visibility: "private",
-                    presentation: "memory"
-                },
-                {
-                    id: "demo-4",
-                    category: "book",
-                    title: "Why old friendships still matter",
-                    content: "ಒಂದು ದೊಡ್ಡ ಬರಹದ ಮೊದಲ ಅಧ್ಯಾಯ.",
-                    author: "ವಿನಯ್",
-                    time: "2 ವಾರಗಳ ಹಿಂದೆ",
-                    visibility: "members",
-                    presentation: "book"
-                },
-                {
-                    id: "demo-5",
-                    category: "article",
-                    title: "ಬಂಧಗಳ ಅರ್ಥ",
-                    content: "ಸ್ನೇಹ ಎಂದರೆ ಕೇವಲ ನೆನಪುಗಳಲ್ಲ. ಅದು ನಮ್ಮನ್ನು ರೂಪಿಸಿದ ಸಂಬಂಧಗಳ ಕಥೆ.",
-                    author: "ಅನಿಲ್",
-                    time: "3 ವಾರಗಳ ಹಿಂದೆ",
-                    visibility: "public",
-                    presentation: "default"
-                }
-            ];
-
-            // Feed configuration keeps demo/static content optional without changing
-            // the initialization path. Set includeStaticPosts to false when Baraha
-            // should render only the live Supabase feed.
-            const BARAHA_FEED_CONFIG = {
-                includeStaticPosts: true
-            };
-
-            function getConfiguredStaticPosts() {
-                return BARAHA_FEED_CONFIG.includeStaticPosts
-                    ? BARAHA_STATIC_POSTS.slice()
-                    : [];
-            }
-
-            function buildBarahaFeed(livePosts) {
-                const staticPosts = getConfiguredStaticPosts();
-                return staticPosts.concat(Array.isArray(livePosts) ? livePosts : []);
-            }
-
-            let BARAHA_POSTS = getConfiguredStaticPosts();
 
             // One shared initialization gate prevents page load, auth restoration
             // and BFCache restoration from running competing controller.init() calls.
@@ -353,7 +285,8 @@
             }
 
             function renderPosts() {
-                feed.innerHTML = BARAHA_POSTS.map((post) => {
+                const posts = BarahaView.postsToUi(barahaModel.posts || []);
+                feed.innerHTML = posts.map((post) => {
                     const category = BARAHA_CATEGORIES.find((item) => item.key === post.category);
                     const visibility = BARAHA_VISIBILITY.find((item) => item.key === post.visibility);
                     const cardClass = post.presentation === "default" ? "card" : `card ${post.presentation}`;
@@ -440,8 +373,6 @@
                 const result = await barahaController.init();
 
                 applyBarahaCapabilities(result?.capabilities || barahaContext.capabilities);
-                const livePosts = BarahaView.postsToUi(result?.posts?.posts || barahaModel.posts || []);
-                BARAHA_POSTS = buildBarahaFeed(livePosts);
                 renderPosts();
 
                 return result;
@@ -654,13 +585,8 @@
             });
 
             async function openPostFromFeed(postId) {
-                const livePost = barahaModel.posts.find((post) => String(post.id) === String(postId));
-                const post = livePost || BARAHA_POSTS.find((item) => String(item.id) === String(postId));
-
-                if (!post) return;
-
                 try {
-                    const currentPost = await barahaController.openPost(post);
+                    const currentPost = await barahaController.openPost(postId);
                     readerOpenedFromUrl = false;
                     barahaReader.open(currentPost);
                 } catch (error) {
@@ -672,12 +598,8 @@
                 const postId = new URLSearchParams(window.location.search).get("post");
                 if (!postId) return;
 
-                const demoPost = BARAHA_POSTS.find((post) => String(post.id) === String(postId));
-
                 try {
-                    const currentPost = demoPost
-                        ? await barahaController.openPost(demoPost)
-                        : await barahaController.openPost(postId);
+                    const currentPost = await barahaController.openPost(postId);
 
                     if (currentPost) {
                         readerOpenedFromUrl = true;
@@ -775,10 +697,8 @@
                         return;
                     }
 
-                    // The controller owns the submitted post in the model. Rebuild the
-                    // existing page feed from that model without assuming its status is public.
-                    const livePosts = BarahaView.postsToUi(barahaModel.posts || []);
-                    BARAHA_POSTS = buildBarahaFeed(livePosts);
+                    // The controller adds the submitted post to model-owned live state.
+                    // Rendering always reads the model's combined authoritative feed.
                     renderPosts();
                     showPublishSuccess();
                     await waitForPublishSuccessMoment();
