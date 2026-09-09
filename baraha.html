@@ -387,6 +387,7 @@
                 syncMembershipOptions(activeMemberships);
                 applyWritingCapabilityState(capabilities);
                 applyVisibilityCapabilityState(capabilities);
+                check();
             }
 
             async function initializeBaraha() {
@@ -535,6 +536,7 @@
             // overwriting any other target memberships already chosen by the user.
             membershipSelect.addEventListener("change", () => {
                 ensureAuthorMembershipTargetSelected();
+                check();
             });
 
             vis.addEventListener("click", (e) => {
@@ -543,6 +545,13 @@
                 vis.querySelectorAll(".v").forEach((x) => x.classList.remove("active"));
                 b.classList.add("active");
                 members.classList.toggle("open", b.dataset.v === "members");
+                check();
+            });
+
+            // Target memberships affect eligibility only for ಸದಸ್ಯರು visibility.
+            // A delegated listener keeps the existing dynamically rendered options covered.
+            members.addEventListener("change", (e) => {
+                if (e.target.matches('input[type="checkbox"]')) check();
             });
 
             chips.addEventListener("click", (e) => {
@@ -605,7 +614,19 @@
             });
 
             function check() {
-                publish.disabled = !(title.value.trim() && body.value.trim());
+                const canWrite = Boolean(barahaContext.capabilities?.canWrite);
+                const hasContent = Boolean(title.value.trim() && body.value.trim());
+                const activeVisibility = vis.querySelector(".v.active")?.dataset.v;
+                const hasMembershipTarget = Array.from(
+                    members.querySelectorAll('input[type="checkbox"]:checked')
+                ).length > 0;
+
+                const requiresMembershipTarget = activeVisibility === "members";
+                publish.disabled = !(
+                    canWrite &&
+                    hasContent &&
+                    (!requiresMembershipTarget || hasMembershipTarget)
+                );
                 publish.style.opacity = publish.disabled ? ".45" : "1";
                 publish.style.cursor = publish.disabled ? "not-allowed" : "pointer";
             }
