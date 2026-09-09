@@ -213,8 +213,32 @@
                 }
             ];
 
-            let BARAHA_POSTS = BARAHA_STATIC_POSTS.slice();
-            let barahaFeedInitialization = 0;
+            // Feed configuration keeps demo/static content optional without changing
+            // the initialization path. Set includeStaticPosts to false when Baraha
+            // should render only the live Supabase feed.
+            const BARAHA_FEED_CONFIG = {
+                includeStaticPosts: true
+            };
+
+            function getConfiguredStaticPosts() {
+                return BARAHA_FEED_CONFIG.includeStaticPosts
+                    ? BARAHA_STATIC_POSTS.slice()
+                    : [];
+            }
+
+            function buildBarahaFeed(livePosts) {
+                const staticPosts = getConfiguredStaticPosts();
+                return staticPosts.concat(Array.isArray(livePosts) ? livePosts : []);
+            }
+
+            let BARAHA_POSTS = getConfiguredStaticPosts();
+
+            // One shared initialization gate prevents page load, auth restoration
+            // and BFCache restoration from running competing controller.init() calls.
+            // If a new refresh request arrives while one is active, exactly one
+            // follow-up initialization is queued after the current run completes.
+            let barahaInitializationPromise = null;
+            let barahaInitializationQueued = false;
 
             let BARAHA_MEMBERSHIPS = [];
 
@@ -412,19 +436,39 @@
                 check();
             }
 
-            async function initializeBaraha() {
-                const initializationId = ++barahaFeedInitialization;
-
-                BARAHA_POSTS = BARAHA_STATIC_POSTS.slice();
-                renderPosts();
-
+            async function runBarahaInitialization() {
                 const result = await barahaController.init();
-                if (initializationId !== barahaFeedInitialization) return;
 
                 applyBarahaCapabilities(result?.capabilities || barahaContext.capabilities);
                 const livePosts = BarahaView.postsToUi(result?.posts?.posts || barahaModel.posts || []);
-                BARAHA_POSTS = BARAHA_STATIC_POSTS.concat(livePosts);
+                BARAHA_POSTS = buildBarahaFeed(livePosts);
                 renderPosts();
+
+                return result;
+            }
+
+            async function initializeBaraha() {
+                if (barahaInitializationPromise) {
+                    barahaInitializationQueued = true;
+                    return barahaInitializationPromise;
+                }
+
+                barahaInitializationPromise = (async () => {
+                    let result;
+
+                    do {
+                        barahaInitializationQueued = false;
+                        result = await runBarahaInitialization();
+                    } while (barahaInitializationQueued);
+
+                    return result;
+                })();
+
+                try {
+                    return await barahaInitializationPromise;
+                } finally {
+                    barahaInitializationPromise = null;
+                }
             }
 
             function openSheet() {
@@ -734,7 +778,7 @@
                     // The controller owns the submitted post in the model. Rebuild the
                     // existing page feed from that model without assuming its status is public.
                     const livePosts = BarahaView.postsToUi(barahaModel.posts || []);
-                    BARAHA_POSTS = BARAHA_STATIC_POSTS.concat(livePosts);
+                    BARAHA_POSTS = buildBarahaFeed(livePosts);
                     renderPosts();
                     showPublishSuccess();
                     await waitForPublishSuccessMoment();
