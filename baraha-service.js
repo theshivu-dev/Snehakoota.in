@@ -51,20 +51,12 @@
                 throw new Error("Publishing requires an authenticated user.");
             }
 
-            const profileResult = await this.supabase
-                .from("profiles")
-                .select("display_name, full_name")
-                .eq("id", user.id)
-                .maybeSingle();
-
-            if (profileResult.error) {
-                throw profileResult.error;
-            }
-
-            const profile = profileResult.data || {};
+            // The authenticated user is the publishing identity. Profile data is
+            // enriched through the controlled author-profile RPC after publishing,
+            // so this path must not directly read the protected profiles table.
             return {
                 authorId: user.id,
-                authorDisplayName: profile.display_name || profile.full_name || null
+                authorDisplayName: null
             };
         }
 
