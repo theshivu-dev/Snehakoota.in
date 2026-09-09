@@ -724,3 +724,88 @@ select {
     opacity: .5;
     cursor: not-allowed;
 }
+
+
+/* Compact publish confirmation. This stays independent from the larger
+ * writing chooser so confirmation does not inherit sheet-sized behavior. */
+.baraha-publish-confirmation {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    display: none;
+    place-items: center;
+    padding: var(--sk-mobile-gutter);
+    background: rgba(43, 33, 24, .28);
+    backdrop-filter: blur(4px);
+}
+
+.baraha-publish-confirmation.is-open {
+    display: grid;
+}
+
+.baraha-publish-confirmation__card {
+    width: min(100%, 420px);
+    border: 1px solid var(--line);
+    border-radius: var(--sk-radius-lg);
+    background: var(--paper2);
+    box-shadow: var(--sk-shadow-game);
+    padding: 22px;
+}
+
+.baraha-publish-confirmation__card h2 {
+    margin: 0;
+    color: var(--ink);
+    font: 700 24px/1.35 var(--lit);
+}
+
+.baraha-publish-confirmation__card p {
+    margin: 8px 0 0;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.baraha-publish-confirmation__actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 18px;
+}
+
+.baraha-publish-confirmation__actions button {
+    min-height: var(--sk-touch-target);
+    border-radius: var(--sk-radius-pill);
+    padding: 10px 12px;
+    font-weight: 700;
+}
+
+.baraha-publish-confirmation__cancel {
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--ink);
+}
+
+.baraha-publish-confirmation__confirm {
+    border: 1px solid var(--red);
+    background: var(--red);
+    color: #fff;
+}
+
+.baraha-publish-confirmation__actions button:focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 2px;
+}
+
+@media (max-width: 360px) {
+    .baraha-publish-confirmation {
+        padding: 14px;
+    }
+
+    .baraha-publish-confirmation__card {
+        padding: 18px;
+    }
+
+    .baraha-publish-confirmation__card h2 {
+        font-size: 22px;
+    }
+}
