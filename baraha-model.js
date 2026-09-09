@@ -142,14 +142,14 @@
             return this.seedPosts.concat(this.livePosts);
         }
 
-        setPosts(rows) {
+        setLivePosts(rows) {
             this.livePosts = Array.isArray(rows)
                 ? rows.map((row) => row instanceof BarahaPost ? row : new BarahaPost(row))
                 : [];
             return this.posts;
         }
 
-        appendPosts(rows) {
+        appendLivePosts(rows) {
             const additions = Array.isArray(rows)
                 ? rows.map((row) => row instanceof BarahaPost ? row : new BarahaPost(row))
                 : [];
@@ -169,7 +169,7 @@
                 : null;
         }
 
-        addPost(row) {
+        addLivePost(row) {
             const post = row instanceof BarahaPost ? row : new BarahaPost(row);
             this.livePosts = [post].concat(
                 this.livePosts.filter((item) => item.id !== post.id)
