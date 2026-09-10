@@ -31,7 +31,10 @@
                 </section>
                 <div class="chips" id="chips"></div>
                 <section>
-                    <div class="sect">ಇತ್ತೀಚಿನ ಬರಹಗಳು</div>
+                    <div class="baraha-feed-heading">
+                        <div class="sect">ಇತ್ತೀಚಿನ ಬರಹಗಳು</div>
+                        <button class="baraha-my-posts" id="barahaMyPosts" type="button" disabled>ನನ್ನ ಬರಹಗಳು</button>
+                    </div>
                     <div class="feed" id="feed"></div>
                     <div class="baraha-load-more" id="barahaLoadMore"></div>
                 </section>
@@ -200,6 +203,7 @@
             const chips = document.getElementById("chips");
             const feed = document.getElementById("feed");
             const barahaLoadMore = document.getElementById("barahaLoadMore");
+            const barahaMyPosts = document.getElementById("barahaMyPosts");
             const membershipSelect = document.getElementById("membershipSelect");
             const modes = document.getElementById("modes");
             const options = document.getElementById("options");
@@ -332,6 +336,32 @@
 
             // Single UI entry gate for pagination. The controller remains the
             // sole owner of cursor, loading and has-more state.
+            function updateMyPostsUI() {
+                const isAuthenticated = Boolean(barahaContext.capabilities?.isAuthenticated);
+                const isSelected = typeof barahaController.isMyPostsMode === "function"
+                    && barahaController.isMyPostsMode();
+
+                barahaMyPosts.disabled = !isAuthenticated;
+                barahaMyPosts.classList.toggle("active", isSelected);
+                barahaMyPosts.setAttribute("aria-pressed", isSelected ? "true" : "false");
+            }
+
+            async function handleMyPostsToggle() {
+                if (barahaMyPosts.disabled || barahaController.feedLoading) return;
+
+                barahaMyPosts.disabled = true;
+                try {
+                    await barahaController.setMyPostsMode(!barahaController.isMyPostsMode());
+                    renderPosts();
+                    updateLoadMoreUI();
+                    updateMyPostsUI();
+                } catch (error) {
+                    console.error("Baraha My Posts failed:", error);
+                } finally {
+                    updateMyPostsUI();
+                }
+            }
+
             async function handleLoadMore() {
                 if (barahaController.feedLoading || !barahaController.hasMorePosts) {
                     updateLoadMoreUI();
@@ -416,6 +446,7 @@
                 applyBarahaCapabilities(result?.capabilities || barahaContext.capabilities);
                 renderPosts();
                 updateLoadMoreUI();
+                updateMyPostsUI();
 
                 return result;
             }
@@ -568,6 +599,8 @@
                     console.error("Baraha restore failed:", error);
                 });
             });
+
+            barahaMyPosts.addEventListener("click", handleMyPostsToggle);
 
             barahaLoadMore.addEventListener("click", (event) => {
                 const button = event.target.closest(".baraha-load-more__button");
