@@ -260,6 +260,54 @@
             return result.data;
         }
 
+
+        // Lifecycle actions stay behind the same service boundary as publishing.
+        // Controllers call these focused methods; status changes remain enforced by
+        // the controlled Supabase RPCs rather than frontend updates.
+        async approvePost(postId) {
+            return this.callLifecycleAction(
+                "baraha_approve_post",
+                postId,
+                "BarahaService.approvePost"
+            );
+        }
+
+        async hidePost(postId) {
+            return this.callLifecycleAction(
+                "baraha_hide_post",
+                postId,
+                "BarahaService.hidePost"
+            );
+        }
+
+        async archivePost(postId) {
+            return this.callLifecycleAction(
+                "baraha_archive_post",
+                postId,
+                "BarahaService.archivePost"
+            );
+        }
+
+        async callLifecycleAction(rpcName, postId, callerName) {
+            if (!this.supabase) {
+                throw new Error((callerName || "BarahaService lifecycle action") + " requires a Supabase client.");
+            }
+
+            if (postId === null || postId === undefined || postId === "") {
+                throw new Error((callerName || "BarahaService lifecycle action") + " requires a post ID.");
+            }
+
+            const result = await this.supabase.rpc(rpcName, {
+                p_post_id: postId
+            });
+
+            if (result.error) {
+                throw result.error;
+            }
+
+            return result.data;
+        }
+
     }
 
     window.BarahaService = BarahaService;
