@@ -135,7 +135,6 @@
                 const result = await this.service.getPosts({
                     cursor: this.feedCursor,
                     limit: 20,
-                    authorId: this.feedAuthorId,
                     authorId: this.feedAuthorId
                 });
 
