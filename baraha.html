@@ -33,6 +33,7 @@
                 <section>
                     <div class="sect">ಇತ್ತೀಚಿನ ಬರಹಗಳು</div>
                     <div class="feed" id="feed"></div>
+                    <div class="baraha-load-more" id="barahaLoadMore"></div>
                 </section>
             </main>
             <main class="editor" id="editor">
@@ -198,6 +199,7 @@
             const back = document.getElementById("back");
             const chips = document.getElementById("chips");
             const feed = document.getElementById("feed");
+            const barahaLoadMore = document.getElementById("barahaLoadMore");
             const membershipSelect = document.getElementById("membershipSelect");
             const modes = document.getElementById("modes");
             const options = document.getElementById("options");
@@ -310,6 +312,45 @@
                 }).join("");
             }
 
+            // The controller owns pagination state. This is the only UI function
+            // allowed to translate that state into a Load More control.
+            function updateLoadMoreUI() {
+                if (!barahaLoadMore) return;
+
+                if (barahaController.feedLoading) {
+                    barahaLoadMore.innerHTML = '<button class="baraha-load-more__button" type="button" disabled>ಇನ್ನಷ್ಟು ಬರಹಗಳನ್ನು ಲೋಡ್ ಮಾಡಲಾಗುತ್ತಿದೆ…</button>';
+                    return;
+                }
+
+                if (!barahaController.hasMorePosts) {
+                    barahaLoadMore.innerHTML = "";
+                    return;
+                }
+
+                barahaLoadMore.innerHTML = '<button class="baraha-load-more__button" type="button">ಇನ್ನಷ್ಟು ಬರಹಗಳನ್ನು ನೋಡಿ</button>';
+            }
+
+            // Single UI entry gate for pagination. The controller remains the
+            // sole owner of cursor, loading and has-more state.
+            async function handleLoadMore() {
+                if (barahaController.feedLoading || !barahaController.hasMorePosts) {
+                    updateLoadMoreUI();
+                    return;
+                }
+
+                const loadMorePromise = barahaController.loadMorePosts();
+                updateLoadMoreUI();
+
+                try {
+                    const result = await loadMorePromise;
+                    if (result) renderPosts();
+                } catch (error) {
+                    console.error("Baraha load more failed:", error);
+                } finally {
+                    updateLoadMoreUI();
+                }
+            }
+
             // Writing memberships come from the capability snapshot. This function
             // only adapts that already-approved list to the existing UI format.
             function syncMembershipOptions(memberships) {
@@ -374,6 +415,7 @@
 
                 applyBarahaCapabilities(result?.capabilities || barahaContext.capabilities);
                 renderPosts();
+                updateLoadMoreUI();
 
                 return result;
             }
@@ -525,6 +567,12 @@
                 initializeBaraha().catch((error) => {
                     console.error("Baraha restore failed:", error);
                 });
+            });
+
+            barahaLoadMore.addEventListener("click", (event) => {
+                const button = event.target.closest(".baraha-load-more__button");
+                if (!button || button.disabled) return;
+                handleLoadMore();
             });
 
             fab.addEventListener("click", openSheet);
