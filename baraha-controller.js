@@ -34,9 +34,10 @@
 
             await this.loadMemberships();
             await this.loadCapabilities();
-            this.feedCursor = null;
-            this.hasMorePosts = true;
-            const posts = await this.loadPosts();
+
+            // All authoritative feed entries, including real re-entry and BFCache
+            // restoration, reset through this one pagination path.
+            const posts = await this.refreshPosts();
 
             if (this.view && typeof this.view.render === "function") {
                 this.view.render(this.model, this.context);
