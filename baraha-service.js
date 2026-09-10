@@ -193,7 +193,13 @@
 
             let query = this.supabase
                 .from("baraha_posts")
-                .select("*")
+                .select("*");
+
+            if (options.authorId) {
+                query = query.eq("author_id", options.authorId);
+            }
+
+            query = query
                 .order("created_at", { ascending: false })
                 .order("id", { ascending: false })
                 .limit(limit + 1);
