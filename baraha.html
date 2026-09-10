@@ -52,6 +52,8 @@
                     <div class="vrow" id="vis"></div>
                     <div class="members" id="members"></div>
                 </div>
+                <p class="baraha-publish-note" id="publishNote">ಪ್ರಕಟಿಸಿದ ನಂತರ ನಿಮ್ಮ ಬರಹದ ಸ್ಥಿತಿಯನ್ನು ಇಲ್ಲಿ ತಿಳಿಸಲಾಗುತ್ತದೆ. ಕೆಲವು ಬರಹಗಳಿಗೆ ಪರಿಶೀಲನೆ ಅಗತ್ಯವಾಗಬಹುದು.</p>
+                <p class="baraha-publish-error" id="publishError" role="alert" aria-live="assertive" hidden></p>
                 <button class="publish" id="publish" disabled>ಪ್ರಕಟಿಸಿ</button>
             </main>
             <button class="fab" id="fab">+ ಬರೆಯಿರಿ</button>
@@ -106,7 +108,7 @@
         </div>
         <section class="baraha-publish-success" id="publishSuccess" aria-hidden="true">
             <div class="baraha-publish-success__card" role="status" aria-live="polite">
-                <p>ನಿಮ್ಮ ಬರಹ ಪ್ರಕಟವಾಗಿದೆ</p>
+                <p id="publishSuccessMessage">ನಿಮ್ಮ ಬರಹ ಪ್ರಕಟವಾಗಿದೆ</p>
             </div>
         </section>
         <section class="baraha-publish-confirmation" id="publishConfirmation" aria-hidden="true">
@@ -213,6 +215,8 @@
             const body = document.getElementById("body");
             const publish = document.getElementById("publish");
             const publishSuccess = document.getElementById("publishSuccess");
+            const publishSuccessMessage = document.getElementById("publishSuccessMessage");
+            const publishError = document.getElementById("publishError");
             const publishConfirmation = document.getElementById("publishConfirmation");
             const publishConfirmationContext = document.getElementById("publishConfirmationContext");
             const publishCancel = document.getElementById("publishCancel");
@@ -724,7 +728,18 @@
                 publish.style.cursor = publish.disabled ? "not-allowed" : "pointer";
             }
 
-            function showPublishSuccess() {
+            function getPublishStatusMessage(contentStatus) {
+                const messages = {
+                    published: "ನಿಮ್ಮ ಬರಹ ಪ್ರಕಟವಾಗಿದೆ",
+                    pending: "ನಿಮ್ಮ ಬರಹ ಪರಿಶೀಲನೆಗಾಗಿ ಸಲ್ಲಿಸಲಾಗಿದೆ",
+                    draft: "ನಿಮ್ಮ ಬರಹ ಕರಡಾಗಿ ಉಳಿಸಲಾಗಿದೆ"
+                };
+
+                return messages[contentStatus] || "ನಿಮ್ಮ ಬರಹ ಯಶಸ್ವಿಯಾಗಿ ಉಳಿಸಲಾಗಿದೆ";
+            }
+
+            function showPublishSuccess(contentStatus) {
+                publishSuccessMessage.textContent = getPublishStatusMessage(contentStatus);
                 publishSuccess.classList.add("is-open");
                 publishSuccess.setAttribute("aria-hidden", "false");
             }
@@ -732,6 +747,17 @@
             function closePublishSuccess() {
                 publishSuccess.classList.remove("is-open");
                 publishSuccess.setAttribute("aria-hidden", "true");
+            }
+
+            function clearPublishError() {
+                publishError.hidden = true;
+                publishError.textContent = "";
+            }
+
+            function showPublishError(error) {
+                const message = error?.message || "ಏನೋ ಸಮಸ್ಯೆಯಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.";
+                publishError.textContent = message;
+                publishError.hidden = false;
             }
 
             function waitForPublishSuccessMoment() {
@@ -770,6 +796,7 @@
                 if (publishInProgress || publish.disabled) return;
 
                 publishInProgress = true;
+                clearPublishError();
                 check();
 
                 try {
@@ -781,13 +808,14 @@
                     // The controller adds the submitted post to model-owned live state.
                     // Rendering always reads the model's combined authoritative feed.
                     renderPosts();
-                    showPublishSuccess();
+                    showPublishSuccess(result?.post?.content_status);
                     await waitForPublishSuccessMoment();
                     closePublishSuccess();
                     resetEditorAfterSuccessfulPublish();
                     closeEditor();
                 } catch (error) {
                     console.error("Baraha publish failed:", error);
+                    showPublishError(error);
                 } finally {
                     publishInProgress = false;
                     check();
