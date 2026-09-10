@@ -132,9 +132,38 @@ select {
     color: #fff;
 }
 
-.sect {
+.baraha-feed-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
     padding: 8px var(--sk-mobile-gutter) 0;
+}
+
+.sect {
     font: 18px/1.25 var(--lit);
+}
+
+.baraha-my-posts {
+    min-height: var(--sk-touch-target);
+    border: 1px solid var(--line);
+    border-radius: var(--sk-radius-pill);
+    background: var(--white);
+    color: var(--muted);
+    padding: 7px 11px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.baraha-my-posts.active {
+    background: var(--red);
+    border-color: var(--red);
+    color: #fff;
+}
+
+.baraha-my-posts:disabled {
+    cursor: not-allowed;
+    opacity: .55;
 }
 
 .feed {
