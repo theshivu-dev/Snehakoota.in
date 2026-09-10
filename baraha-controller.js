@@ -22,6 +22,7 @@
             this.feedCursor = null;
             this.hasMorePosts = true;
             this.feedLoading = false;
+            this.feedAuthorId = null;
         }
 
         async init() {
@@ -105,6 +106,27 @@
             return this.loadPosts();
         }
 
+        async setMyPostsMode(enabled) {
+            const authorId = enabled && this.context && this.context.user
+                ? this.context.user.id
+                : null;
+
+            if (enabled && !authorId) {
+                throw new Error("My Posts requires an authenticated user.");
+            }
+
+            if (this.feedAuthorId === authorId) {
+                return null;
+            }
+
+            this.feedAuthorId = authorId;
+            return this.refreshPosts();
+        }
+
+        isMyPostsMode() {
+            return Boolean(this.feedAuthorId);
+        }
+
         async loadPosts() {
             if (this.feedLoading || !this.hasMorePosts) return;
 
@@ -112,7 +134,9 @@
             try {
                 const result = await this.service.getPosts({
                     cursor: this.feedCursor,
-                    limit: 20
+                    limit: 20,
+                    authorId: this.feedAuthorId,
+                    authorId: this.feedAuthorId
                 });
 
                 this.model.setLivePosts(result.posts);
