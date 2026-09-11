@@ -281,6 +281,8 @@
                 ? this.model.addLivePost(publishedPost[0] || post)
                 : (publishedPost[0] || post);
 
+            this.renderFeed();
+
             return {
                 published: true,
                 post: modelPost
