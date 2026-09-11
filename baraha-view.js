@@ -97,9 +97,101 @@
         return posts.map(postToUi).filter(Boolean);
     }
 
+
+    /*
+     * Feed DOM projection.
+     *
+     * The controller remains the owner of feed state. This view receives that
+     * state and projects it into the existing Baraha page DOM without fetching
+     * data or changing application state.
+     */
+    class BarahaFeedView {
+        constructor(options) {
+            options = options || {};
+            this.feedElement = options.feedElement || null;
+            this.loadMoreElement = options.loadMoreElement || null;
+            this.myPostsElement = options.myPostsElement || null;
+        }
+
+        renderFeed(model, context, feedState) {
+            feedState = feedState || {};
+
+            this.renderPosts(model);
+            this.renderLoadMore(feedState);
+            this.renderMyPosts(context, feedState);
+        }
+
+        renderPosts(model) {
+            if (!this.feedElement) return;
+
+            const posts = postsToUi((model && model.posts) || []);
+
+            this.feedElement.innerHTML = posts.map((post) => {
+                const cardClass = post.presentation === "default"
+                    ? "card"
+                    : `card ${post.presentation}`;
+                const type = `${post.categoryLabel} · ${post.visibilityLabel}`;
+
+                if (post.presentation === "memory") {
+                    return `<article class="${cardClass}" data-category="${post.category}" data-post-id="${post.id}" tabindex="0">
+                        <div class="memory-art">✦</div>
+                        <div>
+                            <div class="type">${type}</div>
+                            <h2>${post.title}</h2>
+                            <div class="meta"><span>${post.author} · ${post.time}</span><span class="card-open-cue" aria-hidden="true">→</span></div>
+                        </div>
+                    </article>`;
+                }
+
+                return `<article class="${cardClass}" data-category="${post.category}" data-post-id="${post.id}" tabindex="0">
+                    <div class="type">${type}</div>
+                    <h2>${post.title}</h2>
+                    <div class="meta"><span>${post.author} · ${post.time}</span><span class="card-open-cue" aria-hidden="true">→</span></div>
+                </article>`;
+            }).join("");
+        }
+
+        renderLoadMore(feedState) {
+            if (!this.loadMoreElement) return;
+
+            if (feedState.feedLoading) {
+                this.loadMoreElement.innerHTML = '<button class="baraha-load-more__button" type="button" disabled>ಇನ್ನಷ್ಟು ಬರಹಗಳನ್ನು ಲೋಡ್ ಮಾಡಲಾಗುತ್ತಿದೆ…</button>';
+                return;
+            }
+
+            if (feedState.hasMorePosts === false) {
+                this.loadMoreElement.innerHTML = "";
+                return;
+            }
+
+            this.loadMoreElement.innerHTML = '<button class="baraha-load-more__button" type="button">ಇನ್ನಷ್ಟು ಬರಹಗಳನ್ನು ನೋಡಿ</button>';
+        }
+
+        renderMyPosts(context, feedState) {
+            if (!this.myPostsElement) return;
+
+            const isAuthenticated = Boolean(
+                feedState.isAuthenticated !== undefined
+                    ? feedState.isAuthenticated
+                    : context && context.capabilities && context.capabilities.isAuthenticated
+            );
+            const isSelected = Boolean(feedState.isMyPostsMode);
+
+            this.myPostsElement.disabled = !isAuthenticated;
+            this.myPostsElement.classList.toggle("active", isSelected);
+            this.myPostsElement.setAttribute("aria-pressed", isSelected ? "true" : "false");
+        }
+    }
+
+    function createFeedView(options) {
+        return new BarahaFeedView(options);
+    }
+
     window.BarahaView = {
         postToUi: postToUi,
         postsToUi: postsToUi,
-        formatRelativeTime: formatRelativeTime
+        formatRelativeTime: formatRelativeTime,
+        BarahaFeedView: BarahaFeedView,
+        createFeedView: createFeedView
     };
 })(window);
