@@ -100,7 +100,29 @@
             return this.context.capabilities;
         }
 
-        async archivePost(postId) {
+        async approvePost(postId) {
+        if (!this.service || typeof this.service.approvePost !== "function") {
+            throw new Error("BarahaController requires a service with approvePost().");
+        }
+
+        const approvedPost = await this.service.approvePost(postId);
+        await this.refreshPosts();
+
+        return approvedPost;
+    }
+
+    async hidePost(postId) {
+        if (!this.service || typeof this.service.hidePost !== "function") {
+            throw new Error("BarahaController requires a service with hidePost().");
+        }
+
+        const hiddenPost = await this.service.hidePost(postId);
+        await this.refreshPosts();
+
+        return hiddenPost;
+    }
+
+    async archivePost(postId) {
             if (!this.service || typeof this.service.archivePost !== "function") {
                 throw new Error("BarahaController requires a service with archivePost().");
             }
