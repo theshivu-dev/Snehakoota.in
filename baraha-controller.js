@@ -30,8 +30,22 @@
                 throw new Error("BarahaController requires context, model and service.");
             }
 
+            // Compare identities across the existing initialization path. A user-specific
+            // feed filter must never survive a sign-out or switch to another account.
+            const previousUserId = this.context.user && this.context.user.id
+                ? this.context.user.id
+                : null;
+
             const session = await this.service.getSession();
             this.context.setSession(session);
+
+            const currentUserId = this.context.user && this.context.user.id
+                ? this.context.user.id
+                : null;
+
+            if (previousUserId !== currentUserId) {
+                this.feedAuthorId = null;
+            }
 
             await this.loadMemberships();
             await this.loadCapabilities();
@@ -39,10 +53,6 @@
             // All authoritative feed entries, including real re-entry and BFCache
             // restoration, reset through this one pagination path.
             const posts = await this.refreshPosts();
-
-            if (this.view && typeof this.view.render === "function") {
-                this.view.render(this.model, this.context);
-            }
 
             return {
                 session,
