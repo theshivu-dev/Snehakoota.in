@@ -141,10 +141,16 @@
             };
 
             const barahaModel = new BarahaModel(BARAHA_MODEL_CONFIG);
+            const barahaFeedView = window.BarahaView.createFeedView({
+                feedElement: document.getElementById("feed"),
+                loadMoreElement: document.getElementById("barahaLoadMore"),
+                myPostsElement: document.getElementById("barahaMyPosts")
+            });
             const barahaController = new BarahaController({
                 context: barahaContext,
                 model: barahaModel,
-                service: barahaService
+                service: barahaService,
+                view: barahaFeedView
             });
             let readerOpenedFromUrl = false;
             let editingPostId = null;
