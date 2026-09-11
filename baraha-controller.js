@@ -133,6 +133,21 @@
             return archivedPost;
         }
 
+        renderFeed() {
+            if (!this.view || typeof this.view.renderFeed !== "function") return;
+
+            this.view.renderFeed(this.model, this.context, {
+                feedLoading: this.feedLoading,
+                hasMorePosts: this.hasMorePosts,
+                isMyPostsMode: this.isMyPostsMode(),
+                isAuthenticated: Boolean(
+                    this.context
+                    && this.context.capabilities
+                    && this.context.capabilities.isAuthenticated
+                )
+            });
+        }
+
         async refreshPosts() {
             this.feedCursor = null;
             this.hasMorePosts = true;
@@ -164,6 +179,7 @@
             if (this.feedLoading || !this.hasMorePosts) return;
 
             this.feedLoading = true;
+            this.renderFeed();
             try {
                 const result = await this.service.getPosts({
                     cursor: this.feedCursor,
@@ -175,13 +191,10 @@
                 this.feedCursor = result.nextCursor;
                 this.hasMorePosts = result.hasMore;
 
-                if (this.view && typeof this.view.renderFeed === "function") {
-                    this.view.renderFeed(this.model, this.context);
-                }
-
                 return result;
             } finally {
                 this.feedLoading = false;
+                this.renderFeed();
             }
         }
 
@@ -318,6 +331,7 @@
             if (this.feedLoading || !this.hasMorePosts) return null;
 
             this.feedLoading = true;
+            this.renderFeed();
             try {
                 const result = await this.service.getPosts({
                     cursor: this.feedCursor,
@@ -329,13 +343,10 @@
                 this.feedCursor = result.nextCursor;
                 this.hasMorePosts = result.hasMore;
 
-                if (this.view && typeof this.view.renderFeed === "function") {
-                    this.view.renderFeed(this.model, this.context);
-                }
-
                 return result;
             } finally {
                 this.feedLoading = false;
+                this.renderFeed();
             }
         }
 
