@@ -106,31 +106,70 @@
             }));
         }
 
+        async getModerationCapabilities(postIds) {
+            const ids = [...new Set((postIds || [])
+                .map((postId) => Number(postId))
+                .filter((postId) => Number.isFinite(postId)))];
+
+            if (!ids.length) {
+                return new Map();
+            }
+
+            const result = await this.supabase.rpc(
+                "baraha_get_moderation_capabilities",
+                { p_post_ids: ids }
+            );
+
+            if (result.error) {
+                throw result.error;
+            }
+
+            return new Map(
+                (result.data || []).map((row) => [
+                    Number(row.post_id),
+                    Boolean(row.can_moderate)
+                ])
+            );
+        }
+
         async enrichPosts(posts) {
             const rows = Array.isArray(posts) ? posts : [];
             const authorIds = Array.from(new Set(
                 rows.map((post) => post.author_id).filter(Boolean)
             ));
 
-            const authorsById = {};
-            if (authorIds.length) {
-                const authorResult = await this.supabase.rpc(
+            if (!rows.length) {
+                return [];
+            }
+
+            const moderationCapabilitiesPromise = this.getModerationCapabilities(
+                rows.map((post) => post.id)
+            );
+
+            const authorResultPromise = authorIds.length
+                ? this.supabase.rpc(
                     "baraha_get_author_profiles",
                     { p_post_ids: rows.map((post) => post.id) }
-                );
+                )
+                : Promise.resolve({ data: [], error: null });
 
-                if (authorResult.error) {
-                    throw authorResult.error;
-                }
+            const [authorResult, moderationCapabilities] = await Promise.all([
+                authorResultPromise,
+                moderationCapabilitiesPromise
+            ]);
 
-                (authorResult.data || []).forEach((author) => {
-                    authorsById[author.author_id] = {
-                        id: author.author_id,
-                        displayName: author.display_name || author.full_name || "Member",
-                        avatarUrl: author.avatar_url || null
-                    };
-                });
+            if (authorResult.error) {
+                throw authorResult.error;
             }
+
+            const authorsById = {};
+            (authorResult.data || []).forEach((author) => {
+                authorsById[author.author_id] = {
+                    id: author.author_id,
+                    displayName: author.display_name || author.full_name || "Member",
+                    avatarUrl: author.avatar_url || null
+                };
+            });
 
             return rows.map((post) => Object.assign({}, post, {
                 author: {
@@ -139,7 +178,8 @@
                         (authorsById[post.author_id] && authorsById[post.author_id].displayName) ||
                         "Member",
                     avatarUrl: (authorsById[post.author_id] && authorsById[post.author_id].avatarUrl) || null
-                }
+                },
+                canModerate: moderationCapabilities.get(Number(post.id)) === true
             }));
         }
 
