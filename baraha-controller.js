@@ -288,7 +288,8 @@
             try {
                 const result = await this.service.getPosts({
                     cursor: this.feedCursor,
-                    limit: 20
+                    limit: 20,
+                    authorId: this.feedAuthorId
                 });
 
                 this.model.appendLivePosts(result.posts || []);
