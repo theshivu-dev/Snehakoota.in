@@ -100,6 +100,17 @@
             return this.context.capabilities;
         }
 
+        async archivePost(postId) {
+            if (!this.service || typeof this.service.archivePost !== "function") {
+                throw new Error("BarahaController requires a service with archivePost().");
+            }
+
+            const archivedPost = await this.service.archivePost(postId);
+            await this.refreshPosts();
+
+            return archivedPost;
+        }
+
         async refreshPosts() {
             this.feedCursor = null;
             this.hasMorePosts = true;
