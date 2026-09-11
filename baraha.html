@@ -172,6 +172,42 @@
                         throw error;
                     }
                 },
+                canApprovePost: (post) => Boolean(
+                    post &&
+                    post.canModerate === true &&
+                    (post.contentStatus || post.content_status) === "pending"
+                ),
+                onApprove: async (post) => {
+                    const confirmed = window.confirm("ಈ ಬರಹವನ್ನು ಪ್ರಕಟಿಸಬೇಕೇ?");
+                    if (!confirmed) return;
+
+                    try {
+                        await barahaController.approvePost(post.id);
+                        barahaReader.close();
+                    } catch (error) {
+                        console.error("Baraha approval failed:", error);
+                        window.alert("ಬರಹವನ್ನು ಪ್ರಕಟಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.");
+                        throw error;
+                    }
+                },
+                canHidePost: (post) => Boolean(
+                    post &&
+                    post.canModerate === true &&
+                    (post.contentStatus || post.content_status) === "published"
+                ),
+                onHide: async (post) => {
+                    const confirmed = window.confirm("ಈ ಬರಹವನ್ನು ಮರೆಮಾಡಬೇಕೇ?");
+                    if (!confirmed) return;
+
+                    try {
+                        await barahaController.hidePost(post.id);
+                        barahaReader.close();
+                    } catch (error) {
+                        console.error("Baraha hide failed:", error);
+                        window.alert("ಬರಹವನ್ನು ಮರೆಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.");
+                        throw error;
+                    }
+                },
                 canEditPost: (post) => {
                     const currentUserId = barahaContext.user?.id || null;
                     return Boolean(
