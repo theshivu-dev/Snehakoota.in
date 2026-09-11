@@ -47,6 +47,7 @@
                 }
                 : null);
             this.memberships = Array.isArray(data.memberships) ? data.memberships : [];
+            this.canModerate = Boolean(data.canModerate);
         }
     }
 
