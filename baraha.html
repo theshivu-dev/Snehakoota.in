@@ -374,94 +374,23 @@
                     .join("");
             }
 
-            function renderPosts() {
-                const posts = BarahaView.postsToUi(barahaModel.posts || []);
-                feed.innerHTML = posts.map((post) => {
-                    const category = BARAHA_CATEGORIES.find((item) => item.key === post.category);
-                    const visibility = BARAHA_VISIBILITY.find((item) => item.key === post.visibility);
-                    const cardClass = post.presentation === "default" ? "card" : `card ${post.presentation}`;
-                    const type = `${category ? category.label : post.category} · ${visibility ? visibility.label : post.visibility}`;
-                    if (post.presentation === "memory") {
-                        return `<article class="${cardClass}" data-category="${post.category}" data-post-id="${post.id}" tabindex="0">
-                            <div class="memory-art">✦</div>
-                            <div>
-                                <div class="type">${type}</div>
-                                <h2>${post.title}</h2>
-                                <div class="meta"><span>${post.author} · ${post.time}</span><span class="card-open-cue" aria-hidden="true">→</span></div>
-                            </div>
-                        </article>`;
-                    }
-
-                    return `<article class="${cardClass}" data-category="${post.category}" data-post-id="${post.id}" tabindex="0">
-                        <div class="type">${type}</div>
-                        <h2>${post.title}</h2>
-                        <div class="meta"><span>${post.author} · ${post.time}</span><span class="card-open-cue" aria-hidden="true">→</span></div>
-                    </article>`;
-                }).join("");
-            }
-
-            // The controller owns pagination state. This is the only UI function
-            // allowed to translate that state into a Load More control.
-            function updateLoadMoreUI() {
-                if (!barahaLoadMore) return;
-
-                if (barahaController.feedLoading) {
-                    barahaLoadMore.innerHTML = '<button class="baraha-load-more__button" type="button" disabled>ಇನ್ನಷ್ಟು ಬರಹಗಳನ್ನು ಲೋಡ್ ಮಾಡಲಾಗುತ್ತಿದೆ…</button>';
-                    return;
-                }
-
-                if (!barahaController.hasMorePosts) {
-                    barahaLoadMore.innerHTML = "";
-                    return;
-                }
-
-                barahaLoadMore.innerHTML = '<button class="baraha-load-more__button" type="button">ಇನ್ನಷ್ಟು ಬರಹಗಳನ್ನು ನೋಡಿ</button>';
-            }
-
-            // Single UI entry gate for pagination. The controller remains the
-            // sole owner of cursor, loading and has-more state.
-            function updateMyPostsUI() {
-                const isAuthenticated = Boolean(barahaContext.capabilities?.isAuthenticated);
-                const isSelected = typeof barahaController.isMyPostsMode === "function"
-                    && barahaController.isMyPostsMode();
-
-                barahaMyPosts.disabled = !isAuthenticated;
-                barahaMyPosts.classList.toggle("active", isSelected);
-                barahaMyPosts.setAttribute("aria-pressed", isSelected ? "true" : "false");
-            }
-
             async function handleMyPostsToggle() {
                 if (barahaMyPosts.disabled || barahaController.feedLoading) return;
 
-                barahaMyPosts.disabled = true;
                 try {
                     await barahaController.setMyPostsMode(!barahaController.isMyPostsMode());
-                    renderPosts();
-                    updateLoadMoreUI();
-                    updateMyPostsUI();
                 } catch (error) {
                     console.error("Baraha My Posts failed:", error);
-                } finally {
-                    updateMyPostsUI();
                 }
             }
 
             async function handleLoadMore() {
-                if (barahaController.feedLoading || !barahaController.hasMorePosts) {
-                    updateLoadMoreUI();
-                    return;
-                }
-
-                const loadMorePromise = barahaController.loadMorePosts();
-                updateLoadMoreUI();
+                if (barahaController.feedLoading || !barahaController.hasMorePosts) return;
 
                 try {
-                    const result = await loadMorePromise;
-                    if (result) renderPosts();
+                    await barahaController.loadMorePosts();
                 } catch (error) {
                     console.error("Baraha load more failed:", error);
-                } finally {
-                    updateLoadMoreUI();
                 }
             }
 
@@ -528,9 +457,6 @@
                 const result = await barahaController.init();
 
                 applyBarahaCapabilities(result?.capabilities || barahaContext.capabilities);
-                renderPosts();
-                updateLoadMoreUI();
-                updateMyPostsUI();
 
                 return result;
             }
@@ -953,9 +879,6 @@
                         return;
                     }
 
-                    // The controller adds the submitted post to model-owned live state.
-                    // Rendering always reads the model's combined authoritative feed.
-                    renderPosts();
                     showPublishSuccess(result?.post?.content_status);
                     await waitForPublishSuccessMoment();
                     closePublishSuccess();
