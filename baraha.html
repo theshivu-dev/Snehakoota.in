@@ -147,7 +147,23 @@
                 service: barahaService
             });
             let readerOpenedFromUrl = false;
+            let editingPostId = null;
+
             const barahaReader = new BarahaReader({
+                canEditPost: (post) => {
+                    const currentUserId = barahaContext.user?.id || null;
+                    return Boolean(
+                        currentUserId &&
+                        post &&
+                        String(post.authorId || post.author_id || "") === String(currentUserId) &&
+                        ["draft", "pending"].includes(post.contentStatus || post.content_status)
+                    );
+                },
+                onEdit: (post) => {
+                    beginEditingPost(post).catch((error) => {
+                        console.error("Baraha edit open failed:", error);
+                    });
+                },
                 onClose: () => {
                     if (!readerOpenedFromUrl) return;
                     const url = new URL(window.location.href);
@@ -230,7 +246,7 @@
                     : [];
 
                 return {
-                    id: null,
+                    id: editingPostId,
                     title: title.value,
                     content: body.value,
                     category: activeMode?.dataset.mode || null,
@@ -480,6 +496,7 @@
             }
 
             function openSheet() {
+                clearEditingState();
                 backdrop.classList.add("open");
             }
 
@@ -525,6 +542,71 @@
                 window.history.replaceState(window.history.state, "", url.toString());
             }
 
+            function getEditorModeForPost(post) {
+                const category = post?.category || null;
+                const categoryToMode = {
+                    baraha: "ಬರಹ",
+                    poem: "ಕವನ",
+                    memory: "ನೆನಪು",
+                    article: "ಲೇಖನ"
+                };
+
+                return categoryToMode[category] || "ಬರಹ";
+            }
+
+            function clearEditingState() {
+                editingPostId = null;
+            }
+
+            async function beginEditingPost(post) {
+                if (!post) return;
+
+                const currentUserId = barahaContext.user?.id || null;
+                const postStatus = post.contentStatus || post.content_status;
+                const postAuthorId = post.authorId || post.author_id;
+
+                if (
+                    !currentUserId ||
+                    String(postAuthorId || "") !== String(currentUserId) ||
+                    !["draft", "pending"].includes(postStatus)
+                ) {
+                    throw new Error("This Baraha post cannot be edited.");
+                }
+
+                editingPostId = post.id;
+                title.value = post.title || "";
+                body.value = post.content || "";
+
+                modes.querySelectorAll(".mode").forEach((button) => {
+                    button.classList.toggle("active", button.dataset.mode === getEditorModeForPost(post));
+                });
+
+                const postVisibility = post.visibility || "private";
+                vis.querySelectorAll(".v").forEach((button) => {
+                    button.classList.toggle("active", button.dataset.v === postVisibility);
+                });
+                members.classList.toggle("open", postVisibility === "members");
+
+                membershipSelect.value = post.authorMembershipId || post.author_membership_id || "";
+                members.querySelectorAll('input[type="checkbox"]').forEach((input) => {
+                    input.checked = false;
+                });
+
+                if (postVisibility === "members") {
+                    const membershipIds = await barahaService.getPostMembershipIds(post.id);
+                    const selectedIds = new Set(membershipIds.map(String));
+                    members.querySelectorAll('input[type="checkbox"]').forEach((input) => {
+                        input.checked = selectedIds.has(String(input.value));
+                    });
+                }
+
+                clearPublishError();
+                barahaReader.close();
+                updateWriteUrl(getEditorModeForPost(post), { replace: true });
+                openEditor(getEditorModeForPost(post));
+                check();
+            }
+
             // Single editor entry gate for chooser, refresh and direct URLs.
             function openEditor(mode) {
                 closeSheet();
@@ -536,6 +618,7 @@
 
             // Single editor exit gate. UI restoration and write-route cleanup stay together.
             function closeEditor({ clearUrl = true } = {}) {
+                clearEditingState();
                 editor.classList.remove("open");
                 landing.style.display = "block";
                 if (clearUrl) clearWriteUrl();
@@ -545,6 +628,7 @@
             // from closeEditor() so Back, validation failures, and publish failures
             // continue preserving the user's unfinished content.
             function resetEditorAfterSuccessfulPublish() {
+                clearEditingState();
                 title.value = "";
                 body.value = "";
 
