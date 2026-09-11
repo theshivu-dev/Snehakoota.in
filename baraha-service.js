@@ -143,6 +143,29 @@
             }));
         }
 
+        async getPostMembershipIds(postId) {
+            if (!this.supabase) {
+                throw new Error("BarahaService.getPostMembershipIds requires a Supabase client.");
+            }
+
+            if (postId === null || postId === undefined || postId === "") {
+                return [];
+            }
+
+            const result = await this.supabase
+                .from("baraha_post_memberships")
+                .select("membership_id")
+                .eq("post_id", postId);
+
+            if (result.error) {
+                throw result.error;
+            }
+
+            return (result.data || [])
+                .map((row) => row.membership_id)
+                .filter((membershipId) => membershipId !== null && membershipId !== undefined);
+        }
+
         async getPostById(postId) {
             if (!this.supabase) {
                 throw new Error("BarahaService.getPostById requires a Supabase client.");
