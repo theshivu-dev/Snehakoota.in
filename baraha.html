@@ -150,6 +150,28 @@
             let editingPostId = null;
 
             const barahaReader = new BarahaReader({
+                canArchivePost: (post) => {
+                    const currentUserId = barahaContext.user?.id || null;
+                    return Boolean(
+                        currentUserId &&
+                        post &&
+                        String(post.authorId || post.author_id || "") === String(currentUserId) &&
+                        ["draft", "pending", "published"].includes(post.contentStatus || post.content_status)
+                    );
+                },
+                onArchive: async (post) => {
+                    const confirmed = window.confirm("ಈ ಬರಹವನ್ನು ಅಳಿಸಬೇಕೇ?");
+                    if (!confirmed) return;
+
+                    try {
+                        await barahaController.archivePost(post.id);
+                        barahaReader.close();
+                    } catch (error) {
+                        console.error("Baraha archive failed:", error);
+                        window.alert("ಬರಹವನ್ನು ಅಳಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.");
+                        throw error;
+                    }
+                },
                 canEditPost: (post) => {
                     const currentUserId = barahaContext.user?.id || null;
                     return Boolean(
