@@ -368,11 +368,16 @@
         }
 
         async loadMorePosts() {
-            if (this.feedLoading || !this.hasMorePosts) return null;
+            if (this.feedLoading) {
+                return this.feedLoadPromise || null;
+            }
+
+            if (!this.hasMorePosts) return null;
 
             this.feedLoading = true;
             this.renderFeed();
-            try {
+
+            const loadPromise = (async () => {
                 const result = await this.service.getPosts({
                     cursor: this.feedCursor,
                     limit: 20,
@@ -385,9 +390,18 @@
                 this.hasMorePosts = result.hasMore;
 
                 return result;
+            })();
+
+            this.feedLoadPromise = loadPromise;
+
+            try {
+                return await loadPromise;
             } finally {
-                this.feedLoading = false;
-                this.renderFeed();
+                if (this.feedLoadPromise === loadPromise) {
+                    this.feedLoadPromise = null;
+                    this.feedLoading = false;
+                    this.renderFeed();
+                }
             }
         }
 
