@@ -22,6 +22,7 @@
             this.feedCursor = null;
             this.hasMorePosts = true;
             this.feedLoading = false;
+            this.feedLoadPromise = null;
             this.feedAuthorId = null;
         }
 
@@ -159,6 +160,13 @@
         }
 
         async refreshPosts() {
+            // A lifecycle change must not be lost when a feed request is already
+            // in flight. Finish the existing authoritative read first, then start
+            // one fresh read from the beginning.
+            if (this.feedLoading && this.feedLoadPromise) {
+                await this.feedLoadPromise;
+            }
+
             this.feedCursor = null;
             this.hasMorePosts = true;
             return this.loadPosts();
@@ -186,11 +194,16 @@
         }
 
         async loadPosts() {
-            if (this.feedLoading || !this.hasMorePosts) return;
+            if (this.feedLoading) {
+                return this.feedLoadPromise || null;
+            }
+
+            if (!this.hasMorePosts) return null;
 
             this.feedLoading = true;
             this.renderFeed();
-            try {
+
+            const loadPromise = (async () => {
                 const result = await this.service.getPosts({
                     cursor: this.feedCursor,
                     limit: 20,
@@ -203,9 +216,18 @@
                 this.hasMorePosts = result.hasMore;
 
                 return result;
+            })();
+
+            this.feedLoadPromise = loadPromise;
+
+            try {
+                return await loadPromise;
             } finally {
-                this.feedLoading = false;
-                this.renderFeed();
+                if (this.feedLoadPromise === loadPromise) {
+                    this.feedLoadPromise = null;
+                    this.feedLoading = false;
+                    this.renderFeed();
+                }
             }
         }
 
