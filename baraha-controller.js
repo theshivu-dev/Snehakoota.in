@@ -23,7 +23,12 @@
             this.hasMorePosts = true;
             this.feedLoading = false;
             this.feedLoadPromise = null;
-            this.feedAuthorId = null;
+            // Query identity belongs to the controller. Pagination state stays
+            // separate so every page of the same query uses the same filters.
+            this.feedQuery = {
+                category: null,
+                authorId: null
+            };
         }
 
         async init() {
@@ -45,7 +50,7 @@
                 : null;
 
             if (previousUserId !== currentUserId) {
-                this.feedAuthorId = null;
+                this.feedQuery.authorId = null;
             }
 
             await this.loadMemberships();
@@ -181,16 +186,27 @@
                 throw new Error("My Posts requires an authenticated user.");
             }
 
-            if (this.feedAuthorId === authorId) {
+            if (this.feedQuery.authorId === authorId) {
                 return null;
             }
 
-            this.feedAuthorId = authorId;
+            this.feedQuery.authorId = authorId;
+            return this.refreshPosts();
+        }
+
+        async setFeedCategory(category) {
+            const normalizedCategory = category || null;
+
+            if (this.feedQuery.category === normalizedCategory) {
+                return null;
+            }
+
+            this.feedQuery.category = normalizedCategory;
             return this.refreshPosts();
         }
 
         isMyPostsMode() {
-            return Boolean(this.feedAuthorId);
+            return Boolean(this.feedQuery.authorId);
         }
 
         async loadPosts() {
@@ -207,7 +223,8 @@
                 const result = await this.service.getPosts({
                     cursor: this.feedCursor,
                     limit: 20,
-                    authorId: this.feedAuthorId,
+                    category: this.feedQuery.category,
+                    authorId: this.feedQuery.authorId,
                     viewerId: this.context && this.context.user ? this.context.user.id : null
                 });
 
@@ -381,7 +398,8 @@
                 const result = await this.service.getPosts({
                     cursor: this.feedCursor,
                     limit: 20,
-                    authorId: this.feedAuthorId,
+                    category: this.feedQuery.category,
+                    authorId: this.feedQuery.authorId,
                     viewerId: this.context && this.context.user ? this.context.user.id : null
                 });
 
