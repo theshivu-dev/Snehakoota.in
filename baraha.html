@@ -321,10 +321,19 @@
             }
 
             function renderCategoryChips() {
+                const activeCategory = barahaController.feedQuery?.category || null;
+
                 chips.innerHTML = [
-                    '<button class="chip active" data-filter="all">ಎಲ್ಲಾ</button>',
-                    ...BARAHA_CATEGORIES.map((category) => `<button class="chip" data-filter="${category.key}">${category.label}</button>`)
+                    `<button class="chip${activeCategory === null ? " active" : ""}" data-filter="all">ಎಲ್ಲಾ</button>`,
+                    ...BARAHA_CATEGORIES.map((category) => `<button class="chip${activeCategory === category.key ? " active" : ""}" data-filter="${category.key}">${category.label}</button>`)
                 ].join("");
+            }
+
+            function setActiveCategoryChip(category) {
+                const filter = category || "all";
+                chips.querySelectorAll(".chip").forEach((chip) => {
+                    chip.classList.toggle("active", chip.dataset.filter === filter);
+                });
             }
 
             function renderMembershipOptions() {
@@ -731,15 +740,26 @@
                 if (e.target.matches('input[type="checkbox"]')) check();
             });
 
-            chips.addEventListener("click", (e) => {
+            chips.addEventListener("click", async (e) => {
                 const chip = e.target.closest(".chip");
                 if (!chip) return;
-                chips.querySelectorAll(".chip").forEach((x) => x.classList.remove("active"));
-                chip.classList.add("active");
-                const filter = chip.dataset.filter;
-                document.querySelectorAll(".feed .card").forEach((card) => {
-                    card.style.display = filter === "all" || card.dataset.category === filter ? "" : "none";
-                });
+
+                const category = chip.dataset.filter === "all"
+                    ? null
+                    : chip.dataset.filter;
+
+                if (barahaController.feedQuery?.category === category) {
+                    return;
+                }
+
+                setActiveCategoryChip(category);
+
+                try {
+                    await barahaController.setFeedCategory(category);
+                } catch (error) {
+                    setActiveCategoryChip(barahaController.feedQuery?.category || null);
+                    console.error("Baraha category change failed:", error);
+                }
             });
 
             function getReaderPostIdFromUrl() {
