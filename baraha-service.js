@@ -262,6 +262,10 @@
                 .from("baraha_posts")
                 .select("*");
 
+            if (options.category) {
+                query = query.eq("category", options.category);
+            }
+
             if (options.authorId) {
                 query = query.eq("author_id", options.authorId);
             }
