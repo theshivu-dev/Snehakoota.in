@@ -194,7 +194,8 @@
                 const result = await this.service.getPosts({
                     cursor: this.feedCursor,
                     limit: 20,
-                    authorId: this.feedAuthorId
+                    authorId: this.feedAuthorId,
+                    viewerId: this.context && this.context.user ? this.context.user.id : null
                 });
 
                 this.model.setLivePosts(result.posts);
@@ -240,7 +241,9 @@
                 throw new Error("BarahaController requires a service with getPostById().");
             }
 
-            const post = await this.service.getPostById(postId);
+            const post = await this.service.getPostById(postId, {
+                viewerId: this.context && this.context.user ? this.context.user.id : null
+            });
 
             this.model.setCurrentPost(post);
 
@@ -286,7 +289,10 @@
             const preparedPost = this.preparePostPayload(editorData);
             const publishingPost = await this.populatePublishingContext(preparedPost);
             const post = await this.service.createPost(publishingPost);
-            const publishedPost = await this.service.enrichPosts([post]);
+            const publishedPost = await this.service.enrichPosts(
+                [post],
+                this.context && this.context.user ? this.context.user.id : null
+            );
             const modelPost = this.model && typeof this.model.addLivePost === "function"
                 ? this.model.addLivePost(publishedPost[0] || post)
                 : (publishedPost[0] || post);
@@ -348,7 +354,8 @@
                 const result = await this.service.getPosts({
                     cursor: this.feedCursor,
                     limit: 20,
-                    authorId: this.feedAuthorId
+                    authorId: this.feedAuthorId,
+                    viewerId: this.context && this.context.user ? this.context.user.id : null
                 });
 
                 this.model.appendLivePosts(result.posts || []);
