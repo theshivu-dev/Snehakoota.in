@@ -664,11 +664,10 @@
             initializeBaraha().catch((error) => {
                 console.error("Baraha initialization failed:", error);
             }).finally(() => {
-                if (new URL(window.location.href).searchParams.has("post")) {
-                    openPostFromUrl();
-                } else {
-                    restoreWriteEditorFromUrl();
-                }
+                syncReaderWithUrl().catch((error) => {
+                    console.error("Baraha reader route sync failed:", error);
+                });
+                syncWriteEditorWithUrl();
             });
 
             window.addEventListener("pageshow", (event) => {
@@ -743,29 +742,75 @@
                 });
             });
 
-            async function openPostFromFeed(postId) {
-                try {
-                    const currentPost = await barahaController.openPost(postId);
-                    readerOpenedFromUrl = false;
-                    barahaReader.open(currentPost);
-                } catch (error) {
-                    console.error("Baraha post open failed:", error);
-                }
+            function getReaderPostIdFromUrl() {
+                return new URLSearchParams(window.location.search).get("post");
             }
 
-            async function openPostFromUrl() {
-                const postId = new URLSearchParams(window.location.search).get("post");
-                if (!postId) return;
+            function updateReaderUrl(postId, { replace = false } = {}) {
+                const url = new URL(window.location.href);
 
-                try {
-                    const currentPost = await barahaController.openPost(postId);
+                if (postId === null || postId === undefined || postId === "") {
+                    url.searchParams.delete("post");
+                } else {
+                    url.searchParams.set("post", String(postId));
+                    url.searchParams.delete("write");
+                }
 
-                    if (currentPost) {
-                        readerOpenedFromUrl = true;
-                        barahaReader.open(currentPost);
+                if (replace) {
+                    window.history.replaceState(window.history.state, "", url.toString());
+                    return;
+                }
+
+                window.history.pushState(
+                    postId ? { barahaPostId: String(postId) } : window.history.state,
+                    "",
+                    url.toString()
+                );
+            }
+
+            // One reader route boundary keeps direct entry, feed navigation and
+            // browser Back/Forward synchronized from the URL into the reader UI.
+            async function syncReaderWithUrl() {
+                const postId = getReaderPostIdFromUrl();
+
+                if (!postId) {
+                    readerOpenedFromUrl = false;
+                    if (barahaReader.isOpen()) {
+                        barahaReader.close();
                     }
+                    return false;
+                }
+
+                closeEditor({ clearUrl: false });
+
+                const currentPostId = barahaReader.currentPost?.id;
+                if (
+                    barahaReader.isOpen() &&
+                    currentPostId !== null &&
+                    currentPostId !== undefined &&
+                    String(currentPostId) === String(postId)
+                ) {
+                    readerOpenedFromUrl = true;
+                    return true;
+                }
+
+                const currentPost = await barahaController.openPost(postId);
+
+                if (!currentPost) {
+                    return false;
+                }
+
+                readerOpenedFromUrl = true;
+                barahaReader.open(currentPost);
+                return true;
+            }
+
+            async function openPostFromFeed(postId) {
+                try {
+                    updateReaderUrl(postId);
+                    await syncReaderWithUrl();
                 } catch (error) {
-                    console.error("Baraha direct post open failed:", error);
+                    console.error("Baraha post open failed:", error);
                 }
             }
 
@@ -920,9 +965,11 @@
                 closeEditor();
             });
 
-            // Browser Back/Forward restores the same write state without creating
-            // another editor path or disturbing the existing post reader route.
+            // Browser Back/Forward restores both route states from the same URL.
             window.addEventListener("popstate", () => {
+                syncReaderWithUrl().catch((error) => {
+                    console.error("Baraha reader route restore failed:", error);
+                });
                 syncWriteEditorWithUrl();
             });
 
