@@ -136,7 +136,14 @@
             this.modes = [];
             this.visibilityOptions = [];
             this.currentMembership = null;
-            this.selectedCategory = "all";
+
+            // TEMPORARY UI-test cleanup hold:
+            // Category query state is now owned by BarahaController.feedQuery.
+            // selectedCategory is no longer used by the live feed pipeline.
+            // Keep the previous assignment commented until UI testing confirms
+            // no legacy consumer still depends on it; remove this commented
+            // line during the final cleanup review.
+            // this.selectedCategory = "all";
         }
 
         get posts() {
