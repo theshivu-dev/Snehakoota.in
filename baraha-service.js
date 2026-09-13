@@ -132,7 +132,7 @@
             );
         }
 
-        async enrichPosts(posts) {
+        async enrichPosts(posts, viewerId) {
             const rows = Array.isArray(posts) ? posts : [];
             const authorIds = Array.from(new Set(
                 rows.map((post) => post.author_id).filter(Boolean)
@@ -142,9 +142,11 @@
                 return [];
             }
 
-            const moderationCapabilitiesPromise = this.getModerationCapabilities(
-                rows.map((post) => post.id)
-            );
+            // Moderation capability is viewer-specific metadata, not a dependency
+            // of the post itself. Anonymous readers never call the protected RPC.
+            const moderationCapabilitiesPromise = viewerId
+                ? this.getModerationCapabilities(rows.map((post) => post.id))
+                : Promise.resolve(new Map());
 
             const authorResultPromise = authorIds.length
                 ? this.supabase.rpc(
@@ -206,7 +208,7 @@
                 .filter((membershipId) => membershipId !== null && membershipId !== undefined);
         }
 
-        async getPostById(postId) {
+        async getPostById(postId, options) {
             if (!this.supabase) {
                 throw new Error("BarahaService.getPostById requires a Supabase client.");
             }
@@ -214,6 +216,8 @@
             if (postId === null || postId === undefined || postId === "") {
                 throw new Error("BarahaService.getPostById requires a post ID.");
             }
+
+            options = options || {};
 
             const result = await this.supabase
                 .from("baraha_posts")
@@ -229,7 +233,7 @@
                 return null;
             }
 
-            const posts = await this.enrichPosts([result.data]);
+            const posts = await this.enrichPosts([result.data], options.viewerId || null);
             return posts[0] || null;
         }
 
@@ -283,7 +287,7 @@
             const rows = Array.isArray(result.data) ? result.data : [];
             const hasMore = rows.length > limit;
             const posts = hasMore ? rows.slice(0, limit) : rows;
-            const enrichedPosts = await this.enrichPosts(posts);
+            const enrichedPosts = await this.enrichPosts(posts, options.viewerId || null);
 
             const last = enrichedPosts.length ? enrichedPosts[enrichedPosts.length - 1] : null;
 
