@@ -204,6 +204,14 @@
       const end = toIso(e.eventEndsAt && e.eventEndsAt.value);
       if (!start) return markInvalid(e.eventStartsAt, "ಕಾರ್ಯಕ್ರಮದ ಆರಂಭದ ದಿನಾಂಕ ಮತ್ತು ಸಮಯವನ್ನು ಆಯ್ಕೆಮಾಡಿ.");
       if (end && end < start) return markInvalid(e.eventEndsAt, "ಕಾರ್ಯಕ್ರಮದ ಸಮಯಗಳನ್ನು ಪರಿಶೀಲಿಸಿ.");
+      if (e.eventLocationUrl && e.eventLocationUrl.value.trim()) {
+        try {
+          const eventUrl = new URL(e.eventLocationUrl.value.trim());
+          if (!/^https?:$/.test(eventUrl.protocol)) throw new Error("Unsupported protocol");
+        } catch (error) {
+          return markInvalid(e.eventLocationUrl, "ಸ್ಥಳದ ಲಿಂಕ್ ಸರಿಯಾದ http ಅಥವಾ https ವಿಳಾಸವಾಗಿರಬೇಕು.");
+        }
+      }
     }
 
     if (e.relatedUrl && e.relatedUrl.value.trim()) {
