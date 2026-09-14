@@ -1,0 +1,2 @@
+-- Reconciliation marker: Community Updates foundation objects were created and verified before migration tracking was aligned.
+-- This migration intentionally performs no schema changes.
