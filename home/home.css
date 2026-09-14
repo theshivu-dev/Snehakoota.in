@@ -149,6 +149,14 @@
   .wordmark .sneha{ color:var(--rust); }
   .wordmark .koota{ color:var(--banyan); }
 
+  /* ---- Supporting message composition ---- */
+  .home-copy{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    width:min(100%, 560px);
+  }
+
   .tagline{
     font-family:'Fraunces', serif;
     font-weight:300;
@@ -157,21 +165,43 @@
     color:var(--ink-soft);
     margin:1.3rem 0 0;
     line-height:1.5;
+    text-wrap:balance;
+  }
+
+  .home-message{
+    width:min(100%, 480px);
+    margin-top:1.8rem;
+    padding-top:1.55rem;
+    border-top:1px solid rgba(43,33,24,0.11);
   }
 
   .desc{
     font-size:1.02rem;
     line-height:1.7;
     color:var(--ink-soft);
-    margin:1.8rem 0 0;
-    max-width:480px;
+    margin:0;
+    text-wrap:pretty;
   }
 
   .kannada{
+    font-family:'Noto Sans Kannada', sans-serif;
     font-size:.95rem;
+    line-height:1.7;
     color:var(--ink-soft);
-    opacity:.8;
-    margin-top:.6rem;
+    opacity:.86;
+    margin:1rem 0 0;
+  }
+
+  @media (max-width:480px){
+    .home-message{
+      margin-top:1.5rem;
+      padding-top:1.3rem;
+    }
+
+    .desc{
+      font-size:.98rem;
+      line-height:1.68;
+    }
   }
 
   footer{
