@@ -5,19 +5,6 @@
    and animation. Shared tokens remain in theme.css.
    ========================================================= */
 
-:root{
-    --sky-top:    #FFF6E8;
-    --sky-bottom: #FDE7C8;
-    --marigold:   #E29B3F;
-    --rust:       #B5502E;
-    --banyan:     #2F5233;
-    --ink:        #2B2118;
-    --ink-soft:  #6B5C4C;
-    --rose:       #E07A66;
-    --line-idle:  rgba(43,33,24,0.16);
-  }
-
-  *{ box-sizing:border-box; }
 
   html,body{
     margin:0;
