@@ -366,16 +366,22 @@
        compete with the tagline and message on a narrow screen.
     */
     .paths{
-      /*
-       * Mobile uses a hard visual boundary instead of relying on a long
-       * gradient fade. The roads are allowed to arrive at the gateway
-       * threshold and breathe just below it, but they never continue
-       * through the tagline/message area.
-       */
-      transform:translateY(-clamp(28px, 5vw, 48px));
+      transform:translateY(-clamp(42px, 8vw, 72px));
       transform-origin:top center;
-      -webkit-clip-path:inset(0 0 calc(100% - (var(--hero-height) + 56px)) 0);
-      clip-path:inset(0 0 calc(100% - (var(--hero-height) + 56px)) 0);
+      -webkit-mask-image:linear-gradient(
+        to bottom,
+        #000 0,
+        #000 calc(var(--hero-height) + 24px),
+        rgba(0,0,0,.72) calc(var(--hero-height) + 110px),
+        transparent calc(var(--hero-height) + 240px)
+      );
+      mask-image:linear-gradient(
+        to bottom,
+        #000 0,
+        #000 calc(var(--hero-height) + 24px),
+        rgba(0,0,0,.72) calc(var(--hero-height) + 110px),
+        transparent calc(var(--hero-height) + 240px)
+      );
     }
 
     .hero-identity{
