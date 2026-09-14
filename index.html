@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="navigation.css?v=7">
 <script src="navigation.js?v=1" defer></script>
 <link rel="stylesheet" href="footer.css">
-<link rel="stylesheet" href="home/home.css?v=4">
+<link rel="stylesheet" href="home/home.css?v=5">
 <script src="footer.js" defer></script>
 <script src="home/home.js?v=1" defer></script>
 
@@ -25,10 +25,15 @@
 <header class="topbar"></header>
 
 <div class="stage">
-  <div class="hero-media" aria-hidden="true">
-    <img src="assets/images/friends.png" alt="">
+  <!-- Home hero is a self-contained visual surface.
+       Its frame, image and shade stay together so future road connections
+       can target the hero as one architectural element. -->
+  <div class="hero-gateway" aria-hidden="true">
+    <div class="hero-media">
+      <img src="assets/images/friends.png" alt="">
+    </div>
+    <div class="hero-shade"></div>
   </div>
-  <div class="hero-shade" aria-hidden="true"></div>
   <div class="sun" aria-hidden="true"></div>
 
   <svg class="paths" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
