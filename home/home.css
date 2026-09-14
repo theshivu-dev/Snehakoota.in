@@ -47,6 +47,16 @@
     */
     --hero-height:clamp(360px, 48svh, 560px);
 
+    /*
+       ROAD / HERO THRESHOLD CONTRACT
+       The convergence hub belongs at the bottom edge of the hero,
+       not as a separate point floating inside the copy area. Keep the
+       desktop offset as a named composition value so the SVG geometry
+       can be tuned without scattering hard-coded transforms.
+    */
+    --road-join-offset:clamp(-150px, -18svh, -94px);
+    --road-join-x:77%;
+
     position:relative;
     isolation:isolate;
     min-height:100vh;
@@ -142,12 +152,52 @@
     z-index:0;
 
     /*
-       Stage 4A keeps the Stage 3 convergence visually attached to the
-       shorter hero threshold. Narrow-screen composition overrides this
-       transform with its own focused mobile treatment below.
+       The SVG's convergence hub is deliberately lifted onto the hero
+       threshold. Previously the hub sat visibly below the image, making
+       the main line feel like an unrelated diagonal drawn over the hero.
+       This offset makes the roads meet at the gateway edge and lets the
+       main line continue naturally into the image.
     */
-    transform:translateY(-clamp(48px, 12svh, 120px));
+    transform:translateY(var(--road-join-offset));
   }
+
+
+  /*
+     ROAD / HERO BLEND
+     ---------------------------------------------------------
+     A very soft warm bloom sits behind the exact visual threshold where
+     the converging roads enter the hero. It is intentionally subtle:
+     the line itself remains the narrative element while the bloom removes
+     the hard "image ends / SVG starts" seam.
+  */
+  .stage::before{
+    content:"";
+    position:absolute;
+    left:var(--road-join-x);
+    top:calc(var(--gateway-top, 8px) + var(--hero-height));
+    width:clamp(72px, 8vw, 130px);
+    height:clamp(72px, 8vw, 130px);
+    transform:translate(-50%, -50%);
+    border-radius:50%;
+    pointer-events:none;
+    z-index:0;
+    background:
+      radial-gradient(
+        circle,
+        rgba(226,155,63,0.18) 0%,
+        rgba(226,155,63,0.09) 30%,
+        rgba(226,155,63,0.025) 54%,
+        transparent 74%
+      );
+    filter:blur(5px);
+    animation:roadJoinGlow 4.8s ease-in-out infinite;
+  }
+
+  @keyframes roadJoinGlow{
+    0%,100%{ opacity:0.42; transform:translate(-50%, -50%) scale(0.94); }
+    50%{ opacity:0.78; transform:translate(-50%, -50%) scale(1.06); }
+  }
+
   .paths path{
     fill:none;
     stroke-linecap:round;
@@ -331,7 +381,7 @@
   }
 
   @media (prefers-reduced-motion: reduce){
-    .thread, .mainline, .sun, .eyebrow .dot{
+    .thread, .mainline, .sun, .eyebrow .dot, .stage::before{
       animation:none !important;
       stroke-dashoffset:0 !important;
       opacity:1 !important;
@@ -385,6 +435,7 @@
        compete with the tagline and message on a narrow screen.
     */
     .paths{
+      /* Mobile uses its own focused SVG composition and join position. */
       transform:translateY(-clamp(42px, 8vw, 72px));
       transform-origin:top center;
       -webkit-mask-image:linear-gradient(
@@ -405,6 +456,12 @@
 
     .hero-identity{
       padding-bottom:clamp(1.75rem, 4vw, 2.5rem);
+    }
+
+    /* The mobile SVG viewBox already focuses on the hub; avoid a
+       desktop-positioned bloom appearing away from the actual join. */
+    .stage::before{
+      display:none;
     }
   }
 
