@@ -286,8 +286,13 @@
      to squeeze the wide desktop image into the phone.
      ========================================================= */
   @media (max-width:700px){
+    /*
+       On phones/tablets the hero height follows viewport WIDTH rather
+       than viewport height. This keeps the same wide-image character
+       instead of turning a landscape image into a tall cropped panel.
+    */
     .stage{
-      --hero-height:clamp(360px, 50svh, 500px);
+      --hero-height:clamp(250px, 56.25vw, 380px);
     }
 
     .hero-media,
@@ -300,13 +305,13 @@
     }
 
     .hero-identity{
-      padding-bottom:clamp(2rem, 4.5svh, 2.75rem);
+      padding-bottom:clamp(1.75rem, 4vw, 2.5rem);
     }
   }
 
   @media (max-width:480px){
     .stage{
-      --hero-height:clamp(340px, 46svh, 430px);
+      --hero-height:clamp(220px, 56.25vw, 300px);
       padding:0 7vw 8vh;
     }
 
@@ -320,11 +325,15 @@
     }
 
     .wordmark{
-      font-size:clamp(2.8rem, 13vw, 3.8rem);
+      font-size:clamp(2.65rem, 12vw, 3.55rem);
+    }
+
+    .eyebrow{
+      margin-bottom:1rem;
     }
 
     .hero-identity{
-      padding-bottom:clamp(1.75rem, 4svh, 2.25rem);
+      padding-bottom:1.5rem;
     }
 
     .home-copy{
