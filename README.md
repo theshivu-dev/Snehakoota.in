@@ -1,6 +1,6 @@
 # Snehakoota.in — Project Rules & Development Standards
 
-> **Last updated:** 2026-09-04
+> **Last updated:** 2026-09-14
 >
 > This README is the working contract for AI-assisted development of Snehakoota.in. It records both the stable project rules and the current authenticated/invitation architecture so future sessions can continue without losing decisions already made.
 
@@ -1063,30 +1063,57 @@ Where a business rule can change independently of the UI, it belongs at the Serv
 
 ## 27. Baraha implementation roadmap and architecture maintenance
 
-The Baraha architecture is intended to support incremental implementation without breaking the existing static site.
+Baraha is no longer only static scaffolding. Its core feed, publishing, reader, moderation and lifecycle flows are implemented through the established boundaries below.
 
-### Current implementation stage
+### Current architecture boundary
 
-The following Baraha-specific scaffolding exists:
+```text
+Baraha HTML / View
+        ↓
+Controller
+        ↓
+Model / Context
+        ↓
+Service
+        ↓
+Supabase
+```
 
-- `baraha-context.js` — application/session context container; no Supabase calls.
-- `baraha-model.js` — Baraha domain/application state container.
-- `baraha-service.js` — Service boundary; Supabase access belongs here.
-- `baraha-controller.js` — application coordinator; does not own raw Supabase queries.
-- `baraha.html` — current visual/template surface with static demo data.
+Responsibilities remain explicit:
 
-These files are architectural foundation/scaffolding. They should not be expanded into a large framework merely to make the architecture look complete.
+- **HTML / View / Reader** — presentation, DOM behaviour and user interaction only.
+- **Controller** — orchestration of application actions and lifecycle transitions.
+- **Model** — Baraha domain/feed state and post objects.
+- **Context** — current session, user, memberships and capability snapshot.
+- **Service** — the only Baraha application boundary that communicates with Supabase.
+- **Supabase** — authoritative identity, membership, authorization, lifecycle and data boundary.
+
+No raw Supabase query belongs in Baraha page code, View or Reader code.
+
+### Current implementation modules
+
+The current Baraha implementation includes:
+
+- `baraha-context.js` — session/user/membership/capability context; no Supabase calls.
+- `baraha-model.js` — Baraha domain/feed state and post models; no DOM/Supabase calls.
+- `baraha-service.js` — Supabase reads, RPC calls, author enrichment and lifecycle actions.
+- `baraha-controller.js` — orchestration of initialization, feed query state, pagination, publishing and lifecycle refresh.
+- `baraha-view.js` — feed/card presentation and UI mapping.
+- `baraha-reader.js` — reader presentation component and reader-level actions; no Supabase calls.
+- `baraha.html` — page shell and Baraha-specific UI wiring only.
+
+The architecture must remain modular rather than moving business/data logic back into `baraha.html`.
 
 ### Safe implementation order
 
-The intended direction is:
+The working direction remains:
 
 ```text
 architecture decision
       ↓
 README / durable contract
       ↓
-small module change
+small focused change
       ↓
 inspect + implement
       ↓
@@ -1097,30 +1124,34 @@ post-commit compare/validation
 continue
 ```
 
-The current Baraha UI should remain static-first until the View/Controller/Model boundaries are stable enough to wire real data safely.
+### One capability / one foundation path
 
-### Change one capability at a time
+Future work must prefer the existing foundation rather than creating parallel refresh, authorization or data paths.
 
-Future Baraha work should prefer changing one capability or boundary at a time, for example:
+Examples:
 
-- feed loading;
-- membership context;
-- post reading;
-- author resolution;
-- editor/save;
-- publishing;
-- moderation;
-- collection support.
+- feed refreshes go through the controller's authoritative refresh path;
+- load-more continues the same active feed query;
+- category and My Posts changes reset through the same refresh path;
+- publish/moderation/archive lifecycle changes return through the same authoritative feed refresh;
+- auth changes reuse the existing Baraha initialization path;
+- BFCache restoration reuses the same initialization/refresh path.
 
-A change to one capability should not require rewriting unrelated modules.
+Do not add page-specific "quick refresh" methods when an existing lifecycle entry path can perform the required work.
 
 ### Architecture is revisitable, not frozen forever
 
-This architecture is a durable starting boundary, not a claim that every method or class is permanent.
+This architecture is a durable boundary, not a claim that every method/class is permanent.
 
-If future requirements show that a boundary is wrong or too small, first document the proposed architectural change, inspect its impact on Supabase and existing modules, then change the smallest affected boundary and update this README.
+If future requirements show that a boundary is wrong or too small:
 
-Do not bypass the architecture by placing a quick Supabase query directly into a page just because it is faster for one feature.
+1. inspect the current repository and Supabase impact;
+2. identify the smallest correct architectural change;
+3. avoid parallel/competing paths;
+4. implement the correction;
+5. update this README when the decision becomes durable.
+
+Do not bypass the architecture by placing a quick Supabase query directly into a page because it is faster for one feature.
 
 ### README is the continuity mechanism
 
@@ -1132,9 +1163,9 @@ Future AI sessions should use this README plus the current repository/Supabase s
 
 ---
 
-## 28. Current Baraha status — foundation vs implementation
+## 28. Current Baraha status — implemented foundation and regression rules
 
-### Backend foundation — established
+### Backend / Supabase foundation — established
 
 - [x] `baraha_posts` schema foundation.
 - [x] `baraha_post_memberships` normalized membership bridge.
@@ -1145,33 +1176,212 @@ Future AI sessions should use this README plus the current repository/Supabase s
 - [x] RLS-based viewer-relative read access.
 - [x] Multiple membership support.
 - [x] Collection foundation fields reserved for future use.
+- [x] Capability snapshot used by the application through controlled Supabase RPC access.
+- [x] Controlled Baraha publish/lifecycle RPC boundary.
+- [x] Moderation capability lookup through a controlled Supabase RPC boundary.
+- [x] Baraha RPC permission hardening and repository migration-history alignment completed during the current stabilization work.
 
 ### Application architecture — established
 
 - [x] View / Controller / Model / Context / Service boundary.
 - [x] Service as the only Baraha application layer communicating with Supabase.
-- [x] Supabase as authoritative source for read/write, identity, membership and authorization.
-- [x] Viewer-relative feed concept.
-- [x] Cursor pagination contract.
-- [x] Single-post/deep-link concept.
-- [x] Collection concept and future boundary.
-- [x] Membership selector semantics.
-- [x] Author-resolution extension point.
-- [x] Error/loading/lifecycle model.
+- [x] Supabase remains authoritative for read/write, identity, membership and authorization.
+- [x] Viewer-relative feed.
+- [x] Cursor/keyset pagination using `created_at DESC, id DESC`.
+- [x] Single active feed-query state for category and My Posts filters.
+- [x] Category changes reset pagination through the authoritative refresh path.
+- [x] My Posts changes reset pagination through the same authoritative refresh path.
+- [x] Load More continues the same active query/filter context.
+- [x] Refresh waits for an in-flight authoritative read before starting a new first-page read.
+- [x] Publish adds the newly returned/enriched post through the model and renders the feed.
+- [x] Archive, approve and hide actions refresh the authoritative feed after the lifecycle RPC succeeds.
+- [x] Reader presentation separated from Service/database access.
+- [x] Reader actions currently include contextual edit/archive/approve/hide/share presentation with controller/service orchestration.
+- [x] Shared auth-state event from the account widget reuses the normal Baraha initialization path.
+- [x] Sign-out/account-switch protection clears user-specific My Posts filtering through identity comparison during initialization.
+- [x] BFCache `pageshow` restoration reuses the same initialization path.
+- [x] Browser Back/Forward restores reader/editor route state from the URL.
+- [x] Deep-link reader state uses stable post identity and meaningful unavailable handling.
+- [x] HTML remains a page/UI shell; Baraha controller/service/model/context logic belongs in their modules.
 
-### Still implementation work
+### Feed query and pagination contract
 
-- [ ] Replace static demo feed with Service-backed feed.
-- [ ] Wire current membership context to real memberships.
-- [ ] Implement real post reading/deep links.
-- [ ] Implement author resolution through an approved safe Supabase mechanism.
-- [ ] Implement create/update/save/publish operations through Service.
-- [ ] Implement membership bridge writes through Service.
-- [ ] Implement moderation UI through Service/database rules.
-- [ ] Add end-to-end authenticated/member/private/public tests.
-- [ ] Add collection execution/UI only when the product requirement becomes active.
+The active feed is represented by one controller-owned query state:
 
-The existence of a checked backend foundation does **not** mean the UI should jump directly to full CRUD. Continue in small, validated stages.
+```text
+feedQuery
+  ├── category
+  └── authorId (My Posts)
+```
+
+Pagination state remains separate:
+
+```text
+feedCursor
+hasMorePosts
+feedLoading
+feedLoadPromise
+```
+
+Rules:
+
+1. **Initial entry / authoritative refresh** starts from cursor `null`.
+2. **Category change** updates the active query and resets through refresh.
+3. **My Posts toggle** updates `authorId` and resets through refresh.
+4. **Load More** uses the current query plus the current cursor; it must not silently broaden or change the filter.
+5. A lifecycle/auth change must not race an existing read into stale visible state; refresh waits for the current authoritative read and then starts a fresh first-page request.
+6. A selected category must remain semantically aligned with the data loaded by Load More.
+
+The Model supports replacing the current live page and appending subsequent pages without returning to static demo data.
+
+### Single authoritative refresh principle
+
+The stabilization work established the following rule:
+
+```text
+Page entry
+Auth change
+BFCache restoration
+Filter change
+My Posts change
+Lifecycle mutation
+        ↓
+appropriate controller entry
+        ↓
+authoritative refresh/query path
+        ↓
+Model state
+        ↓
+View render
+```
+
+New functionality may introduce a new user action or route hook, but it should call the existing foundation where the underlying requirement is "refresh Baraha data".
+
+Do not solve future refresh issues by creating chains of page-specific methods that call one another or by maintaining multiple competing feed refresh listeners.
+
+### Authentication lifecycle contract
+
+The shared account widget publishes:
+
+```text
+sk:auth-state
+```
+
+Baraha listens to that shared application-level event and calls its existing initialization path to rebuild:
+
+- session context;
+- memberships;
+- capability snapshot;
+- viewer-relative feed.
+
+The Baraha page must not create an additional independent account/auth refresh system.
+
+User-specific feed state must not leak across:
+
+```text
+signed-in user A
+        ↓
+sign out
+        ↓
+signed-out state
+        ↓
+user B
+```
+
+In particular, the My Posts author filter must be cleared when authenticated identity changes.
+
+### Reader and route contract
+
+Baraha uses one reader panel rather than a separate full reading application.
+
+Stable post identity remains:
+
+```text
+baraha.html?post=<id>
+```
+
+The reader:
+
+- renders presentation data only;
+- does not call Supabase directly;
+- delegates lifecycle actions through configured handlers;
+- supports route synchronization;
+- closes/returns through the existing URL/history flow.
+
+Reader action availability must remain contextual and capability-based. UI visibility is convenience only; the database/RPC boundary remains authoritative.
+
+### Moderation / lifecycle orchestration
+
+Lifecycle actions follow:
+
+```text
+Reader/UI action
+      ↓
+Controller
+      ↓
+Service
+      ↓
+controlled Supabase RPC
+      ↓
+authoritative refresh
+```
+
+Current focused actions include:
+
+- approve;
+- hide;
+- archive;
+- publish/create through the controlled publish RPC.
+
+Do not update moderation/lifecycle state by directly mutating arbitrary frontend state as the security/authority source.
+
+### UI cleanup rule
+
+When stabilizing architecture, temporarily commented legacy code may be retained only when:
+
+1. it is intentionally isolated;
+2. the comment explains why it is temporarily retained;
+3. the current replacement path is clear;
+4. it is scheduled for removal after targeted UI/regression verification.
+
+Commented code is not a permanent parallel implementation.
+
+### Current regression expectations
+
+Before treating Baraha changes as safe, verify at minimum:
+
+- anonymous/public feed;
+- signed-in feed;
+- sign-out refresh;
+- account switch;
+- BFCache/page restore;
+- category filter + Load More;
+- My Posts + Load More;
+- filter change after pagination;
+- publish;
+- archive;
+- approve;
+- hide;
+- reader open/close;
+- reader deep link;
+- browser Back/Forward;
+- inaccessible/hidden post behaviour;
+- public/member/private visibility boundaries;
+- admin moderation boundaries.
+
+### Remaining work / intentionally not settled
+
+The following should not be treated as silently complete merely because the current foundation exists:
+
+- [ ] Full UI/manual regression pass after the latest stabilization commits.
+- [ ] Final removal of intentionally commented legacy cleanup code after targeted UI verification.
+- [ ] Broader end-to-end regression coverage across public/member/private/auth transitions.
+- [ ] Any remaining polish of reader action layout/visual hierarchy.
+- [ ] Explicit product decision for published-post editing; current UI must not imply an unsupported edit lifecycle.
+- [ ] Collection execution/UI only when the product requirement becomes active.
+- [ ] Future author/profile display improvements through the approved safe resolution boundary.
+
+The existence of the implemented foundation does **not** authorize future features to bypass it. New Baraha functionality must enter through the existing Controller/Service boundaries and reuse the current refresh/query lifecycle where applicable.
 
 ---
 
