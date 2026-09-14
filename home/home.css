@@ -70,7 +70,7 @@
   .hero-shade{
     position:absolute;
     inset:0 0 auto;
-    height:clamp(430px, 68vh, 760px);
+    height:var(--hero-height);
     z-index:-2;
     pointer-events:none;
     background:
@@ -276,9 +276,18 @@
     }
   }
 
+  /* =========================================================
+     RESPONSIVE HERO COMPOSITION
+     ---------------------------------------------------------
+     Desktop remains intentionally untouched. On narrow screens the
+     same scene is preserved as a focused composition: the hero becomes
+     slightly shorter (reducing aggressive horizontal cropping), while
+     the crop stays centred on the people and sunset rather than trying
+     to squeeze the wide desktop image into the phone.
+     ========================================================= */
   @media (max-width:700px){
     .stage{
-      --hero-height:clamp(380px, 58svh, 540px);
+      --hero-height:clamp(360px, 50svh, 500px);
     }
 
     .hero-media,
@@ -287,17 +296,17 @@
     }
 
     .hero-media img{
-      object-position:center center;
+      object-position:48% center;
     }
 
     .hero-identity{
-      padding-bottom:clamp(2rem, 5vh, 3rem);
+      padding-bottom:clamp(2rem, 4.5svh, 2.75rem);
     }
   }
 
   @media (max-width:480px){
     .stage{
-      --hero-height:clamp(360px, 54svh, 480px);
+      --hero-height:clamp(340px, 46svh, 430px);
       padding:0 7vw 8vh;
     }
 
@@ -306,15 +315,19 @@
       border-radius:0 0 26px 26px;
     }
 
+    .hero-media img{
+      object-position:47% center;
+    }
+
     .wordmark{
-      font-size:clamp(2.8rem, 14vw, 4rem);
+      font-size:clamp(2.8rem, 13vw, 3.8rem);
     }
 
     .hero-identity{
-      padding-bottom:2rem;
+      padding-bottom:clamp(1.75rem, 4svh, 2.25rem);
     }
 
     .home-copy{
-      padding-top:2rem;
+      padding-top:clamp(1.75rem, 4svh, 2.5rem);
     }
   }
