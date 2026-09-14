@@ -402,3 +402,280 @@ body.sk-notice-board-open {
     animation:none;
   }
 }
+
+
+/* =========================================================
+   NOTICE CREATION — admin/owner write surface
+   ========================================================= */
+
+.sk-notice-board-foot {
+  gap:1rem;
+  align-items:center;
+}
+
+.sk-notice-create-open-button {
+  border:1px solid rgba(181,80,46,.18);
+  background:rgba(181,80,46,.09);
+  color:var(--rust);
+  border-radius:999px;
+  padding:.52rem .85rem;
+  font:600 .84rem 'Work Sans', sans-serif;
+  cursor:pointer;
+  transition:background .18s ease, transform .18s ease, box-shadow .18s ease;
+}
+
+.sk-notice-create-open-button:hover,
+.sk-notice-create-open-button:focus-visible {
+  background:rgba(181,80,46,.15);
+  box-shadow:0 8px 18px rgba(43,33,24,.07);
+  transform:translateY(-1px);
+  outline:none;
+}
+
+.sk-notice-create {
+  position:fixed;
+  inset:0;
+  z-index:95;
+  display:grid;
+  padding:clamp(10px,2vw,24px);
+  opacity:0;
+  transition:opacity .22s ease;
+}
+
+.sk-notice-create.is-open { opacity:1; }
+.sk-notice-create[hidden] { display:none; }
+
+.sk-notice-create-backdrop {
+  position:absolute;
+  inset:0;
+  background:rgba(43,33,24,.5);
+  backdrop-filter:blur(7px);
+  -webkit-backdrop-filter:blur(7px);
+}
+
+.sk-notice-create-panel {
+  position:relative;
+  width:min(100%,760px);
+  height:min(100%,860px);
+  margin:auto;
+  display:flex;
+  flex-direction:column;
+  background:var(--sky-top);
+  border:1px solid rgba(255,246,232,.35);
+  border-radius:28px;
+  box-shadow:0 28px 70px rgba(43,33,24,.28);
+  overflow:hidden;
+  transform:translateY(18px) scale(.985);
+  transition:transform .24s ease;
+}
+
+.sk-notice-create.is-open .sk-notice-create-panel {
+  transform:translateY(0) scale(1);
+}
+
+.sk-notice-create-head {
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:1rem;
+  padding:clamp(1rem,3vw,1.5rem) clamp(1rem,4vw,1.8rem);
+  border-bottom:1px solid rgba(43,33,24,.1);
+}
+
+.sk-notice-create-head h2 {
+  margin:.1rem 0 0;
+  font-family:'Fraunces', serif;
+  color:var(--ink);
+  font-size:clamp(1.45rem,3vw,2rem);
+}
+
+.sk-notice-create-close {
+  width:38px;
+  height:38px;
+  flex:0 0 auto;
+  border:1px solid rgba(43,33,24,.1);
+  border-radius:50%;
+  background:rgba(181,80,46,.08);
+  color:var(--ink);
+  cursor:pointer;
+  font-size:1.1rem;
+}
+
+.sk-notice-create-close:hover,
+.sk-notice-create-close:focus-visible {
+  background:rgba(181,80,46,.15);
+  outline:none;
+}
+
+.sk-notice-create-form {
+  flex:1;
+  overflow:auto;
+  padding:clamp(1rem,3vw,1.6rem) clamp(1rem,4vw,1.8rem) clamp(1.2rem,3vw,1.8rem);
+  display:grid;
+  gap:1rem;
+}
+
+.sk-notice-create-field { display:grid; gap:.45rem; }
+
+.sk-notice-create-label {
+  display:flex;
+  align-items:center;
+  gap:.4rem;
+  font:600 .88rem 'Noto Sans Kannada', sans-serif;
+  color:var(--ink);
+}
+
+.sk-notice-create-required { color:var(--rust); }
+
+.sk-notice-create-help {
+  margin:0;
+  color:var(--ink-soft);
+  font-size:.76rem;
+  line-height:1.55;
+}
+
+.sk-notice-create-control {
+  width:100%;
+  min-height:44px;
+  box-sizing:border-box;
+  border:1px solid rgba(43,33,24,.13);
+  border-radius:12px;
+  background:rgba(255,255,255,.58);
+  color:var(--ink);
+  font:400 .92rem 'Work Sans','Noto Sans Kannada',sans-serif;
+  padding:.7rem .8rem;
+  transition:border-color .18s ease, box-shadow .18s ease, background .18s ease;
+}
+
+textarea.sk-notice-create-control {
+  min-height:120px;
+  resize:vertical;
+  line-height:1.6;
+}
+
+.sk-notice-create-control:focus {
+  outline:none;
+  border-color:rgba(181,80,46,.55);
+  background:#fffaf2;
+  box-shadow:0 0 0 3px rgba(181,80,46,.09);
+}
+
+.sk-notice-create-field.has-error .sk-notice-create-control,
+.sk-notice-create-field.has-error .sk-notice-create-targets {
+  border-color:rgba(181,80,46,.72);
+}
+
+.sk-notice-create-grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:1rem;
+}
+
+.sk-notice-create-targets {
+  display:grid;
+  gap:.55rem;
+  padding:.75rem;
+  border:1px solid rgba(43,33,24,.1);
+  border-radius:14px;
+  background:rgba(255,255,255,.36);
+}
+
+.sk-notice-create-target {
+  display:flex;
+  align-items:center;
+  gap:.65rem;
+  min-height:40px;
+  padding:.55rem .65rem;
+  border-radius:10px;
+  cursor:pointer;
+  color:var(--ink);
+  font-size:.88rem;
+}
+
+.sk-notice-create-target:hover { background:rgba(181,80,46,.06); }
+.sk-notice-create-target input { accent-color:var(--rust); }
+
+.sk-notice-create-event {
+  display:grid;
+  gap:1rem;
+  padding:1rem;
+  border:1px solid rgba(47,82,51,.13);
+  border-radius:16px;
+  background:rgba(47,82,51,.045);
+}
+
+.sk-notice-create-event[hidden],
+.sk-notice-create-targets-group[hidden] { display:none; }
+
+.sk-notice-create-status {
+  min-height:1.2em;
+  margin-top:-.2rem;
+  color:var(--ink-soft);
+  font-size:.82rem;
+}
+
+.sk-notice-create-status.is-error { color:var(--rust); }
+.sk-notice-create-status.is-success { color:var(--banyan); }
+.sk-notice-create-status.is-info { color:var(--ink-soft); }
+
+.sk-notice-create-actions {
+  display:flex;
+  justify-content:flex-end;
+  gap:.75rem;
+  padding-top:.35rem;
+  border-top:1px solid rgba(43,33,24,.08);
+}
+
+.sk-notice-create-submit {
+  min-width:132px;
+  min-height:44px;
+  border:0;
+  border-radius:12px;
+  background:var(--rust);
+  color:var(--sky-top);
+  font:600 .88rem 'Noto Sans Kannada', sans-serif;
+  cursor:pointer;
+  box-shadow:0 8px 20px rgba(181,80,46,.18);
+}
+
+.sk-notice-create-submit:hover:not(:disabled),
+.sk-notice-create-submit:focus-visible:not(:disabled) {
+  transform:translateY(-1px);
+  box-shadow:0 11px 24px rgba(181,80,46,.24);
+  outline:none;
+}
+
+.sk-notice-create-submit:disabled { cursor:wait; opacity:.72; }
+
+body.sk-notice-create-open { overflow:hidden; }
+
+@media (max-width:700px) {
+  .sk-notice-board-foot {
+    align-items:stretch;
+    flex-direction:column;
+    gap:.4rem;
+  }
+
+  .sk-notice-create-open-button,
+  .sk-notice-view-all { text-align:right; }
+
+  .sk-notice-create { padding:0; }
+
+  .sk-notice-create-panel {
+    width:100%;
+    height:100%;
+    max-height:100svh;
+    border:0;
+    border-radius:0;
+  }
+
+  .sk-notice-create-grid { grid-template-columns:1fr; }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .sk-notice-create,
+  .sk-notice-create-panel,
+  .sk-notice-create-open-button,
+  .sk-notice-create-control,
+  .sk-notice-create-submit { transition:none; }
+}

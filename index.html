@@ -16,11 +16,13 @@
 <script src="navigation.js?v=1" defer></script>
 <link rel="stylesheet" href="footer.css">
 <link rel="stylesheet" href="home/home.css?v=6">
-<link rel="stylesheet" href="notices/notices.css?v=1">
+<link rel="stylesheet" href="notices/notices.css?v=2">
 <script src="footer.js" defer></script>
 <script src="home/home.js?v=1" defer></script>
 <script src="notices/notices-service.js?v=1" defer></script>
 <script src="notices/notices.js?v=1" defer></script>
+<script src="notices/notices-create-service.js?v=1" defer></script>
+<script src="notices/notices-create.js?v=1" defer></script>
 
 </head>
 <body>
@@ -82,6 +84,7 @@
     </div>
     <div class="sk-notice-preview" id="skNoticePreview" aria-live="polite"></div>
     <div class="sk-notice-board-foot">
+      <button class="sk-notice-create-open-button" id="skNoticeCreateOpen" type="button" hidden>＋ ಪ್ರಕಟಣೆ</button>
       <button class="sk-notice-view-all" id="skNoticeOpenAll" type="button">ಎಲ್ಲಾ ಪ್ರಕಟಣೆಗಳು →</button>
     </div>
   </div>
@@ -99,6 +102,110 @@
     </header>
     <div class="sk-notice-full-status" id="skNoticeFullStatus" aria-live="polite"></div>
     <div class="sk-notice-full-list" id="skNoticeFullList"></div>
+  </section>
+</div>
+
+<div class="sk-notice-create" id="skNoticeCreate" hidden aria-labelledby="skNoticeCreatePanelTitle">
+  <div class="sk-notice-create-backdrop" id="skNoticeCreateBackdrop"></div>
+  <section class="sk-notice-create-panel" role="dialog" aria-modal="true" aria-describedby="skNoticeCreateIntro">
+    <header class="sk-notice-create-head">
+      <div>
+        <span class="sk-notice-kicker">ಹೊಸ ಪ್ರಕಟಣೆ</span>
+        <h2 id="skNoticeCreatePanelTitle">ಪ್ರಕಟಣೆ ರಚಿಸಿ</h2>
+      </div>
+      <button class="sk-notice-create-close" id="skNoticeCreateClose" type="button" aria-label="Close create notice panel">×</button>
+    </header>
+
+    <form class="sk-notice-create-form" id="skNoticeCreateForm" novalidate>
+      <p class="sk-notice-create-help" id="skNoticeCreateIntro">ಸಮುದಾಯಕ್ಕೆ ಸಂಬಂಧಿಸಿದ ಮಾಹಿತಿ, ಪ್ರಕಟಣೆ ಅಥವಾ ಕಾರ್ಯಕ್ರಮವನ್ನು ಇಲ್ಲಿ ಪ್ರಕಟಿಸಬಹುದು.</p>
+
+      <div class="sk-notice-create-grid">
+        <label class="sk-notice-create-field">
+          <span class="sk-notice-create-label">ಪ್ರಕಟಣೆಯ ವಿಧ <span class="sk-notice-create-required">*</span></span>
+          <select class="sk-notice-create-control" id="skNoticeCreateType" required>
+            <option value="notice">ಸೂಚನೆ</option>
+            <option value="announcement">ಪ್ರಕಟಣೆ</option>
+            <option value="event">ಕಾರ್ಯಕ್ರಮ</option>
+          </select>
+          <span class="sk-notice-create-help">ಮಾಹಿತಿಯ ಸ್ವರೂಪಕ್ಕೆ ಹೊಂದುವ ವಿಧವನ್ನು ಆಯ್ಕೆಮಾಡಿ.</span>
+        </label>
+
+        <label class="sk-notice-create-field">
+          <span class="sk-notice-create-label">ಯಾರಿಗೆ ಕಾಣಬೇಕು <span class="sk-notice-create-required">*</span></span>
+          <select class="sk-notice-create-control" id="skNoticeCreateVisibility" required>
+            <option value="public">ಎಲ್ಲರಿಗೂ</option>
+            <option value="membership_targeted">ನಿರ್ದಿಷ್ಟ ಬಳಗಗಳಿಗೆ</option>
+          </select>
+          <span class="sk-notice-create-help">ನಿಮಗೆ ಇರುವ ಅನುಮತಿಯ ಆಧಾರದಲ್ಲಿ ಆಯ್ಕೆಗಳು ಲಭ್ಯವಾಗುತ್ತವೆ.</span>
+        </label>
+      </div>
+
+      <label class="sk-notice-create-field">
+        <span class="sk-notice-create-label">ಶೀರ್ಷಿಕೆ <span class="sk-notice-create-required">*</span></span>
+        <input class="sk-notice-create-control" id="skNoticeCreateTitle" type="text" maxlength="220" autocomplete="off" required>
+        <span class="sk-notice-create-help">ಸಂಕ್ಷಿಪ್ತವಾಗಿ ಮುಖ್ಯ ವಿಷಯವನ್ನು ಬರೆಯಿರಿ.</span>
+      </label>
+
+      <label class="sk-notice-create-field">
+        <span class="sk-notice-create-label">ವಿವರಗಳು</span>
+        <textarea class="sk-notice-create-control" id="skNoticeCreateContent" maxlength="5000"></textarea>
+        <span class="sk-notice-create-help">ಹೆಚ್ಚಿನ ಮಾಹಿತಿ ಬೇಕಿದ್ದರೆ ಇಲ್ಲಿ ಸೇರಿಸಿ.</span>
+      </label>
+
+      <div class="sk-notice-create-field sk-notice-create-targets-group" id="skNoticeCreateTargetsGroup" hidden>
+        <span class="sk-notice-create-label">ನಿರ್ದಿಷ್ಟ ಬಳಗಗಳಿಗೆ <span class="sk-notice-create-required">*</span></span>
+        <div class="sk-notice-create-targets" id="skNoticeCreateTargets"></div>
+        <span class="sk-notice-create-help">ನೀವು ಸಕ್ರಿಯ ನಿರ್ವಹಣಾ ಹಕ್ಕು ಹೊಂದಿರುವ ಬಳಗಗಳಷ್ಟೇ ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತವೆ.</span>
+      </div>
+
+      <div class="sk-notice-create-event" id="skNoticeCreateEventFields" hidden>
+        <div class="sk-notice-create-grid">
+          <label class="sk-notice-create-field">
+            <span class="sk-notice-create-label">ಆರಂಭದ ದಿನಾಂಕ ಮತ್ತು ಸಮಯ <span class="sk-notice-create-required">*</span></span>
+            <input class="sk-notice-create-control" id="skNoticeCreateEventStartsAt" type="datetime-local">
+          </label>
+          <label class="sk-notice-create-field">
+            <span class="sk-notice-create-label">ಅಂತ್ಯದ ದಿನಾಂಕ ಮತ್ತು ಸಮಯ</span>
+            <input class="sk-notice-create-control" id="skNoticeCreateEventEndsAt" type="datetime-local">
+          </label>
+        </div>
+        <div class="sk-notice-create-grid">
+          <label class="sk-notice-create-field">
+            <span class="sk-notice-create-label">ಸ್ಥಳ</span>
+            <input class="sk-notice-create-control" id="skNoticeCreateEventLocationName" type="text" maxlength="220">
+          </label>
+          <label class="sk-notice-create-field">
+            <span class="sk-notice-create-label">ಸ್ಥಳದ ಲಿಂಕ್</span>
+            <input class="sk-notice-create-control" id="skNoticeCreateEventLocationUrl" type="url" inputmode="url">
+          </label>
+        </div>
+      </div>
+
+      <div class="sk-notice-create-grid">
+        <label class="sk-notice-create-field">
+          <span class="sk-notice-create-label">ಪ್ರಕಟಿಸುವ ದಿನಾಂಕ ಮತ್ತು ಸಮಯ</span>
+          <input class="sk-notice-create-control" id="skNoticeCreatePublishedAt" type="datetime-local">
+          <span class="sk-notice-create-help">ಖಾಲಿ ಬಿಟ್ಟರೆ ಈಗಲೇ ಪ್ರಕಟಿಸಲಾಗುತ್ತದೆ.</span>
+        </label>
+        <label class="sk-notice-create-field">
+          <span class="sk-notice-create-label">ಕೊನೆಯ ದಿನಾಂಕ ಮತ್ತು ಸಮಯ</span>
+          <input class="sk-notice-create-control" id="skNoticeCreateExpiresAt" type="datetime-local">
+          <span class="sk-notice-create-help">ಆ ಸಮಯದ ನಂತರ ಪ್ರಕಟಣೆ ಕಾಣಿಸುವುದಿಲ್ಲ.</span>
+        </label>
+      </div>
+
+      <label class="sk-notice-create-field">
+        <span class="sk-notice-create-label">ಸಂಬಂಧಿತ ಲಿಂಕ್</span>
+        <input class="sk-notice-create-control" id="skNoticeCreateRelatedUrl" type="url" inputmode="url" placeholder="https://...">
+        <span class="sk-notice-create-help">ಐಚ್ಛಿಕ. ಈಗ ಯಾವುದೇ ಸರಿಯಾದ ವೆಬ್ ಲಿಂಕ್ ಅನ್ನು ಸೇರಿಸಬಹುದು.</span>
+      </label>
+
+      <div class="sk-notice-create-status" id="skNoticeCreateStatus" aria-live="polite"></div>
+
+      <div class="sk-notice-create-actions">
+        <button class="sk-notice-create-submit" id="skNoticeCreateSubmit" type="submit">ಪ್ರಕಟಿಸಿ</button>
+      </div>
+    </form>
   </section>
 </div>
 
