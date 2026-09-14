@@ -33,7 +33,19 @@
      ========================================================= */
 
   .stage{
-    --hero-height:clamp(400px, 60svh, 680px);
+    /*
+       STAGE 4A — HERO PROPORTION REFINEMENT
+       -------------------------------------------------------
+       The hero remains the opening moment, but no longer consumes
+       most of the first viewport. These bounds preserve the cinematic
+       wide composition while making the supporting homepage content
+       arrive sooner on desktop and laptop screens.
+
+       Mobile overrides remain width-driven below so phones keep their
+       intentional landscape composition rather than inheriting a tall
+       viewport-based hero.
+    */
+    --hero-height:clamp(360px, 48svh, 560px);
 
     position:relative;
     isolation:isolate;
@@ -128,6 +140,13 @@
     width:100%;
     height:100%;
     z-index:0;
+
+    /*
+       Stage 4A keeps the Stage 3 convergence visually attached to the
+       shorter hero threshold. Narrow-screen composition overrides this
+       transform with its own focused mobile treatment below.
+    */
+    transform:translateY(-clamp(48px, 12svh, 120px));
   }
   .paths path{
     fill:none;
