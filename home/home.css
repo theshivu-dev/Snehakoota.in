@@ -357,6 +357,33 @@
       object-position:48% center;
     }
 
+    /*
+       MOBILE ROAD / TEXT HARMONY
+       ---------------------------------------------------------
+       Keep the convergence visually tied to the hero threshold, then
+       let the artwork soften away before it reaches the supporting copy.
+       This preserves the upward-flow idea without allowing road lines to
+       compete with the tagline and message on a narrow screen.
+    */
+    .paths{
+      transform:translateY(-clamp(42px, 8vw, 72px));
+      transform-origin:top center;
+      -webkit-mask-image:linear-gradient(
+        to bottom,
+        #000 0,
+        #000 calc(var(--hero-height) + 24px),
+        rgba(0,0,0,.72) calc(var(--hero-height) + 110px),
+        transparent calc(var(--hero-height) + 240px)
+      );
+      mask-image:linear-gradient(
+        to bottom,
+        #000 0,
+        #000 calc(var(--hero-height) + 24px),
+        rgba(0,0,0,.72) calc(var(--hero-height) + 110px),
+        transparent calc(var(--hero-height) + 240px)
+      );
+    }
+
     .hero-identity{
       padding-bottom:clamp(1.75rem, 4vw, 2.5rem);
     }
