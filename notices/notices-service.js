@@ -15,18 +15,21 @@
     return;
   }
 
-  const client = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_PUBLISHABLE_KEY,
-    {
-      auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-        detectSessionInUrl: true,
-        flowType: "pkce"
+  const client = window.SnehakootaNoticesSupabaseClient
+    || window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_PUBLISHABLE_KEY,
+      {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true,
+          flowType: "pkce"
+        }
       }
-    }
-  );
+    );
+
+  window.SnehakootaNoticesSupabaseClient = client;
 
   function normalizeUpdate(row) {
     const eventDetails = Array.isArray(row.community_update_event_details)
