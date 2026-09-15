@@ -40,6 +40,9 @@
 .sk-footer-modal-body { padding-top:1rem; font-family:var(--font-body,'Work Sans',sans-serif); font-size:.9rem; line-height:1.7; color:var(--ink-soft,#6B5C4C); }
 .sk-footer-modal-body p { margin:0 0 .8rem; }
 .sk-footer-modal-body p:last-child { margin-bottom:0; }
+.sk-footer-modal-body h3 { margin:1.15rem 0 .35rem; color:var(--ink,#2B2118); font-family:var(--font-display,'Fraunces',serif); font-size:1rem; line-height:1.35; font-weight:600; }
+.sk-footer-modal-body .sk-footer-intro { margin-bottom:1.05rem; color:var(--ink,#2B2118); font-size:.94rem; line-height:1.65; }
+.sk-footer-modal-body .sk-footer-closing { margin-top:1.25rem; padding:1rem 1.05rem; border-left:3px solid rgba(181,80,46,.38); border-radius:0 10px 10px 0; background:rgba(181,80,46,.055); color:var(--ink,#2B2118); }
 .sk-footer-email { display:inline-block; margin-top:.35rem; color:var(--rust,#B5502E); font-weight:600; text-decoration:none; }
 .sk-footer-email:hover { text-decoration:underline; }
 body.sk-footer-modal-open { overflow:hidden; }
@@ -48,5 +51,8 @@ body.sk-footer-modal-open { overflow:hidden; }
   .sk-footer { margin-top:.75rem; padding:.45rem .75rem .3rem; }
   .sk-footer-links { gap:.2rem; }
   .sk-footer-modal { width:calc(100vw - 24px); max-height:82vh; padding:1.2rem; border-radius:16px; }
+  .sk-footer-modal-title { font-size:1.1rem; }
+  .sk-footer-modal-body { font-size:.86rem; line-height:1.65; }
+  .sk-footer-modal-body h3 { font-size:.96rem; }
 }
 @media (prefers-reduced-motion:reduce) { .sk-footer-modal-backdrop,.sk-footer-modal,.sk-footer-links button { transition:none; } }
