@@ -1,7 +1,7 @@
 /* =========================================================
    SNEHAKOOTA — COMMUNITY UPDATES SERVICE
    ---------------------------------------------------------
-   Owns Community Updates reads and management actions.
+   Owns Community Updates reads only.
    UI modules must not call Supabase directly.
    ========================================================= */
 (function(){
@@ -115,8 +115,6 @@
     if (result.error) throw result.error;
     return true;
   }
-
-  window.SnehakootaNoticesSupabaseClient = client;
 
   window.SnehakootaNoticesService = Object.freeze({
     getVisibleUpdates,
