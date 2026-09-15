@@ -82,14 +82,14 @@
 
     return [
       '<article class="sk-notice-preview-item" data-notice-id="', update.id, '">',
-        '<button class="sk-notice-preview-trigger" type="button" data-notice-open="', update.id, '">',
+        '<button class="sk-notice-preview-trigger" type="button" data-notice-open="', update.id, '" aria-label="Open ', escapeHtml(update.title), '">',
           '<span class="sk-notice-type sk-notice-type--', escapeHtml(update.type), '">',
             '<span class="sk-notice-type-icon" aria-hidden="true">', meta.icon, '</span>',
             '<span>', escapeHtml(meta.label), '</span>',
           '</span>',
           eventDate ? '<span class="sk-notice-preview-date">' + escapeHtml(eventDate) + '</span>' : '',
           '<strong>', escapeHtml(update.title), '</strong>',
-          '<span class="sk-notice-preview-more" aria-hidden="true">⌄</span>',
+          '<span class="sk-notice-preview-more" aria-hidden="true">›</span>',
         '</button>',
       '</article>'
     ].join("");
