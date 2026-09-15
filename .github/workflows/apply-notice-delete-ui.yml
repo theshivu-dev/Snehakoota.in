@@ -11,7 +11,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Add notice delete controls
-        run: python3 - <<'PY'
+        shell: bash
+        run: |
+          python3 <<'PY'
           from pathlib import Path
 
           service = Path('notices/notices-service.js')
