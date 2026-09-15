@@ -1,7 +1,7 @@
 /* =========================================================
    SNEHAKOOTA — COMMUNITY UPDATES SERVICE
    ---------------------------------------------------------
-   Owns Community Updates reads only.
+   Owns Community Updates reads and management actions.
    UI modules must not call Supabase directly.
    ========================================================= */
 (function(){
@@ -83,7 +83,44 @@
     return (data || []).map(normalizeUpdate);
   }
 
+  async function getManageCapabilities(updateIds) {
+    const ids = Array.isArray(updateIds)
+      ? updateIds.map(Number).filter(Number.isFinite)
+      : [];
+
+    if (!ids.length) return new Map();
+
+    const { data, error } = await client.rpc(
+      "community_updates_get_manage_capabilities",
+      { p_update_ids: ids }
+    );
+
+    if (error) throw error;
+
+    return new Map((data || []).map(function(row) {
+      return [Number(row.update_id), row.can_manage === true];
+    }));
+  }
+
+  async function deleteUpdate(updateId) {
+    const id = Number(updateId);
+    if (!Number.isFinite(id)) {
+      throw new Error("Invalid Community Update id");
+    }
+
+    const result = await client.rpc("community_updates_delete", {
+      p_update_id: id
+    });
+
+    if (result.error) throw result.error;
+    return true;
+  }
+
+  window.SnehakootaNoticesSupabaseClient = client;
+
   window.SnehakootaNoticesService = Object.freeze({
-    getVisibleUpdates
+    getVisibleUpdates,
+    getManageCapabilities,
+    deleteUpdate
   });
 })();
