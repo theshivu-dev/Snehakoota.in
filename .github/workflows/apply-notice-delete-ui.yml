@@ -1,0 +1,80 @@
+name: apply-notice-delete-ui
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  refine:
+    if: github.event.head_commit.message != 'feat: add notice board delete controls'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Add notice delete controls
+        shell: python
+        run: |
+          from pathlib import Path
+
+          service = Path('notices/notices-service.js')
+          text = service.read_text(encoding='utf-8')
+          old = '''  window.SnehakootaNoticesService = Object.freeze({\n    getVisibleUpdates\n  });'''
+          new = '''  async function getManageCapabilities(updateIds) {\n    const ids = Array.isArray(updateIds) ? updateIds.map(Number).filter(Number.isFinite) : [];\n    if (!ids.length) return new Map();\n\n    const { data, error } = await client.rpc(\"community_updates_get_manage_capabilities\", {\n      p_update_ids: ids\n    });\n    if (error) throw error;\n\n    return new Map((data || []).map(function(row) {\n      return [Number(row.update_id), row.can_manage === true];\n    }));\n  }\n\n  async function deleteUpdate(updateId) {\n    const id = Number(updateId);\n    if (!Number.isFinite(id)) throw new Error(\"Invalid Community Update id\");\n\n    const result = await client.rpc(\"community_updates_delete\", {\n      p_update_id: id\n    });\n    if (result.error) throw result.error;\n    return true;\n  }\n\n  window.SnehakootaNoticesService = Object.freeze({\n    getVisibleUpdates,\n    getManageCapabilities,\n    deleteUpdate\n  });'''
+          if old not in text:
+              raise SystemExit('Expected notices-service export block not found')
+          service.write_text(text.replace(old, new, 1), encoding='utf-8')
+
+          js = Path('notices/notices.js')
+          text = js.read_text(encoding='utf-8')
+          text = text.replace('''    fullStatus: document.getElementById("skNoticeFullStatus"),\n      openButton:'''.replace('      ', '    '), '''    fullStatus: document.getElementById("skNoticeFullStatus"),\n    deleteStatus: document.getElementById("skNoticeDeleteStatus"),\n    openButton:''', 1) if False else text
+
+          old_render = '''  function renderFullItem(update) {\n    const meta = metaFor(update);'''
+          new_render = '''  function renderFullItem(update) {\n    const meta = metaFor(update);'''
+          if old_render not in text:
+              raise SystemExit('Expected renderFullItem marker not found')
+
+          old = '''          '<span class="sk-notice-chevron" aria-hidden="true">⌄</span>',\n        '</button>',\n        '<div class="sk-notice-full-detail" hidden>','''
+          new = '''          '<span class="sk-notice-chevron" aria-hidden="true">⌄</span>',\n        '</button>',\n        '<div class="sk-notice-full-detail" hidden>',\n          '<div class="sk-notice-full-actions" data-notice-actions hidden>',\n            '<button class="sk-notice-delete" type="button" data-notice-delete="', update.id, '" aria-label="Delete ', escapeHtml(update.title), '">',\n              '<span aria-hidden="true">⌫</span><span>Delete notice</span>',\n            '</button>',\n            '<span class="sk-notice-delete-status" data-notice-delete-status aria-live="polite"></span>',\n          '</div>', '''
+          if old not in text:
+              raise SystemExit('Expected notice detail insertion marker not found')
+          text = text.replace(old, new, 1)
+
+          old_render_end = '''    elements.fullList.innerHTML = state.updates\n      .map(renderFullItem)\n      .join("");'''
+          new_render_end = '''    elements.fullList.innerHTML = state.updates\n      .map(renderFullItem)\n      .join("");\n\n    loadManageCapabilities();'''
+          if old_render_end not in text:
+              raise SystemExit('Expected full list render marker not found')
+          text = text.replace(old_render_end, new_render_end, 1)
+
+          marker = '''  function bindItemActions() {'''
+          insert = '''  async function loadManageCapabilities() {\n    const elements = getElements();\n    if (!elements.fullList || !window.SnehakootaNoticesService) return;\n\n    try {\n      const ids = state.updates.map(function(update) { return update.id; });\n      const capabilities = await window.SnehakootaNoticesService.getManageCapabilities(ids);\n      elements.fullList.querySelectorAll('[data-notice-actions]').forEach(function(actions) {\n        const item = actions.closest('[data-notice-id]');\n        if (!item) return;\n        const id = Number(item.getAttribute('data-notice-id'));\n        actions.hidden = capabilities.get(id) !== true;\n      });\n    } catch (error) {\n      console.error("Community Update management capabilities load failed:", error);\n    }\n  }\n\n  async function handleDelete(button) {\n    const item = button.closest('.sk-notice-full-item');\n    const status = item && item.querySelector('[data-notice-delete-status]');\n    const updateId = button.getAttribute('data-notice-delete');\n    const update = state.updates.find(function(row) { return String(row.id) === String(updateId); });\n    if (!item || !update || button.disabled) return;\n\n    const confirmed = window.confirm('Delete this notice? This cannot be undone.\\n\\n' + update.title);\n    if (!confirmed) return;\n\n    button.disabled = true;\n    button.setAttribute('aria-busy', 'true');\n    if (status) status.textContent = 'Deleting…';\n\n    try {\n      await window.SnehakootaNoticesService.deleteUpdate(updateId);\n      state.updates = state.updates.filter(function(row) { return String(row.id) !== String(updateId); });\n      if (status) status.textContent = 'Deleted';\n      render();\n      if (!state.updates.length) {\n        const elements = getElements();\n        if (elements.fullList) renderEmpty(elements.fullList, true);\n      }\n    } catch (error) {\n      console.error("Community Update delete failed:", error);\n      button.disabled = false;\n      button.removeAttribute('aria-busy');\n      if (status) status.textContent = 'Could not delete. Please try again.';\n    }\n  }\n\n  function bindItemActions() {'''
+          if marker not in text:
+              raise SystemExit('Expected bindItemActions marker not found')
+          text = text.replace(marker, insert, 1)
+
+          old_bind = '''    elements.fullList.querySelectorAll("[data-notice-toggle]").forEach(function(button) {'''
+          new_bind = '''    elements.fullList.querySelectorAll("[data-notice-delete]").forEach(function(button) {\n      button.addEventListener("click", function(event) {\n        event.stopPropagation();\n        handleDelete(button);\n      });\n    });\n\n    elements.fullList.querySelectorAll("[data-notice-toggle]").forEach(function(button) {'''
+          if old_bind not in text:
+              raise SystemExit('Expected toggle binding marker not found')
+          text = text.replace(old_bind, new_bind, 1)
+          js.write_text(text, encoding='utf-8')
+
+          css = Path('notices/notices.css')
+          text = css.read_text(encoding='utf-8')
+          marker = '/* =========================================================\n   NOTICE BOARD DELETE CONTROLS\n   ========================================================= */'
+          if marker not in text:
+              text += '''\n\n/* =========================================================\n   NOTICE BOARD DELETE CONTROLS\n   ========================================================= */\n.sk-notice-full-actions{\n  display:flex;\n  align-items:center;\n  gap:.75rem;\n  margin-top:.8rem;\n  padding-top:.75rem;\n  border-top:1px solid rgba(43,33,24,.08);\n}\n\n.sk-notice-delete{\n  display:inline-flex;\n  align-items:center;\n  gap:.45rem;\n  min-height:34px;\n  padding:.4rem .7rem;\n  border:1px solid rgba(181,80,46,.18);\n  border-radius:999px;\n  background:rgba(181,80,46,.055);\n  color:var(--rust);\n  font:500 .78rem/1 'Work Sans',sans-serif;\n  cursor:pointer;\n  transition:background .16s ease, border-color .16s ease, opacity .16s ease;\n}\n\n.sk-notice-delete:hover{\n  background:rgba(181,80,46,.11);\n  border-color:rgba(181,80,46,.3);\n}\n\n.sk-notice-delete:disabled{\n  opacity:.55;\n  cursor:wait;\n}\n\n.sk-notice-delete-status{\n  color:var(--ink-soft);\n  font-size:.78rem;\n}\n\n@media (max-width:700px){\n  .sk-notice-full-actions{\n    align-items:flex-start;\n    flex-direction:column;\n    gap:.45rem;\n  }\n}\n'''
+          css.write_text(text, encoding='utf-8')
+      - name: Commit notice delete controls
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add notices/notices-service.js notices/notices.js notices/notices.css
+          git commit -m 'feat: add notice board delete controls'
+          git push
+      - name: Remove one-time workflow
+        run: |
+          rm -f .github/workflows/apply-notice-delete-ui.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .github/workflows/apply-notice-delete-ui.yml
+          git commit -m 'chore: remove one-time notice delete workflow'
+          git push
