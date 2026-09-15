@@ -679,3 +679,123 @@ body.sk-notice-create-open { overflow:hidden; }
   .sk-notice-create-control,
   .sk-notice-create-submit { transition:none; }
 }
+
+/* =========================================================
+   NOTICE BOARD UI REFINEMENT — compact, aligned, self-evident
+   ========================================================= */
+
+/* One heading only: the visible board title. */
+.sk-notice-board-head .sk-notice-kicker,
+.sk-notice-full-head .sk-notice-kicker {
+  display:none;
+}
+
+/* Reduce the large vertical air without making the board feel cramped. */
+.sk-notice-board-head {
+  align-items:center;
+  padding:clamp(.85rem,2.4vw,1.25rem) clamp(1rem,3.5vw,1.7rem) .7rem;
+}
+
+.sk-notice-preview {
+  gap:.45rem;
+  padding:0 clamp(1rem,3.5vw,1.7rem) clamp(.85rem,2.4vw,1.2rem);
+}
+
+/* Stable four-column desktop rhythm: type | title | date | action. */
+.sk-notice-preview-trigger {
+  grid-template-columns:auto minmax(0,1fr) auto auto;
+  gap:.65rem;
+  min-height:52px;
+  padding:.56rem .7rem;
+}
+
+.sk-notice-preview-trigger .sk-notice-type { grid-column:1; }
+.sk-notice-preview-trigger strong { grid-column:2; min-width:0; }
+.sk-notice-preview-date { grid-column:3; white-space:nowrap; }
+
+/* A small Snehakoota-style doorway/arrow cue rather than a loose glyph. */
+.sk-notice-preview-more {
+  grid-column:4;
+  display:inline-grid;
+  place-items:center;
+  width:28px;
+  height:28px;
+  border:1px solid rgba(181,80,46,.16);
+  border-radius:50%;
+  background:rgba(181,80,46,.07);
+  color:var(--rust);
+  font-size:0;
+  line-height:1;
+}
+
+.sk-notice-preview-more::before {
+  content:'↗';
+  font-size:.9rem;
+}
+
+/* Full-board expansion uses a symmetric plus/minus cue in the same tile. */
+.sk-notice-full-trigger {
+  grid-template-columns:auto minmax(0,1fr) auto;
+  gap:.65rem;
+  padding:.72rem .8rem;
+}
+
+.sk-notice-chevron {
+  display:inline-grid;
+  place-items:center;
+  width:30px;
+  height:30px;
+  flex:0 0 30px;
+  border:1px solid rgba(181,80,46,.18);
+  border-radius:50%;
+  background:rgba(181,80,46,.07);
+  color:var(--rust);
+  font-size:0;
+  line-height:1;
+  transform:none !important;
+}
+
+.sk-notice-chevron::before {
+  content:'+';
+  font:500 1rem/1 'Work Sans', sans-serif;
+}
+
+.sk-notice-full-item.is-expanded .sk-notice-chevron::before { content:'−'; }
+
+.sk-notice-full-detail {
+  padding:0 .8rem .9rem;
+}
+
+.sk-notice-board-foot {
+  padding:0 clamp(1rem,3.5vw,1.7rem) .85rem;
+}
+
+@media (max-width:700px) {
+  .sk-notice-board-head {
+    padding:.85rem 1rem .65rem;
+  }
+
+  .sk-notice-preview {
+    padding:0 1rem .85rem;
+  }
+
+  .sk-notice-preview-trigger {
+    grid-template-columns:auto minmax(0,1fr) auto;
+    min-height:50px;
+  }
+
+  .sk-notice-preview-trigger .sk-notice-type {
+    grid-column:1;
+    grid-row:1;
+  }
+
+  .sk-notice-preview-trigger strong {
+    grid-column:2;
+    grid-row:1;
+  }
+
+  .sk-notice-preview-more {
+    grid-column:3;
+    grid-row:1;
+  }
+}
