@@ -1,0 +1,36 @@
+/* =========================================================
+   SNEHAKOOTA — NOTICE BOARD RUNTIME LAYOUT SAFEGUARDS
+   ---------------------------------------------------------
+   Small additive rules loaded by notices.js. Keeps the main
+   Notice Board stylesheet unchanged while fixing the expanded
+   board's scroll/visibility behavior.
+   ========================================================= */
+
+.sk-notice-full-panel {
+  min-height:0;
+}
+
+.sk-notice-full-list {
+  flex:1 1 auto;
+  min-height:0;
+  overflow-y:auto;
+  overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+  align-content:start;
+}
+
+.sk-notice-full-item {
+  overflow:visible;
+}
+
+.sk-notice-full-detail[hidden],
+.sk-notice-full-actions[hidden] {
+  display:none;
+}
+
+.sk-notice-delete-icon {
+  width:1rem;
+  height:1rem;
+  flex:0 0 1rem;
+}

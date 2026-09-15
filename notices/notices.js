@@ -116,16 +116,19 @@
           '<span class="sk-notice-chevron" aria-hidden="true">⌄</span>',
         '</button>',
         '<div class="sk-notice-full-detail" hidden>',
-          '<div class="sk-notice-full-actions" data-notice-actions hidden>',
-            '<button class="sk-notice-delete" type="button" data-notice-delete="', update.id, '" aria-label="Delete ', escapeHtml(update.title), '">',
-              '<span aria-hidden="true">⌫</span><span>Delete notice</span>',
-            '</button>',
-            '<span class="sk-notice-delete-status" data-notice-delete-status aria-live="polite"></span>',
-          '</div>',
           update.content ? '<p>' + escapeHtml(update.content).replace(/\n/g, "<br>") + '</p>' : '',
           eventInfo,
           location,
           update.linkedBarahaPostId ? '<span class="sk-notice-linked-note">Related community story available</span>' : '',
+          '<div class="sk-notice-full-actions" data-notice-actions hidden>',
+            '<button class="sk-notice-delete" type="button" data-notice-delete="', update.id, '" aria-label="Delete ', escapeHtml(update.title), '">',
+              '<svg class="sk-notice-delete-icon" aria-hidden="true" viewBox="0 0 24 24" focusable="false">',
+                '<path d="M4 7h16M9 7V5.5h6V7M7 7l.8 12h8.4L17 7M10 10.5v5.5M14 10.5v5.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>',
+              '</svg>',
+              '<span>Delete notice</span>',
+            '</button>',
+            '<span class="sk-notice-delete-status" data-notice-delete-status aria-live="polite"></span>',
+          '</div>',
         '</div>',
       '</article>'
     ].join("");
@@ -338,6 +341,16 @@
     }
   }
 
+  function ensureRuntimeStyles() {
+    if (document.querySelector('link[data-sk-notice-runtime]')) return;
+
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = "notices/notices-runtime.css";
+    link.setAttribute("data-sk-notice-runtime", "true");
+    document.head.appendChild(link);
+  }
+
   function bindBoardActions() {
     const elements = getElements();
 
@@ -373,6 +386,7 @@
   }
 
   function init() {
+    ensureRuntimeStyles();
     bindBoardActions();
     refreshNotices();
   }
