@@ -1,57 +1,75 @@
-# Snehakoota.in — Project Rules & Development Standards
+# Snehakoota.in — Project Rules, Architecture & Development Standards
 
-> **Last updated:** 2026-09-14
+> **Last updated:** 2026-09-15
 >
-> This README is the working contract for AI-assisted development of Snehakoota.in. It records both the stable project rules and the current authenticated/invitation architecture so future sessions can continue without losing decisions already made.
+> This README is the working contract for AI-assisted development of Snehakoota.in. It records durable project rules, current architecture, implemented functionality, important security decisions, recent learnings, and the preferred way future AI sessions should work with the project.
 
 ---
 
 ## 1. Project purpose
 
-**Snehakoota.in** is a Kannada-first community website for the Snehakoota school-friends community. The site is being built incrementally, with a strong focus on:
+**Snehakoota.in** is a Kannada-first community website for the Snehakoota school-friends community. It is being built incrementally with emphasis on:
 
-- Clean, warm, human/community-oriented visual design.
-- Kannada-first content and typography.
-- Excellent mobile experience without sacrificing desktop presentation.
-- Simple, maintainable code that can grow into a larger platform.
-- Preserving established visual identity and interaction patterns.
-- Keeping the website open and community-oriented rather than treating account creation as a closed-membership gate.
+- warm, human, community-oriented design;
+- Kannada-first content and typography;
+- excellent mobile experience without sacrificing desktop presentation;
+- simple, maintainable code that can grow;
+- preserving established visual identity and working interactions;
+- an open community model where account creation is not invitation-only.
 
-The frontend may remain static HTML/CSS/JavaScript while Supabase provides authentication and database-backed community features.
+The frontend remains intentionally static-web-first: HTML + CSS + vanilla JavaScript. Supabase provides authentication, PostgreSQL data/authorization, storage and future realtime capabilities where genuinely needed.
 
 ---
 
 ## 2. Golden rule for AI-assisted development
 
-Any AI tool working on this repository must read this README before making or proposing changes.
+AI is an **implementation partner**, not primarily a discussion partner.
 
-Before modifying a page or shared file:
+Preferred working mode:
+
+```text
+UNDERSTAND → INSPECT → DECIDE → IMPLEMENT → VERIFY → REPORT
+```
+
+When the requested outcome is clear, do not turn routine implementation into repeated clarification loops. Make reasonable engineering/UI decisions using the established project language and proceed.
+
+### Before changing code
 
 1. Inspect the current repository and relevant files.
-2. Understand existing HTML, CSS, JavaScript, assets and shared UI patterns.
-3. Reuse existing components/patterns wherever practical.
-4. Make the smallest safe change that satisfies the request.
-5. Do not rewrite an entire page when a targeted change is sufficient.
-6. Do not remove existing functionality unless explicitly requested.
-7. Do not introduce duplicate controls, buttons, icons, links or functionality.
-8. Do not silently change unrelated pages.
-9. Keep implementation understandable for a non-specialist owner who maintains the project with AI assistance.
-10. Clearly state what files were changed and what changed.
+2. Trace the existing implementation and ownership boundary.
+3. Check whether the requested behaviour already exists and can be reused.
+4. If Supabase is involved, inspect live database/RPC/RLS/config truth before changing backend code.
+5. Identify the smallest safe change.
+6. Protect unrelated modules and existing behaviour.
 
-### Mandatory write/commit confirmation
+### Implementation rules
 
-Before creating, modifying, deleting, or committing any repository file, the AI must first show the proposed change and obtain explicit confirmation from the user in chat. A generic question such as “Can you do this?” does not constitute permission to write or commit.
+- Reuse existing components/patterns wherever practical.
+- Prefer targeted edits over rewrites.
+- Do not create a parallel implementation when an existing path can be repaired or reused.
+- Do not introduce duplicate controls, renderers, services, state paths or event mechanisms.
+- Do not silently change unrelated pages/modules.
+- Use configuration/flags for legitimate future variation instead of hard-coded policy.
+- Do not add infrastructure merely because it is available.
+- Keep code understandable for a non-specialist owner maintaining the project with AI assistance.
 
-For an explicitly approved multi-step task, that approval covers the stated scope only. If the intended scope expands, stop and obtain confirmation for the expansion.
+### When to ask
 
-### Mandatory post-commit validation
+Ask only when an essential requirement is genuinely ambiguous, unsafe, unavailable, or would materially change architecture/scope. Do not stop for small visual or implementation decisions that can be resolved consistently from the existing project standards.
+
+An explicit user request to implement a scoped change is authorization for the normal sub-steps required to complete that request. Do not ask for a second confirmation for routine internal steps within the approved scope.
+
+### Mandatory post-change validation
 
 After every repository commit:
 
-1. Re-fetch the committed file(s) and confirm the intended content is present.
-2. Compare the commit against its parent and verify that only the approved files/changes were included.
-3. Check for accidental truncation, unrelated edits, missing content, or reverted work.
-4. Report the commit SHA and validation result before proceeding to another change.
+1. Re-fetch the committed file(s).
+2. Compare the commit with its parent.
+3. Verify only intended files/changes were included.
+4. Check for truncation, unrelated edits, missing content or accidental reverts.
+5. Verify the user-visible scenario that motivated the change.
+6. For backend work, verify authorization, RLS/grants, configuration dependencies and persistence behaviour.
+7. Report the commit SHA and validation result.
 
 Never assume a successful GitHub write means the change is correct.
 
@@ -59,7 +77,7 @@ Never assume a successful GitHub write means the change is correct.
 
 ## 3. Current development approach
 
-The project uses a **static-web-first approach**.
+Snehakoota uses a **static-web-first** approach.
 
 Prefer:
 
@@ -69,561 +87,752 @@ Prefer:
 - Existing assets
 - Lightweight browser APIs
 
-Avoid adding frameworks, build systems, packages or external dependencies unless clearly justified and approved.
+Avoid frameworks, build systems, packages or external dependencies unless the actual requirement justifies them.
 
-The architecture should remain capable of growing into a modern application without forcing unnecessary complexity into the current static phase.
+Preferred application boundary:
+
+```text
+Supabase / browser APIs
+        ↓
+      Service
+        ↓
+    Controller
+        ↓
+ Model / state / context
+        ↓
+       View
+        ↓
+       HTML
+```
+
+Use this as a principle, not as a requirement to add layers where a small module does not need them.
 
 ---
 
-## 4. Responsive design standard
+## 4. Repository responsibility map
 
-Use one semantic HTML structure with responsive CSS/layout rules rather than separate desktop/mobile pages.
-
-For business-card-style pages such as `samparka.html`:
-
-- Mobile: aim for at least 2 collapsed cards in a normal phone viewport where practical.
-- Expanded mobile card: important expanded content should fit within approximately one viewport where practical, without unnecessary scrolling.
-- Laptop/desktop: aim for at least 4 comfortable collapsed cards where width permits.
-- Do not distort card proportions merely to hit a numeric target.
-
-Use CSS Grid/Flexbox, fluid sizing, sensible breakpoints and reusable patterns.
+| Area | Responsibility |
+|---|---|
+| `index.html` | Home page and shared mounts |
+| `theme.css` | Global theme/design tokens/base styling |
+| `navigation.css` / `navigation.js` | Shared navigation styling and behaviour |
+| `footer.html` / `footer.css` / `footer.js` | Shared footer and panels |
+| `account.css` / `account.js` | Auth/account/invitation UI |
+| `game.css` / `game.js` | Extracted Game component |
+| `game-fix.js` / `game-repair.js` | Historical repair helpers; not automatically long-term architecture |
+| `game-test.html` | Isolated Game verification |
+| `baraha.html` + Baraha modules | Community writing/feed system |
+| `story.html` | Story / Payana page |
+| `samparka.html` | Reusable business/contact cards |
+| `signin.html` | Authentication-related page |
+| `notices/notices-service.js` | Community Updates read/data boundary |
+| `notices/notices-create-service.js` | Community Updates creation/RPC boundary |
+| `notices/notices.js` | Notice Board rendering/controller |
+| `notices/notices-create.js` | Notice creation UI/controller |
+| `notices/notices.css` | Main Notice Board styling |
+| `notices/notices-runtime.css` | Small isolated Notice Board runtime layout safeguards |
+| `UI_ARCHITECTURE.md` | Architecture reference |
+| `README.md` | Durable project rules and continuity record |
 
 ---
 
-## 5. Visual design language
+## 5. Responsive and visual standards
 
-Maintain the established Snehakoota visual identity:
+Use one semantic HTML structure with responsive CSS rather than separate desktop/mobile pages.
 
-- Warm cream/beige backgrounds.
-- Terracotta/rust accents.
-- Dark green accents where already established.
-- Soft borders and rounded cards.
-- Subtle shadows/glows.
-- Friendly, premium-but-community-oriented appearance.
-- Readable, elegant Kannada typography.
+General standards:
 
-Avoid replacing the established visual language with generic or AI-looking UI styles.
+- Mobile-first thinking without separate mobile pages.
+- Grid/Flexbox, fluid sizing and sensible breakpoints.
+- Avoid hard-coded dimensions that only work at one viewport.
+- Preserve important content and controls on small screens.
+- Test mobile and desktop when a change can affect both.
+
+Visual language:
+
+- warm cream/beige backgrounds;
+- restrained terracotta/rust accents;
+- dark green identity areas where already established;
+- soft borders and rounded cards;
+- subtle shadows/glows;
+- calm spacing;
+- elegant, readable Kannada typography;
+- mature, premium-but-community-oriented presentation.
+
+Avoid generic dashboard styling and visibly AI-generated visual language.
 
 ### Icons
 
-Prefer clean inline SVG icons with consistent stroke/weight. Do not mix unrelated icon styles on the same page.
+Use clean, coherent inline SVG/equivalent icons with consistent stroke/weight.
+
+Recent global-navigation decision:
+
+- **Payana / Story:** winding-road/journey icon.
+- **Baraha:** elegant writing/page + pen icon.
+- Home and all navigation behaviour remain unchanged.
+
+These were intentionally visual-only changes in shared `navigation.css`. Do not alter navigation routing or feature behaviour when an icon-only change is requested.
+
+### Home decorative road
+
+The home page may retain the joining/road visual motif on desktop. On small screens, decorative road geometry may be hidden rather than forcing desktop geometry into a narrow viewport. The visual effect is secondary to clean mobile composition.
 
 ---
 
-## 6. Business-card component standard
+## 6. Page/module scope and protected areas
 
-Business-card-style tiles should be reusable and expandable as more friends/businesses are added.
+When a request applies to one page/module, touch only that page/module and the minimum necessary shared code/assets.
 
-Collapsed cards generally contain the image/visual area, heading/title, category/tag, business/person title, owner/person information where applicable, short description, one Share action, and one expand/details action.
+Before modifying shared CSS/JS:
 
-When expanded, additional details may include services, contact actions, website, location/map, and download/share functionality. Avoid duplicated actions without a clear UX reason.
+1. Trace consumers.
+2. Confirm the change is genuinely shared.
+3. Prefer module-owned styling when the behaviour is not global.
+4. If global, make the smallest shared change and regression-check other consumers.
 
-If the image itself contains a meaningful heading, crop/position the image so the heading remains visible in the collapsed state.
+**Gaming is protected.** Do not modify Game files for unrelated work.
 
----
+**Account/Auth/membership foundations are protected.** Do not change them while working on unrelated modules.
 
-## 7. Expand/collapse behaviour
-
-Expansion must be predictable and reversible.
-
-- Clicking the details control opens the card.
-- Clicking it again or the designated close control reliably collapses it.
-- Do not accidentally create multiple independent expanded states.
-- Preserve existing left-side toggle/bookmark behaviour where present.
-- Use working interactions on `index.html` or `story.html` as reference patterns.
+**Baraha architecture/security is protected.** Trace current implementation before resuming old Baraha work.
 
 ---
 
-## 8. Share and download actions
+## 7. Preserve working functionality
 
-Avoid duplicate Share buttons.
+Existing working behaviour is reference material.
 
-The planned card download feature is intended to create one commonly supported image format containing only the selected card information, not the entire webpage. Final format/implementation is deferred until that feature is actually developed.
+Before replacing something, determine whether:
 
----
+- it already works elsewhere;
+- another module already owns the behaviour;
+- the problem is integration/order/state rather than missing functionality;
+- a targeted repair is sufficient.
 
-## 9. Maps/location standard
+Project-wide rule:
 
-For business cards with locations:
+> **Fix the existing path before creating a new path.**
 
-- Show the address clearly.
-- Use supplied Google Maps Embed code when an embed is provided.
-- Do not invent a different location.
-- Keep map embeds responsive.
-- Do not add a Maps API key merely to display an existing embed.
-
-Current dummy reference location is the Hukkerimath High School area in Haveri.
+Do not create a second renderer, refresh system, event bus, service, controller or state owner simply because the first path is not immediately obvious.
 
 ---
 
-## 10. Page scope rule
+# 8. Authentication and membership architecture
 
-When the owner says a change applies to one page, touch only that page and the minimum necessary shared code/assets.
+## Identity
 
-Before changing shared CSS/JS, check for possible impact on other pages.
+- Supabase Auth provides durable identity.
+- `auth.users.id` is the identity basis.
+- `profiles.id` references that Auth UUID.
+- Google/passkey/etc. are authentication methods, not separate Snehakoota identities.
 
----
+## Account vs membership
 
-## 11. Preserve working functionality
+```text
+Snehakoota Account ≠ Membership
+```
 
-Existing working behaviour is reference material. Check whether the same interaction already works elsewhere before replacing it.
+A person can have a Snehakoota account without any membership.
 
-Examples include navigation/bookmark toggles, card expansion, Share controls, responsive layouts and header/navigation behaviour.
+Account creation is **not invitation-only**.
 
----
+Application roles such as `member` and `admin` are membership/application concepts, not Supabase Dashboard roles.
 
-## 12. Code quality and maintainability
+## Membership model
 
-Prefer semantic, modular, clearly named code that another AI or human can understand later.
+A membership represents:
 
-Avoid unnecessary duplication, unexplained magic numbers, dead CSS/JS, competing implementations and hard-coded dimensions that break on mobile.
+```text
+user + school + batch
+```
 
-Use CSS custom properties for recurring design values where practical.
+`membership_type` describes the user's role within that membership (`member` / `admin`).
 
----
+Multiple memberships per user are supported.
 
-## 13. Content and language
+Current lifecycle values include:
 
-The website is Kannada-first.
+- `pending`
+- `active`
+- `rejected`
+- `suspended`
 
-Do not translate or rewrite existing Kannada content unless requested. Added Kannada wording should be natural, readable and not unnecessarily formal or robotic.
+HSHS / Haveri / 2004 is the current seed/default membership context, not a permanent universal assumption.
 
-English may be used for real business names, technical terms, URLs, product/service names and user-provided content.
+## Approval
 
----
+Membership approval is configuration-driven through `site_config`.
 
-## 14. Long-term authenticated/community architecture
-
-The frontend may remain static while Supabase provides authentication, PostgreSQL, Storage and Realtime functionality.
-
-The intended separation is:
-
-- **GitHub** → source/version control.
-- **Static frontend hosting** → serves HTML/CSS/JS.
-- **Supabase Auth** → authentication and sessions.
-- **Supabase PostgreSQL** → application data and authorization logic.
-- **Supabase Storage** → uploads/media where needed.
-- **Supabase Realtime** → future live features such as chat where appropriate.
-
-Privileged server-side operations may use a secure backend/Edge Function. Service-role keys must never be placed in browser code.
-
-### Authentication foundation
-
-1. `auth.users.id` is the durable authentication identity.
-2. `profiles.id` references that Auth UUID.
-3. Google/passkey/etc. are authentication methods, not separate Snehakoota identities.
-4. Authentication is independent from membership.
-5. Account creation and membership creation are separate concepts.
-6. A person can have a Snehakoota account without having any membership.
-7. A person with no membership is treated as a **public Snehakoota account** until they obtain/request membership through the appropriate lifecycle.
-8. Application roles such as member/admin are application membership concepts, not Supabase Dashboard roles.
-
-### RLS/security
-
-Supabase/PostgreSQL RLS is part of the security model. Frontend visibility is UX only and must not be the security boundary.
-
-Application authorization should be represented in database relationships and server-side logic.
-
-Authentication is required for user-specific/member/private operations; public Baraha content may remain anonymously readable according to RLS.
-
----
-
-## 15. Current membership foundation
-
-### Membership model
-
-A **membership is a relationship between a user and a school/batch context**. `membership_type` describes the user's role within that membership (for example `member` or `admin`); it does not describe the school/batch itself.
-
-The current HSHS / Haveri / 2004 membership is the initial/default membership context.
-
-The current database supports multiple memberships per user. The architecture must not assume HSHS2004 is the only membership forever.
-
-Relevant `memberships` fields include:
-
-- `user_id`
-- `school_id`
-- `batch_id`
-- `invitation_id`
-- `membership_type`
-- `status`
-- approval/rejection/suspension timestamps and approver information
-
-Membership statuses currently include `pending`, `active`, `rejected`, and `suspended`.
-
-### Membership approval configuration
-
-Approval is configuration-driven through `site_config` using `membership_approval_required`.
-
-The current HSHS2004 configuration is:
+Current HSHS2004 setting:
 
 `membership_approval_required = false`
 
-Therefore a new HSHS2004 membership can become `active` without a separate approval step.
-
-Generic status rule:
+Generic rule:
 
 ```text
-approval_required = false
-    → ACTIVE
+approval_required = false → ACTIVE
 
-approval_required = true
-    + inviter has an ACTIVE ADMIN membership for that same school/batch
-    → ACTIVE
+approval_required = true + inviter is ACTIVE ADMIN
+for the same school/batch → ACTIVE
 
-approval_required = true
-    + inviter is not an ACTIVE ADMIN for that same school/batch
-    → PENDING
+approval_required = true + inviter is not ACTIVE ADMIN
+for the same school/batch → PENDING
 ```
 
-The active-admin rule is an approval **booster**. The inviter is a helper/spreader of the community, not the owner of the receiver's membership decision.
+The active-admin rule is an approval booster, not permanent ownership.
 
-Invitation processing must never downgrade an already `ACTIVE` membership to `PENDING`. Admin tools may perform deliberate downgrades later.
-
-For an existing `PENDING`, `SUSPENDED` or `REJECTED` membership, a new invitation may move it to the newly determined `PENDING` or `ACTIVE` state. Old rejection/suspension lifecycle metadata is cleared when that happens.
+Invitation processing must never downgrade an existing `ACTIVE` membership to `PENDING`.
 
 ---
 
-## 16. Current invitation architecture — implemented foundation
+# 9. Invitation architecture
 
-The invitation system is now an actual working backend + sender UI foundation. Future AI sessions must preserve these decisions unless explicitly changed.
+The invitation system is an implemented backend + sender UI foundation.
 
-### Core philosophy
+## Philosophy
 
-An invitation is primarily a **way for a member to spread the word about Snehakoota and bring another person into the community**.
+An invitation helps a member spread the word and propose membership context. It does not control account creation.
 
-It is **not** an account-creation gate.
+## Generation
 
-A person may create a Snehakoota account without an invitation. An account with no membership is a valid public Snehakoota account.
-
-An invitation adds context and can propose one or more memberships, but the receiver's membership relationship is governed by the membership lifecycle and receiver consent.
-
-### Invitation generation
-
-The current sender RPC is:
+Primary RPC:
 
 `public.create_invitation(p_membership_ids bigint[] default null)`
 
-The sender UI can select multiple memberships or choose a General Snehakoota invitation.
-
-The generation sequence is:
+Flow:
 
 ```text
 authenticated sender
-  → validate active profile
-  → validate invitation configuration
-  → validate selected membership(s)
-  → create secure random token
-  → store token hash
-  → generate unique public short code
-  → persist invitation
-  → persist invitation_memberships
-  → return path/short code
-```
-
-The invitation is persisted before the frontend displays the link.
-
-### Public invitation URL
-
-The public link uses a short code:
-
-`https://snehakoota.in/?invite=XXXXXXXX`
-
-The current implementation generates an 8-character uppercase hexadecimal code and enforces uniqueness in `invitations.short_code`.
-
-The short code is a public lookup identifier only. The secure invitation token/hash remains separate.
-
-A new invitation generation always creates a new invitation/token. It does not silently reuse an old invitation.
-
-### Invitation tables
-
-#### `invitations`
-
-Represents the generated invitation itself.
-
-Important fields include:
-
-- `id` — permanent internal identity.
-- `short_code` — unique public lookup key.
-- `token_hash` — secure token material.
-- `inviter_id` — sender identity.
-- `status`.
-- `expires_at` / `revoked_at`.
-- `invitee_id` / email remain available for future directed-invitation use if needed.
-
-#### `invitation_memberships`
-
-Maps an invitation to the membership(s) proposed by the sender.
-
-This is the normalized representation for multiple proposed memberships.
-
-#### `invitation_uses`
-
-Records authenticated people who actually used an invitation.
-
-The unique key `(invitation_id, invitee_id)` makes repeated use by the same person idempotent while allowing the same invitation URL to be shared by multiple people.
-
-No usage counter is required. Counts can be queried from `invitation_uses` when an admin panel is built.
-
-### Invitation lifecycle
-
-Invitation status values are:
-
-```text
-PENDING
-REUSABLE
-EXPIRED
-REVOKED
-```
-
-`PENDING` means generated and currently usable but not yet successfully used.
-
-`REUSABLE` means it has been successfully used at least once and remains usable by other people until expiry or revocation.
-
-The invitation is **not** marked `ACCEPTED`, because the invitation itself is reusable.
-
-The actual people who used it are tracked in `invitation_uses`.
-
-Current configured lifetime:
-
-`invitation_expiry_days = 5`
-
-Current configured retention/cleanup value:
-
-`invitation_cleanup_after_days = 7`
-
-Expired/revoked invitations are intended to be cleaned up by a controlled backend/scheduled maintenance mechanism. Manual SQL cleanup is acceptable during development.
-
-### Sender UI principles
-
-The sender flow is:
-
-```text
-Invite a friend
-  → choose one or more memberships OR General invitation
-  → Generating…
-  → backend persists invitation
-  → display short invitation link
+  → validate profile/configuration
+  → validate selected memberships
+  → secure token/hash
+  → unique public short code
+  → persist invitation + proposals
+  → return invitation path/code
   → Copy / Share
 ```
 
-The current Account widget is intentionally modular. Existing frontend switches include:
+Public format:
 
-- `INVITATION_MEMBERSHIP_MODE`
-- `INVITATION_SHOW_GENERAL_OPTION`
-- invitation success-message timing
+`https://snehakoota.in/?invite=XXXXXXXX`
 
-These are presentation controls, not security controls.
+The current public code is 8-character uppercase hexadecimal. It is a lookup identifier; secure token/hash material remains separate.
 
-Copy and Share do not close the panel.
+A new invitation generation creates a new invitation/token rather than silently reusing an old invitation.
 
-Copy provides a simple human-facing confirmation such as `Link copied.`
+## Tables
 
-### General invitation
+- `invitations` — invitation identity, code, token hash, inviter, lifecycle and expiry/revocation data.
+- `invitation_memberships` — normalized membership proposals.
+- `invitation_uses` — authenticated receivers who used the invitation.
 
-A General Snehakoota invitation has **no attached membership proposal**.
+`UNIQUE(invitation_id, invitee_id)` makes repeated use by the same person idempotent while allowing the same invitation to be reused by different people.
 
-It does not automatically create a membership.
+## Lifecycle
 
-A future onboarding UI may use the configured default membership (`default_batch`, currently 2004) to present a likely/default choice, but that configuration must not silently create a membership or override receiver consent.
+```text
+PENDING → REUSABLE
+          ↘ EXPIRED
+          ↘ REVOKED
+```
 
-The UI may later grey out the General option or present it as “Coming soon” without changing the backend model.
+Current configuration:
 
----
-
-## 17. Receiver-side architecture — current backend implementation
-
-Receiver implementation is being built separately from the sender UI.
-
-The receiver is divided into three logical stages.
-
-### Part 1 — Landing / invitation recognition ✅
-
-When someone arrives with:
-
-`/?invite=SHORTCODE`
-
-we first determine whether the invitation is genuinely valid.
-
-The URL alone is **not** treated as an invitation.
-
-Invalid/nonexistent/expired/revoked invitation codes fall back to normal Snehakoota behaviour.
-
-No membership or invitation-use record is created merely by clicking the URL.
-
-### Part 2 — Authentication context ✅
-
-Authentication remains the normal Snehakoota authentication flow.
-
-Invitation presence is not a requirement for creating an account.
-
-Both existing and new users may authenticate normally. A new account without a membership is a valid public account.
-
-A valid invitation context should survive authentication so that the authenticated processing stage can later act on it.
-
-No membership is created merely because authentication occurred.
-
-For Google, the current account widget uses the Supabase OAuth/PKCE flow. Receiver UI work must preserve the invitation context across the OAuth round trip.
-
-Passkey is currently used as an authentication method for existing credentials; passkey registration occurs only after the user is already signed in. Do not treat passkey as a parallel new-user signup mechanism without an explicit future change.
-
-### Part 3 — Authenticated invitation processing ✅ backend
-
-The backend processing rules are now implemented.
-
-#### 3A — Resolve invitation
-
-RPC:
-
-`public.resolve_invitation(p_invitation_code)`
-
-It:
-
-- finds the invitation through `short_code`;
-- accepts only `pending`/`reusable` invitations;
-- rejects revoked/expired invitations;
-- resolves the current school/city/batch context;
-- verifies the proposed membership target still exists and the school/city/batch are active;
-- does not mutate membership data;
-- does not record invitation use.
-
-The sender's own membership status is not a validity gate for the proposal. Sender authority is evaluated separately during processing.
-
-#### 3B — Process membership proposal(s)
-
-RPC:
-
-`public.process_invitation_memberships(p_invitation_code, p_selected_membership_ids)`
-
-For each selected valid proposal it:
-
-1. determines the target membership status from current configuration and inviter authority;
-2. checks whether the receiver already has that school/batch membership;
-3. creates the membership with the correct status when missing;
-4. updates the membership when the target state should change;
-5. does nothing when the existing state is already correct;
-6. never downgrades `ACTIVE → PENDING` through invitation processing;
-7. may move `SUSPENDED`/`REJECTED` to the newly determined `PENDING`/`ACTIVE` state;
-8. keeps `membership.invitation_id` on newly created memberships so invitation provenance is preserved.
-
-Memberships are processed independently, allowing different proposed memberships to produce different statuses.
-
-#### 3C — Invitation use + reusable lifecycle
-
-The same authenticated processing operation:
-
-- inserts `invitation_uses` for the receiver;
-- treats the same `(invitation_id, invitee_id)` again as no-op rather than an error;
-- changes `PENDING → REUSABLE` after the first successful use;
-- leaves an already `REUSABLE` invitation reusable for other people;
-- does not use an `ACCEPTED` invitation state.
-
-The operation is intended to be transactional so membership processing and invitation usage do not intentionally become separate half-completed business events.
-
-### Receiver consent principle
-
-The sender's membership selections are **proposals/context**, not a command to grant membership blindly.
-
-The receiver can eventually choose which proposed memberships to proceed with through the receiver UI.
-
-For every selected membership, the backend evaluates the current membership state and current approval configuration at processing time.
-
----
-
-## 18. Current Supabase configuration
-
-The application configuration lives in `site_config` so operational values do not have to be scattered through multiple SQL functions.
-
-Current relevant configuration includes:
-
-- `invitation_enabled = true`
-- `default_batch = 2004`
-- `membership_approval_required = false` for HSHS2004
 - `invitation_expiry_days = 5`
 - `invitation_cleanup_after_days = 7`
 
-Configuration must be read server-side by RPCs where it affects business logic.
+There is deliberately no `ACCEPTED` state for a reusable invitation.
 
-### Supabase signup switch
+## Receiver
 
-Supabase Dashboard provides **Allow new users to sign up**. Turning it OFF is useful as a temporary development safety switch: existing users can still sign in while new Auth users cannot be created.
+`/?invite=SHORTCODE` is context only; the URL itself grants nothing.
 
-This Dashboard control is separate from Snehakoota's invitation concept.
+Invalid/nonexistent/expired/revoked codes fall back to normal Snehakoota behaviour.
 
-Snehakoota itself is **not invitation-only for account creation**. Invitation is a community/membership mechanism.
+Authentication remains normal Snehakoota authentication. Valid invitation context must survive OAuth/PKCE and only then be processed for membership purposes.
 
-### Legacy helper created during an earlier design discussion
+Backend RPCs:
 
-`check_account_creation_allowed(invitation_code)` was created while invitation-only account creation was being considered.
+- `public.resolve_invitation(p_invitation_code)`
+- `public.process_invitation_memberships(p_invitation_code, p_selected_membership_ids)`
 
-That model was later rejected because Snehakoota intentionally allows public account creation independent of invitations.
+Processing is idempotent and preserves existing `ACTIVE` membership.
 
-**Do not build new receiver logic around this helper.** It can be removed later after confirming that nothing references it.
+A General invitation has no membership proposal and must not silently create HSHS2004 membership.
 
----
+### Rejected model
 
-## 19. Supabase security and operational foundation
-
-### Database security
-
-Current invitation-related RPCs use `SECURITY DEFINER` where appropriate with controlled search paths and explicit grants.
-
-Receivers should not need direct table-write permissions merely to process invitations.
-
-### Heartbeat
-
-A lightweight `supabase_heartbeat()` function and GitHub Actions workflow are used as a project-activity/health mechanism.
-
-The heartbeat is operational infrastructure and should remain separate from Snehakoota business logic.
-
-Do not add heartbeat behaviour to the website UI.
-
-### Edge Functions
-
-Supabase Edge Functions are available for future server-side logic requiring capabilities that should not live in browser JavaScript, especially privileged operations that must never expose a service-role key.
-
-Do not add an Edge Function merely because it is available. Use it when the business requirement actually needs server-side API logic beyond the capabilities of existing RPCs.
-
-For the current receiver architecture, no account-deletion/cleanup Edge Function is required merely because invitation links exist; public account creation is intentionally allowed.
+The earlier invitation-only account-creation model was rejected. Do not build new logic around the historical `check_account_creation_allowed(invitation_code)` helper. Remove it only after references are traced.
 
 ---
 
-## 20. Current receiver backend checklist before UI
+# 10. Supabase security principles
 
-Completed:
+Frontend visibility is UX. **Database authorization is security.**
 
-- [x] Short invitation code stored and unique.
-- [x] Invitation URL resolves through `short_code`.
-- [x] Validity checks include status, expiry and revocation.
-- [x] Proposed membership target checks include current school/city/batch activity.
-- [x] Multiple proposed memberships supported in normalized `invitation_memberships`.
-- [x] Receiver membership create/update/no-change logic implemented.
-- [x] Status determination implemented from approval configuration + active-admin override.
-- [x] Active memberships are never downgraded by invitation processing.
-- [x] Rejected/suspended lifecycle metadata is cleaned when state is reopened.
-- [x] Invitation usage is idempotent per invitation + receiver.
-- [x] Reusable invitation lifecycle implemented.
+Use RLS and controlled RPC/server-side authorization for sensitive operations.
 
-Still pending before/while receiver UI is developed:
+Never place a service-role key in browser code.
 
-- [ ] Carry invitation context through the current Google OAuth/PKCE round trip.
-- [ ] Implement receiver Account-widget presentation for a valid invitation.
-- [ ] Make proposed memberships preselected and configurable/editable at the frontend level without coupling presentation to database security.
-- [ ] Implement the authenticated call to `process_invitation_memberships()` after the appropriate receiver action.
-- [ ] Test existing-user and new-user receiver flows end-to-end.
-- [ ] Test General invitation with no membership.
-- [ ] Test repeated use of the same link by different users and by the same user.
-- [ ] Test expiry/revocation behaviour.
-- [ ] Add controlled expiry/cleanup maintenance once receiver behaviour is stable.
-- [ ] Decide later whether `invitation_uses.invitee_email` should be populated from Auth identity data; `invitee_id` remains the authoritative receiver identity.
-- [ ] Later decide whether legacy `check_account_creation_allowed()` should be removed.
+SECURITY DEFINER RPCs must use controlled search paths and explicit grants.
+
+Do not loosen RLS merely to make a UI operation convenient.
+
+Multi-table business operations should be orchestrated atomically where practical.
+
+Before adding a new role/authority system, inspect the existing live database and configuration foundation.
 
 ---
 
-## 21. Schema evolution and data preservation
+# 11. Baraha — protected architecture
 
-Use migrations/version-controlled schema changes for important database changes.
+Baraha is the Kannada-first long-form community writing/feed system. It intentionally differs from Community Updates.
 
-The preferred direction is:
+| Baraha | Community Updates |
+|---|---|
+| Long-form writing/read | Short-form inform/announce/alert/schedule |
+| Categories such as ಬರಹ/ಕವನ/ನೆನಪು/ಲೇಖನ/ಪುಸ್ತಕ | Notice/Announcement/Event |
+| Feed + dedicated Reader | Expandable Notice Board |
+
+## Feed ownership
+
+The historical Baraha issue involved competing initialization paths and static/live feed ownership.
+
+Direction:
+
+```text
+BarahaModel
+  ├── seed/static posts
+  ├── live Supabase posts
+  └── authoritative combined posts
+          ↓
+      BarahaView
+          ↓
+     renderPosts()
+```
+
+`BARAHA_FEED_CONFIG.includeStaticPosts` controls legitimate static/demo inclusion.
+
+Do not create a second feed builder or competing initialization path.
+
+## Reader
+
+The Reader is separate from the feed view.
+
+- `baraha.html` — Reader shell.
+- `baraha-reader.js` — Reader lifecycle.
+- `baraha.css` — Reader styling.
+- `BarahaModel.currentPost` — selected post state.
+
+Reader methods include `render(post)`, `open(post)`, `close()`, `clear()` and `isOpen()`.
+
+Long content should scroll inside the Reader, not create confusing underlying-page scrolling.
+
+## Lifecycle/security
+
+Server-side lifecycle enforcement remains authoritative.
+
+Author edit is allowed only while the post is `draft` or `pending`.
+
+Published/hidden/archived posts must not become editable merely because the user is the author.
+
+Relevant hardened RPCs include:
+
+- `baraha_publish_post(...)`
+- `baraha_archive_post(bigint)`
+- `baraha_approve_post(bigint)`
+- `baraha_hide_post(bigint)`
+
+Authenticated execution is retained; public execution was removed during ACL hardening.
+
+Do not assume remaining Baraha edit/Reader UI work is complete; trace the current repository before resuming it.
+
+---
+
+# 12. Community Updates / Notice Board — V1
+
+Community Updates is the current information-board module.
+
+Core decision:
+
+> **Do not build separate Notice and Events systems. Use one generic Community Updates model.**
+
+Internal terminology remains **Community Updates / Updates**. User-facing labels may be Notice Board, Upcoming Events or Updates.
+
+## Updates are not Baraha
+
+Updates are short, action-oriented, time-relevant information objects. They are not another long-form writing system and must not gain a second Baraha-style Reader.
+
+The Notice Board itself is the reader for Updates.
+
+## Types and audience
+
+Types:
+
+```text
+notice
+announcement
+event
+```
+
+Audience:
+
+```text
+public
+membership_targeted
+```
+
+One update can target one or multiple membership contexts.
+
+Events may contain start/end time and location name/URL.
+
+An update may optionally link to a Baraha post.
+
+## Database model
+
+### `community_updates`
+
+Core fields include:
+
+- `id`
+- `update_type`
+- `title`
+- `content`
+- `visibility_scope`
+- `is_enabled`
+- `published_at`
+- `expires_at`
+- `linked_baraha_post_id`
+- `created_by`
+- `created_at`
+- `updated_at`
+
+### `community_update_memberships`
+
+Normalized bridge between updates and existing memberships.
+
+`UNIQUE(update_id, membership_id)` prevents duplicate targeting.
+
+### `community_update_event_details`
+
+One optional event-detail row per update:
+
+- `update_id`
+- `starts_at`
+- `ends_at`
+- `location_name`
+- `location_url`
+
+## Integrity rules
+
+Database/orchestration, not frontend-only code, must enforce:
+
+- allowed types are notice/announcement/event;
+- public updates have no membership mappings;
+- targeted updates have at least one membership mapping;
+- public and selected-membership audiences are not mixed;
+- event updates require event details;
+- non-event updates do not retain event details;
+- event end is not earlier than start;
+- publish/expiry relationship is valid.
+
+## Active/expiry lifecycle
+
+```text
+is_enabled = true
+AND published_at <= now()
+AND (expires_at IS NULL OR expires_at > now())
+```
+
+Expired updates disappear from the read query but remain in the database. No cleanup job is required merely to hide them.
+
+---
+
+# 13. Community Updates frontend architecture
+
+The module is intentionally split into narrow responsibilities.
+
+## Read path
+
+```text
+Supabase
+   ↓
+notices-service.js
+   ↓
+notices.js
+   ↓
+Notice Board / Home preview
+```
+
+`notices-service.js` owns Community Update reads and management RPC calls. UI code does not call Supabase directly for those operations.
+
+## Create path
+
+```text
+notices-create.js
+        ↓
+notices-create-service.js
+        ↓
+community_updates_save RPC
+        ↓
+Supabase
+```
+
+The creation UI supports:
+
+- type;
+- audience;
+- title/content;
+- publish time;
+- expiry time;
+- authorized membership targets;
+- event start/end;
+- event location;
+- related URL.
+
+UI validation is for usability. Database/RPC validation remains authoritative.
+
+## Shared Supabase client
+
+The read and creation services share:
+
+`window.SnehakootaNoticesSupabaseClient`
+
+This avoids unnecessary parallel client instances and keeps the read/create flows in one browser session/client context.
+
+---
+
+# 14. Notice Board UI decisions
+
+## Home preview
+
+The current implementation shows up to **5** newest active updates (`HOME_NOTICE_LIMIT = 5`).
+
+## Full board
+
+The full board is an overlay with a scrollable list of visible updates.
+
+Updates expand **inline** inside the board.
+
+There is no separate per-update reader route/panel for normal V1 updates.
+
+The intended flow is:
+
+```text
+Home preview
+   ↓
+Open Notice Board
+   ↓
+Expand update inline
+   ↓
+Read
+```
+
+Event information can be shown directly. Linked Baraha content is a navigation relationship, not another Update reader.
+
+## Scroll/layout safeguards
+
+The full list uses isolated runtime layout safeguards in `notices/notices-runtime.css` so that:
+
+- the board/list can shrink correctly inside the overlay;
+- the list scrolls vertically;
+- horizontal overflow is suppressed;
+- expanded items do not clip their content;
+- multiple expanded items can coexist without incorrect clipping;
+- expanded actions remain reachable.
+
+This runtime stylesheet is deliberately additive and isolated from the main Notice Board stylesheet.
+
+---
+
+# 15. Notice creation refresh — important learned integration rule
+
+After a successful notice creation, the existing Notice Board refresh path is reused.
+
+```text
+create succeeds
+   ↓
+SnehakootaNoticeBoard.refresh()
+   ↓
+getVisibleUpdates()
+   ↓
+state.updates replaced
+   ↓
+render()
+   ↓
+home preview + board update
+```
+
+The project must **not** add polling, another event bus, manual parallel DOM insertion or a second renderer to solve post-create freshness.
+
+The recent fix also established the shared Supabase client between read/create services so the existing refresh path works in the same client/session context.
+
+The same principle applies to future mutations:
+
+> **successful mutation → authoritative existing state/render path**
+
+---
+
+# 16. Notice deletion and authorization
+
+Delete is an existing Notice Board mutation path, not a separate subsystem.
+
+Capability is checked per update through:
+
+`community_updates_get_manage_capabilities`
+
+Secure deletion uses:
+
+`public.community_updates_delete(p_update_id bigint, p_user_id uuid DEFAULT auth.uid())`
+
+Current authority model:
+
+- **platform owner** can manage/delete any Community Update;
+- **active membership admin** can manage/delete membership-targeted updates only when current authority covers the relevant target membership(s);
+- membership admins do not gain deletion rights over public updates merely by being admins.
+
+There is no browser-side direct DELETE permission being used as the security boundary.
+
+Delete flow:
+
+```text
+capability check
+   ↓
+Delete notice
+   ↓
+secure delete RPC
+   ↓
+remove from state
+   ↓
+render()
+```
+
+Failed deletion restores the action and reports an error.
+
+### Important CSS/security-UX lesson
+
+A previous normal-user visibility bug was caused by CSS overriding the browser's semantic `[hidden]` state with `display:flex`.
+
+The correct fix was **not** to add a misleading “Admin Delete” label or duplicate role UI. The correct rule is:
+
+> **Capability controls whether the action exists; CSS must respect the semantic hidden state.**
+
+The runtime Notice Board CSS explicitly preserves `[hidden]` behaviour for action/detail containers.
+
+The delete control uses an actual trash icon rather than the earlier placeholder character.
+
+---
+
+# 17. Community Updates authority model
+
+Authority has two scopes.
+
+## Site-wide/public authority
+
+Public-update authority should be configurable through the existing configuration foundation rather than hard-coded in JavaScript.
+
+Current intended direction:
+
+`updates_public_authority = owner`
+
+Do not assume a generic `admin` role is sufficient in a multi-membership system.
+
+## Membership-scoped authority
+
+For targeted updates, authority follows the current active membership-admin relationship.
+
+Strict multi-membership rule:
+
+> An admin targeting A + B + C must have active admin authority over **all** targeted memberships. Admin of A alone must not gain authority over B/C.
+
+## Creator is not permanent authority
+
+`created_by` is audit/attribution data, not permanent management authority.
+
+If the creator later loses authority, another currently authorized administrator should be able to manage the update.
+
+Before changing this area, inspect the existing site-level owner/configuration model and live RPCs. Do not create a second role system.
+
+---
+
+# 18. Community Updates ↔ Baraha
+
+One Community Update may link to one Baraha post; a Baraha post may be referenced by multiple Updates.
+
+Do not expose a restricted Baraha destination through a broader Update audience.
+
+Safe direction:
+
+```text
+Public Update → Public Baraha
+Targeted Update → compatible Baraha visibility
+```
+
+Avoid:
+
+```text
+Public Update → membership-restricted Baraha
+```
+
+Audience compatibility belongs in the write/authorization path, not frontend presentation alone.
+
+---
+
+# 19. Deferred Community Updates features
+
+Do not add without an explicit product decision:
+
+- RSVP
+- attendance tracking
+- push notifications
+- calendar integration
+- tickets
+- image uploads for updates
+- comments
+- reactions
+- recurring events
+- complex scheduling
+- large admin dashboards
+- realtime feeds merely for the sake of realtime
+
+Keep V1 small, understandable and reliable.
+
+---
+
+# 20. Shared navigation and footer
+
+`navigation.css` / `navigation.js` are shared assets. Visual-only icon refinements must not alter links, routing, active-state logic or feature behaviour.
+
+Current icon refinements:
+
+- Payana → winding road/journey representation.
+- Baraha → elegant writing/page + pen representation.
+
+`footer.html` / `footer.css` / `footer.js` remain logically separate from floating Account/Game widgets.
+
+`footer.js` fetches/injects `footer.html`; scripts inside fetched footer HTML must not be assumed to execute automatically.
+
+---
+
+# 21. Game component — protected
+
+Game extraction established:
+
+- `game.css` for Game styling;
+- `game.js` for Game behaviour/lifecycle;
+- `game-test.html` for isolated verification.
+
+Historical repair helpers are not automatically part of the clean architecture.
+
+Do not put `game.js` inside dynamically fetched footer HTML merely because the footer is globally available; loading order matters.
+
+**Gaming is out of scope for unrelated work.**
+
+---
+
+# 22. Schema evolution and data preservation
+
+Preferred direction:
 
 **upgrade → migrate → preserve existing users/data → continue**
 
@@ -631,61 +840,211 @@ not:
 
 **replace → recreate users/data → repair manually**
 
-Do not design new tables around temporary UI labels or today's HTML structure.
+Before introducing a migration convention, inspect the repository and live Supabase. Earlier ACL work found no reliable tracked migration structure, so do not invent a one-off convention casually.
 
-Use stable IDs and relationships. Keep authentication identity separate from profile/member data. Keep database records separate from uploaded files.
+Do not delete code merely because it looks unused. Trace references and behaviour first.
 
-Avoid adding infrastructure before the requirement becomes real.
+When replacing an implementation:
 
----
-
-## 22. AI change protocol
-
-For every requested change:
-
-### Step 1 — Understand
-Identify the exact page/component/behaviour being changed.
-
-### Step 2 — Inspect
-Read the current repository implementation before proposing code.
-
-### Step 3 — Plan
-Briefly explain what will change and what remains untouched when the change is non-trivial.
-
-### Step 4 — Implement
-Make the smallest appropriate change.
-
-### Step 5 — Verify
-Check HTML, JavaScript, assets, responsive behaviour, duplicate controls, regression risk and (for Supabase) authorization, RLS/grants, configuration dependencies, error handling and persistence order.
-
-### Step 6 — Commit
-Commit only the approved change. Keep commits focused enough that the owner can understand and safely revert them.
-
-### Step 7 — Post-commit validation
-Re-fetch the committed file(s), compare the commit with its parent, verify the exact changed-file set and confirm there was no truncation, accidental revert or unrelated change.
-
-### Step 8 — Update this README when a decision becomes durable
-If a decision changes architecture, security, data ownership, lifecycle, development rules, or another future-session assumption, update this README as part of the same controlled workflow. Record the new decision rather than relying on conversation history alone.
+```text
+old working path
+      ↓
+new isolated path
+      ↓
+verify
+      ↓
+stabilize
+      ↓
+remove old/orphaned path
+```
 
 ---
 
-## 23. Do not over-engineer the current project
+# 23. Testing discipline
 
-Snehakoota.in is being built incrementally.
+Testing is scenario-driven, not only file-driven.
 
-Priority:
+For UI changes, test the user action that motivated the change.
 
-**working → clean → responsive → maintainable → extensible**
+For data mutations, verify:
 
-not:
+1. persistence;
+2. immediate UI refresh;
+3. browser-refresh consistency;
+4. auth-state behaviour;
+5. unauthorized behaviour;
+6. error handling;
+7. no duplicate state/render paths.
 
-**complex → framework-heavy → over-engineered**
+Community Updates regression set should cover:
 
-Future architecture should be anticipated, but future infrastructure should not be implemented before it is needed.
+- anonymous visibility;
+- matching/non-matching membership visibility;
+- admin capability visibility;
+- public-update authority;
+- create success;
+- immediate post-create refresh;
+- delete success;
+- unauthorized delete rejection;
+- disabled/expired updates;
+- events and locations;
+- multiple targets;
+- linked Baraha compatibility;
+- mobile/desktop board scrolling.
 
 ---
 
-## 24. Current project philosophy
+# 24. The learned “no parallel fix” standard
+
+This is now a project-wide rule.
+
+When something is broken:
+
+1. Find the existing intended path.
+2. Identify why it is failing.
+3. Repair that path where possible.
+4. Reuse the existing service/controller/state/render boundary.
+5. Introduce a new boundary only if the existing ownership is fundamentally wrong.
+6. Retire obsolete paths after verification.
+
+Recent examples:
+
+- Notice creation refresh reuses `SnehakootaNoticeBoard.refresh()`.
+- Notice deletion updates existing Notice Board state and calls `render()`.
+- Delete visibility was fixed through capability + semantic `[hidden]` behaviour, not role-labelled duplicate UI.
+- Navigation icon refinement changed only the shared visual layer.
+- Read/create Notice services now share one Supabase client rather than creating another refresh mechanism.
+
+---
+
+# 25. Current status snapshot — 2026-09-15
+
+## Foundation
+
+- [x] Static HTML/CSS/vanilla JS direction.
+- [x] Shared theme/navigation/footer foundation.
+- [x] Supabase Auth foundation.
+- [x] Account vs membership separation.
+- [x] Multiple memberships.
+- [x] Invitation backend + sender foundation.
+- [x] Reusable/idempotent invitation lifecycle.
+
+## Baraha
+
+- [x] Feed initialization stabilization direction.
+- [x] Static/live feed configuration.
+- [x] Dedicated Reader separation.
+- [x] Server-side lifecycle/ACL hardening.
+- [ ] Remaining edit/Reader UI work must be traced from current repository before resuming.
+
+## Community Updates / Notice Board
+
+- [x] Generic `community_updates` model.
+- [x] Membership targeting bridge.
+- [x] Event details model.
+- [x] Read service/controller boundary.
+- [x] Creation service/controller boundary.
+- [x] Create form and validation.
+- [x] Home preview.
+- [x] Inline expandable full board.
+- [x] Secure per-update capability/delete path.
+- [x] Delete visibility correction.
+- [x] Board scroll/overflow safeguards.
+- [x] Shared Supabase client for read/create flows.
+- [x] Immediate post-create refresh through existing board refresh path.
+- [x] Immediate post-delete state/render update.
+- [ ] Further authority/config refinement only after tracing existing site-level foundation.
+
+## Shared navigation
+
+- [x] Payana journey/road icon.
+- [x] Baraha writing/page + pen icon.
+- [x] Navigation links/behaviour preserved.
+
+## Protected unless explicitly requested
+
+- Account/Auth/membership foundations.
+- Gaming.
+- Existing Baraha security/architecture.
+- Shared navigation behaviour during icon-only work.
+
+---
+
+# 26. Recent implementation checkpoints
+
+Recent focused commits:
+
+- `20030a0653b0499b1399a447088ef2efecddf7f0` — `refine: update shared journey and writing icons`
+- `91f3cb23fbf45329ea6dc3b6807840117738f6aa` — `fix: finish notice board delete and scroll behavior`
+- `059c71461947e705ae69f08c8650efbfb1ca4da2` — `fix: share notice Supabase client across read and create flows`
+
+The current README update follows the shared-client refinement commit.
+
+GitHub Pages deployment for the latest application code has been verified successful.
+
+---
+
+# 27. Future-session continuity rule
+
+This README is continuity context, not a substitute for tracing the repository.
+
+Use both:
+
+```text
+README / handover
+      ↓
+continuity + durable decisions
+
+Current GitHub repository
+      ↓
+exact implementation truth
+
+Live Supabase
+      ↓
+exact database/security truth
+```
+
+If they conflict:
+
+> **Current repository/live Supabase wins for exact implementation state.**
+
+Record the discrepancy instead of guessing.
+
+---
+
+# 28. Ready-to-use AI continuation prompt
+
+Continue **Snehakoota.in** from the current repository state.
+
+Treat the current GitHub repository and live Supabase as the source of truth for exact implementation state, and this README as the durable record of architecture, decisions and development standards.
+
+Work as an **implementation partner**:
+
+```text
+INSPECT
+  ↓
+TRACE EXISTING PATH
+  ↓
+DECIDE REASONABLY
+  ↓
+CHANGE MINIMALLY
+  ↓
+VERIFY FROM MULTIPLE PERSPECTIVES
+  ↓
+COMMIT CLEANLY
+  ↓
+UPDATE README WHEN A DECISION BECOMES DURABLE
+```
+
+Do not restart the project, replay old plans blindly, or create parallel fixes. Preserve working behaviour and unrelated modules. Do not stop for small clarifications when the intended outcome is clear; make the reasonable implementation decision using this README and the current code.
+
+For backend work, inspect live Supabase authorization/config/RLS/RPC behaviour before modifying schema or security. For frontend work, identify the existing owner of the behaviour before adding code. For every mutation, prefer the existing authoritative refresh/state/render path.
+
+**Priority:** working → correct → clean → responsive → maintainable → extensible.
+
+---
+
+# 29. Final project philosophy
 
 Snehakoota is a community project first and a technology project second.
 
@@ -699,702 +1058,6 @@ Technology should serve:
 - Simplicity.
 - Long-term maintainability.
 
----
+The goal is not to build the most complicated system.
 
-## 25. Delta since the previous README update — 2026-08-29
-
-The previous README was last updated on 2026-08-29. The following durable decisions were made after that point and are now recorded here so future sessions do not depend on conversation history.
-
-### Baraha backend foundation is now established
-
-Baraha is no longer only a UI prototype at the architecture level. Its PostgreSQL foundation and security model are established and should be treated as the current backend foundation unless explicitly reopened.
-
-The current `baraha_posts` foundation includes:
-
-- `id`
-- `author_id`
-- `author_membership_id`
-- `title`
-- `content`
-- `category`
-- `content_status`
-- `visibility`
-- `collection_key`
-- `collection_part`
-- `collection_order`
-- `created_at`
-- `updated_at`
-
-The normalized `baraha_post_memberships` relationship supports multiple membership contexts per post.
-
-Baraha lifecycle states are:
-
-`draft`, `published`, `hide`, `archived`.
-
-Normal users do not physically delete posts; normal deletion is represented by `archived`. Owner-level physical deletion remains an exceptional/firefighter capability.
-
-Matching active admins may moderate a matching post from `published → hide`, with database protection that prevents unauthorized content/identity changes through the moderation path.
-
-### Baraha authorization and public access
-
-Supabase RLS/database rules remain the actual security boundary.
-
-Authentication is required for user-specific/member/private Baraha operations, while published public Baraha content may remain anonymously readable according to RLS.
-
-Frontend visibility or button state is never considered authorization.
-
-### Baraha membership is contextual, not identity
-
-A Baraha post may carry an author membership context, but `author_id` remains the durable ownership identity. Membership context does not replace the authenticated user identity.
-
-Multiple memberships per user remain a permanent architectural requirement.
-
-### Baraha architecture is deliberately modular
-
-The current Baraha application boundary is:
-
-```text
-Supabase / Auth
-      ↓
-BarahaService
-      ↓
-BarahaController
-   ↙        ↘
-Context     Model
-      \      /
-        View
-          ↓
-     baraha.html
-```
-
-This is a lightweight application architecture, not a new framework.
-
----
-
-## 26. Baraha application architecture
-
-### Purpose
-
-Baraha is being developed as a self-contained modular application inside the static Snehakoota frontend. The goal is to provide clear boundaries now so individual capabilities can be changed later without rewriting unrelated parts of the page.
-
-The architecture intentionally resembles a small MVC/application module and may use PBO/PAI-style thinking for UI lifecycle, but it does not introduce a large generic framework.
-
-### Layers and responsibilities
-
-#### View — `baraha.html` / future `BarahaView`
-
-The View is responsible for:
-
-- presenting Baraha UI;
-- collecting user interaction;
-- UI-only validation and presentation state;
-- rendering data supplied by the application layer;
-- showing loading, empty, unavailable and error states.
-
-The View must not directly query Supabase, implement database authorization, or become the source of business/data truth.
-
-The existing HTML can remain the visual/template surface while the architecture evolves toward a clearer `BarahaView` object where useful.
-
-#### Controller — `BarahaController`
-
-The Controller is the application doorway for user commands and coordinates the flow between View, Model, Context and Service.
-
-Conceptual commands include:
-
-```text
-SELECT_CATEGORY
-SELECT_MEMBERSHIP
-OPEN_POST
-LOAD_MORE
-NEW_POST
-SAVE_DRAFT
-PUBLISH_POST
-HIDE_POST
-```
-
-The exact command catalogue may evolve. The important rule is that user actions enter the application through the Controller rather than embedding business/data operations directly in HTML handlers.
-
-The Controller must not contain raw Supabase table/RPC implementation details.
-
-#### Model — `BarahaModel`
-
-The Model owns Baraha application/domain state, not DOM state and not authentication authority.
-
-The planned structure is:
-
-```text
-BarahaModel
-├── feed
-│   ├── items
-│   ├── loading
-│   ├── hasMore
-│   └── nextCursor
-├── selectedPost
-├── categories / modes / visibility options
-├── selectedCategory / filters
-└── editor
-    ├── mode
-    ├── title
-    ├── content
-    ├── visibility
-    └── selected memberships
-```
-
-Feed, post and editor state may be refined independently as the application grows.
-
-#### Context — `BarahaContext`
-
-Context represents the user's current Baraha operating context:
-
-- current `session`;
-- current `user`;
-- available `memberships[]`;
-- `currentMembership`.
-
-Authentication state is derived from the session rather than maintained as an unrelated second authority.
-
-`currentMembership` means the membership context in which the user is mentally/operationally working. It is not a replacement for authorization.
-
-Context does not independently decide whether an operation is allowed. Supabase/database authorization remains authoritative.
-
-#### Service — `BarahaService`
-
-**BarahaService is the only Baraha application layer responsible for communicating with Supabase.**
-
-It owns the Baraha data boundary and exposes meaningful Baraha operations rather than leaking raw table/query details to the Controller or View.
-
-The service catalogue is expected to include concepts such as:
-
-```text
-READ
-├── getMyMemberships()
-├── getPostList()
-├── getPost()
-└── getCollection()
-
-WRITE
-├── createPost()
-├── updatePost()
-├── publishPost()
-├── archivePost()
-└── setPostMemberships()
-
-MODERATION
-└── hidePost()
-```
-
-This is a conceptual service contract, not a promise that every method is implemented immediately.
-
-The Service may use tables, RPCs, views or other Supabase mechanisms internally. That implementation detail must not leak into Controller/View contracts.
-
-### Service + Supabase are the read/write authority
-
-The fundamental rule is:
-
-```text
-UI/View
-   ↓
-Controller
-   ↓
-BarahaService
-   ↓
-Supabase
-```
-
-The UI, Controller, Model and Context are application helpers/state holders. They are **not independent authorities for Baraha data**.
-
-For reads, the Service asks Supabase for the authoritative data available to the current viewer.
-
-For writes, the Service requests the operation from Supabase, where RLS/RPC/database rules remain the final authority.
-
-The frontend must never reproduce Supabase authorization merely to decide whether an operation is truly allowed.
-
-### Authentication and public feed boundary
-
-A public Baraha post may be readable without authentication if current RLS permits it.
-
-Authentication is required where the operation is user-specific or depends on member/private access.
-
-Therefore the architecture must not use “authenticated = can read Baraha” as a blanket rule. The Service asks Supabase for the current viewer's permitted result.
-
-### Feed contract
-
-The main feed is a viewer-relative representation of content the current viewer is allowed to read.
-
-Default ordering is:
-
-```text
-created_at DESC
-id DESC
-```
-
-The feed uses cursor/keyset pagination rather than page numbers.
-
-The conceptual result contract is:
-
-```js
-{
-  items: [...],
-  nextCursor: "...",
-  hasMore: true
-}
-```
-
-Initial loading, loading more and refreshing are distinct states.
-
-A refresh is represented by a new first-page request rather than by silently reordering the existing scroll position.
-
-Stale asynchronous responses must be discarded when the feed context/request identity has changed.
-
-### `getPostList()` contract
-
-The planned Service contract is:
-
-```js
-getPostList({
-  limit,
-  cursor,
-  category?,
-  membershipId?
-})
-```
-
-`membershipId` is a feed/filter context, not an authorization mechanism.
-
-No explicit `userId` parameter is required for authority. Supabase Auth/session and database rules identify the current user.
-
-No hard-coded status filter is required for the base feed; Supabase/RLS determines which rows are actually visible to the current viewer.
-
-The feed may initially retrieve full post content and derive a short card preview in the presentation layer. A later implementation can switch to a lighter representation without inventing a permanent `summary` database field solely for the current UI.
-
-### Single-post/deep-link contract
-
-Every post is independently addressable by stable `baraha_posts.id`.
-
-Initial deep-link form:
-
-`baraha.html?post=<id>`
-
-The same Baraha application can initially handle both feed and reading. A future dedicated reading route/page can be introduced without changing post identity or the core Service boundary.
-
-An inaccessible, hidden or deleted direct post must result in a meaningful unavailable state rather than a blank page.
-
-### Collections
-
-A Collection is a future grouping of individual posts into a book, article set, series or similar structure.
-
-A post belongs to zero or one Collection.
-
-Existing `collection_key`, `collection_part` and `collection_order` are deliberate database foundation for future grouping/order. Collection UI and execution are not being implemented merely because the columns exist.
-
-The guiding use case is **write first, club later**.
-
-### Membership selector
-
-The Baraha membership selector has two related but distinct meanings:
-
-- **Current operating membership** — “Where am I operating?”
-- **Feed/filter membership** — “Which membership's content am I asking to see?”
-
-They may coincide in the current UI, but the architecture must not collapse these concepts permanently.
-
-A membership can legitimately have zero Baraha posts.
-
-Operations that require membership use an active/valid membership according to Supabase. Base feed retrieval does not require a current membership when RLS allows the requested content.
-
-### Author identity and future author resolution
-
-`baraha_posts.author_id` is the durable ownership identity.
-
-The current demo author names are presentation-only mock values and are not the identity source.
-
-Author display is deliberately separated from ownership/security identity.
-
-The Service should provide a replaceable author-resolution capability such as:
-
-```text
-readAuthor(id)
-readAuthors(ids[])
-```
-
-Batch resolution is preferred when several feed items need author information so that the application does not create avoidable N+1 lookups.
-
-The resolver may determine whether an author has relevant membership context today and may later resolve profile/display information from a different safe Supabase destination. Controller, Model and View should not need to change when that underlying destination evolves.
-
-The preferred implementation is a safe Supabase-side resolver/query/RPC/view rather than exposing arbitrary membership-table reads to the browser simply to classify authors.
-
-No arbitrary author resolver is required to be implemented now; the architectural boundary is what is being fixed.
-
-### Profile visibility and consent — future
-
-Display names, avatars and other profile information are separate from `author_id` ownership.
-
-When profile identity becomes a real UI/data requirement, appropriate visibility, privacy and consent rules will be defined and connected through the existing author-resolution boundary.
-
-No profile redesign is required for the current Baraha foundation.
-
-### Error and lifecycle model
-
-State belongs to the relevant Model area rather than one giant global state:
-
-```text
-Model.feed.state
-Model.post.state
-Model.editor.state
-```
-
-Expected outcomes such as empty data, not found, not accessible and validation failure must remain distinguishable from technical failures such as network/Supabase errors.
-
-A failed operation must not silently become an idle/blank state.
-
-A lightweight future MessageHandler/ErrorHandler may classify technical/application errors and convert them into user-facing messages, but a large global error framework is not required now.
-
-Post lifecycle remains subject to current Supabase truth; the Model must not assume a previously fetched state is permanently authoritative.
-
-### Supabase remains the security boss
-
-Baraha architecture does not move authorization into JavaScript.
-
-The frontend may hide/disable UI controls for usability, but that is only presentation. RLS, database functions, triggers and server-side rules are the actual security boundary.
-
-Where a business rule can change independently of the UI, it belongs at the Service/Supabase boundary rather than being duplicated across pages.
-
----
-
-## 27. Baraha implementation roadmap and architecture maintenance
-
-Baraha is no longer only static scaffolding. Its core feed, publishing, reader, moderation and lifecycle flows are implemented through the established boundaries below.
-
-### Current architecture boundary
-
-```text
-Baraha HTML / View
-        ↓
-Controller
-        ↓
-Model / Context
-        ↓
-Service
-        ↓
-Supabase
-```
-
-Responsibilities remain explicit:
-
-- **HTML / View / Reader** — presentation, DOM behaviour and user interaction only.
-- **Controller** — orchestration of application actions and lifecycle transitions.
-- **Model** — Baraha domain/feed state and post objects.
-- **Context** — current session, user, memberships and capability snapshot.
-- **Service** — the only Baraha application boundary that communicates with Supabase.
-- **Supabase** — authoritative identity, membership, authorization, lifecycle and data boundary.
-
-No raw Supabase query belongs in Baraha page code, View or Reader code.
-
-### Current implementation modules
-
-The current Baraha implementation includes:
-
-- `baraha-context.js` — session/user/membership/capability context; no Supabase calls.
-- `baraha-model.js` — Baraha domain/feed state and post models; no DOM/Supabase calls.
-- `baraha-service.js` — Supabase reads, RPC calls, author enrichment and lifecycle actions.
-- `baraha-controller.js` — orchestration of initialization, feed query state, pagination, publishing and lifecycle refresh.
-- `baraha-view.js` — feed/card presentation and UI mapping.
-- `baraha-reader.js` — reader presentation component and reader-level actions; no Supabase calls.
-- `baraha.html` — page shell and Baraha-specific UI wiring only.
-
-The architecture must remain modular rather than moving business/data logic back into `baraha.html`.
-
-### Safe implementation order
-
-The working direction remains:
-
-```text
-architecture decision
-      ↓
-README / durable contract
-      ↓
-small focused change
-      ↓
-inspect + implement
-      ↓
-commit
-      ↓
-post-commit compare/validation
-      ↓
-continue
-```
-
-### One capability / one foundation path
-
-Future work must prefer the existing foundation rather than creating parallel refresh, authorization or data paths.
-
-Examples:
-
-- feed refreshes go through the controller's authoritative refresh path;
-- load-more continues the same active feed query;
-- category and My Posts changes reset through the same refresh path;
-- publish/moderation/archive lifecycle changes return through the same authoritative feed refresh;
-- auth changes reuse the existing Baraha initialization path;
-- BFCache restoration reuses the same initialization/refresh path.
-
-Do not add page-specific "quick refresh" methods when an existing lifecycle entry path can perform the required work.
-
-### Architecture is revisitable, not frozen forever
-
-This architecture is a durable boundary, not a claim that every method/class is permanent.
-
-If future requirements show that a boundary is wrong or too small:
-
-1. inspect the current repository and Supabase impact;
-2. identify the smallest correct architectural change;
-3. avoid parallel/competing paths;
-4. implement the correction;
-5. update this README when the decision becomes durable.
-
-Do not bypass the architecture by placing a quick Supabase query directly into a page because it is faster for one feature.
-
-### README is the continuity mechanism
-
-The README is intentionally treated as a living architecture and development contract.
-
-When a decision becomes durable, record it here. When a durable decision is superseded, update the relevant section rather than accumulating contradictory rules elsewhere.
-
-Future AI sessions should use this README plus the current repository/Supabase state as the starting point, not assume that old conversation text is still the latest authority.
-
----
-
-## 28. Current Baraha status — implemented foundation and regression rules
-
-### Backend / Supabase foundation — established
-
-- [x] `baraha_posts` schema foundation.
-- [x] `baraha_post_memberships` normalized membership bridge.
-- [x] Post lifecycle states.
-- [x] Owner exceptional delete/security path.
-- [x] Matching-admin moderation boundary.
-- [x] Database-level protection of moderation changes.
-- [x] RLS-based viewer-relative read access.
-- [x] Multiple membership support.
-- [x] Collection foundation fields reserved for future use.
-- [x] Capability snapshot used by the application through controlled Supabase RPC access.
-- [x] Controlled Baraha publish/lifecycle RPC boundary.
-- [x] Moderation capability lookup through a controlled Supabase RPC boundary.
-- [x] Baraha RPC permission hardening and repository migration-history alignment completed during the current stabilization work.
-
-### Application architecture — established
-
-- [x] View / Controller / Model / Context / Service boundary.
-- [x] Service as the only Baraha application layer communicating with Supabase.
-- [x] Supabase remains authoritative for read/write, identity, membership and authorization.
-- [x] Viewer-relative feed.
-- [x] Cursor/keyset pagination using `created_at DESC, id DESC`.
-- [x] Single active feed-query state for category and My Posts filters.
-- [x] Category changes reset pagination through the authoritative refresh path.
-- [x] My Posts changes reset pagination through the same authoritative refresh path.
-- [x] Load More continues the same active query/filter context.
-- [x] Refresh waits for an in-flight authoritative read before starting a new first-page read.
-- [x] Publish adds the newly returned/enriched post through the model and renders the feed.
-- [x] Archive, approve and hide actions refresh the authoritative feed after the lifecycle RPC succeeds.
-- [x] Reader presentation separated from Service/database access.
-- [x] Reader actions currently include contextual edit/archive/approve/hide/share presentation with controller/service orchestration.
-- [x] Shared auth-state event from the account widget reuses the normal Baraha initialization path.
-- [x] Sign-out/account-switch protection clears user-specific My Posts filtering through identity comparison during initialization.
-- [x] BFCache `pageshow` restoration reuses the same initialization path.
-- [x] Browser Back/Forward restores reader/editor route state from the URL.
-- [x] Deep-link reader state uses stable post identity and meaningful unavailable handling.
-- [x] HTML remains a page/UI shell; Baraha controller/service/model/context logic belongs in their modules.
-
-### Feed query and pagination contract
-
-The active feed is represented by one controller-owned query state:
-
-```text
-feedQuery
-  ├── category
-  └── authorId (My Posts)
-```
-
-Pagination state remains separate:
-
-```text
-feedCursor
-hasMorePosts
-feedLoading
-feedLoadPromise
-```
-
-Rules:
-
-1. **Initial entry / authoritative refresh** starts from cursor `null`.
-2. **Category change** updates the active query and resets through refresh.
-3. **My Posts toggle** updates `authorId` and resets through refresh.
-4. **Load More** uses the current query plus the current cursor; it must not silently broaden or change the filter.
-5. A lifecycle/auth change must not race an existing read into stale visible state; refresh waits for the current authoritative read and then starts a fresh first-page request.
-6. A selected category must remain semantically aligned with the data loaded by Load More.
-
-The Model supports replacing the current live page and appending subsequent pages without returning to static demo data.
-
-### Single authoritative refresh principle
-
-The stabilization work established the following rule:
-
-```text
-Page entry
-Auth change
-BFCache restoration
-Filter change
-My Posts change
-Lifecycle mutation
-        ↓
-appropriate controller entry
-        ↓
-authoritative refresh/query path
-        ↓
-Model state
-        ↓
-View render
-```
-
-New functionality may introduce a new user action or route hook, but it should call the existing foundation where the underlying requirement is "refresh Baraha data".
-
-Do not solve future refresh issues by creating chains of page-specific methods that call one another or by maintaining multiple competing feed refresh listeners.
-
-### Authentication lifecycle contract
-
-The shared account widget publishes:
-
-```text
-sk:auth-state
-```
-
-Baraha listens to that shared application-level event and calls its existing initialization path to rebuild:
-
-- session context;
-- memberships;
-- capability snapshot;
-- viewer-relative feed.
-
-The Baraha page must not create an additional independent account/auth refresh system.
-
-User-specific feed state must not leak across:
-
-```text
-signed-in user A
-        ↓
-sign out
-        ↓
-signed-out state
-        ↓
-user B
-```
-
-In particular, the My Posts author filter must be cleared when authenticated identity changes.
-
-### Reader and route contract
-
-Baraha uses one reader panel rather than a separate full reading application.
-
-Stable post identity remains:
-
-```text
-baraha.html?post=<id>
-```
-
-The reader:
-
-- renders presentation data only;
-- does not call Supabase directly;
-- delegates lifecycle actions through configured handlers;
-- supports route synchronization;
-- closes/returns through the existing URL/history flow.
-
-Reader action availability must remain contextual and capability-based. UI visibility is convenience only; the database/RPC boundary remains authoritative.
-
-### Moderation / lifecycle orchestration
-
-Lifecycle actions follow:
-
-```text
-Reader/UI action
-      ↓
-Controller
-      ↓
-Service
-      ↓
-controlled Supabase RPC
-      ↓
-authoritative refresh
-```
-
-Current focused actions include:
-
-- approve;
-- hide;
-- archive;
-- publish/create through the controlled publish RPC.
-
-Do not update moderation/lifecycle state by directly mutating arbitrary frontend state as the security/authority source.
-
-### UI cleanup rule
-
-When stabilizing architecture, temporarily commented legacy code may be retained only when:
-
-1. it is intentionally isolated;
-2. the comment explains why it is temporarily retained;
-3. the current replacement path is clear;
-4. it is scheduled for removal after targeted UI/regression verification.
-
-Commented code is not a permanent parallel implementation.
-
-### Current regression expectations
-
-Before treating Baraha changes as safe, verify at minimum:
-
-- anonymous/public feed;
-- signed-in feed;
-- sign-out refresh;
-- account switch;
-- BFCache/page restore;
-- category filter + Load More;
-- My Posts + Load More;
-- filter change after pagination;
-- publish;
-- archive;
-- approve;
-- hide;
-- reader open/close;
-- reader deep link;
-- browser Back/Forward;
-- inaccessible/hidden post behaviour;
-- public/member/private visibility boundaries;
-- admin moderation boundaries.
-
-### Remaining work / intentionally not settled
-
-The following should not be treated as silently complete merely because the current foundation exists:
-
-- [ ] Full UI/manual regression pass after the latest stabilization commits.
-- [ ] Final removal of intentionally commented legacy cleanup code after targeted UI verification.
-- [ ] Broader end-to-end regression coverage across public/member/private/auth transitions.
-- [ ] Any remaining polish of reader action layout/visual hierarchy.
-- [ ] Explicit product decision for published-post editing; current UI must not imply an unsupported edit lifecycle.
-- [ ] Collection execution/UI only when the product requirement becomes active.
-- [ ] Future author/profile display improvements through the approved safe resolution boundary.
-
-The existence of the implemented foundation does **not** authorize future features to bypass it. New Baraha functionality must enter through the existing Controller/Service boundaries and reuse the current refresh/query lifecycle where applicable.
-
----
-
-## 29. Current project philosophy
-
-Snehakoota is a community project first and a technology project second.
-
-Technology should serve:
-
-- Friends.
-- Community participation.
-- Easy discovery.
-- Good storytelling.
-- Trust.
-- Simplicity.
-- Long-term maintainability.
+The goal is to build the **right system, one careful improvement at a time**.
