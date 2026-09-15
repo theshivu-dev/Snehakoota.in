@@ -506,3 +506,128 @@
       padding-top:clamp(1.75rem, 4svh, 2.5rem);
     }
   }
+
+/* =========================================================
+     HOME STAGE 5 — FLOATING INTRO SURFACE
+     ---------------------------------------------------------
+     Keeps the hero cinematic while grouping the supporting copy into
+     one maintainable floating surface that overlaps the hero threshold.
+     ========================================================= */
+
+.stage{
+  /* Let the hero + intro surface define the stage height naturally. */
+  min-height:auto;
+  padding-bottom:clamp(2.5rem,5vh,4rem);
+}
+
+.content{
+  width:min(100%,920px);
+  max-width:920px;
+}
+
+.home-copy{
+  position:relative;
+  z-index:2;
+  box-sizing:border-box;
+  width:min(760px, calc(100vw - 12vw));
+  margin-top:clamp(-3.5rem, -5vw, -2rem);
+  padding:clamp(1.6rem,3vw,2.5rem) clamp(1.5rem,4vw,3rem) clamp(1.5rem,3vw,2.25rem);
+  border:1px solid rgba(43,33,24,.12);
+  border-radius:28px;
+  background:rgba(255,246,232,.86);
+  box-shadow:
+    0 20px 46px rgba(43,33,24,.09),
+    0 4px 12px rgba(226,155,63,.06);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+
+.home-copy::before{
+  content:"";
+  display:block;
+  width:46px;
+  height:2px;
+  margin:0 auto clamp(.9rem,2vw,1.25rem);
+  border-radius:999px;
+  background:linear-gradient(90deg, rgba(181,80,46,.25), rgba(226,155,63,.72), rgba(47,82,51,.25));
+}
+
+.tagline{
+  max-width:680px;
+}
+
+.home-message{
+  width:min(100%,620px);
+  margin-top:clamp(1.1rem,2.2vw,1.5rem);
+  padding-top:clamp(1rem,2vw,1.25rem);
+}
+
+.desc{
+  font-size:clamp(.95rem,1.6vw,1.02rem);
+  line-height:1.65;
+}
+
+.kannada{
+  margin-top:.8rem;
+}
+
+@media (max-width:700px){
+  .stage{
+    padding:0 5vw clamp(2rem,5vh,3rem);
+  }
+
+  .content{
+    width:100%;
+  }
+
+  /* The road is intentionally a desktop/tablet composition;
+     the intro surface becomes the clean mobile transition. */
+  .paths{
+    display:none;
+  }
+
+  .home-copy{
+    width:100%;
+    margin-top:-1.5rem;
+    padding:1.35rem 1.1rem 1.25rem;
+    border-radius:22px;
+    box-shadow:0 14px 32px rgba(43,33,24,.08);
+  }
+
+  .home-copy::before{
+    margin-bottom:.8rem;
+  }
+
+  .tagline{
+    font-size:clamp(1.05rem,5vw,1.3rem);
+    line-height:1.42;
+  }
+
+  .home-message{
+    width:100%;
+    margin-top:1rem;
+    padding-top:.95rem;
+  }
+
+  .desc{
+    font-size:.94rem;
+    line-height:1.6;
+  }
+
+  .kannada{
+    font-size:.9rem;
+    margin-top:.7rem;
+  }
+}
+
+@media (max-width:480px){
+  .home-copy{
+    margin-top:-1.25rem;
+    padding:1.2rem .95rem 1.1rem;
+    border-radius:20px;
+  }
+
+  .tagline{
+    font-size:1.05rem;
+  }
+}
