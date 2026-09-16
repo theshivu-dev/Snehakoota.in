@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="kn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#fff6e8">
+<title>ನಿರ್ವಹಣೆ — SnehaKoota</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600;700&family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css?v=5">
+<link rel="stylesheet" href="navigation.css?v=9">
+<link rel="stylesheet" href="footer.css">
+<link rel="stylesheet" href="account.css?v=4">
+<link rel="stylesheet" href="controlpanel/controlpanel.css?v=1">
+<script src="navigation.js?v=9" defer></script>
+<script src="footer.js" defer></script>
+</head>
+<body>
+<div id="sk-account-root"></div>
+<div class="cp-gate" id="gate" hidden><div class="cp-gate-card"></div></div>
+<main class="control-panel-page" id="app" hidden>
+  <div class="cp-shell">
+    <span class="cp-kicker">ಸ್ನೇಹಕೂಟ · ನಿರ್ವಹಣೆ</span>
+    <h1 class="cp-title">ನಿರ್ವಹಣಾ ಫಲಕ</h1>
+    <p class="cp-sub">ಬಳಗ, ಸದಸ್ಯತ್ವ ಮತ್ತು ಬರಹಗಳನ್ನು ನೋಡಿಕೊಳ್ಳುವ ಸರಳ ಜಾಗ.</p>
+    <div class="cp-context">
+      <div><strong id="identity">—</strong><small id="status">—</small></div>
+      <select class="cp-scope" id="scope" aria-label="ಬಳಗ ಆಯ್ಕೆ"></select>
+    </div>
+    <nav class="cp-tabs" aria-label="ನಿರ್ವಹಣಾ ವಿಭಾಗಗಳು">
+      <button class="cp-tab active" id="sectionUsers" type="button">ಸದಸ್ಯರು</button>
+      <button class="cp-tab" id="sectionPosts" type="button">ಬರಹಗಳು</button>
+      <button class="cp-tab" id="sectionAdmins" type="button" hidden>ನಿರ್ವಾಹಕರು</button>
+    </nav>
+    <div class="cp-message" id="message" aria-live="polite"></div>
+
+    <section class="cp-section" id="users">
+      <header class="cp-section-head"><h2>ಸದಸ್ಯರು</h2><button class="cp-refresh" id="refreshUsers" type="button">↻ ತಾಜಾ</button></header>
+      <div class="cp-filters">
+        <input class="cp-input" id="userSearch" type="search" placeholder="ಹೆಸರು ಹುಡುಕಿ" autocomplete="off">
+        <select class="cp-select" id="userStatus"><option value="">ಎಲ್ಲಾ ಸ್ಥಿತಿಗಳು</option><option value="pending">ಬಾಕಿ</option><option value="active">ಸಕ್ರಿಯ</option><option value="rejected">ತಿರಸ್ಕೃತ</option><option value="suspended">ಸ್ಥಗಿತ</option></select>
+        <select class="cp-select" id="userType"><option value="">ಎಲ್ಲಾ ಪಾತ್ರಗಳು</option><option value="member">ಸದಸ್ಯ</option><option value="admin">ನಿರ್ವಾಹಕ</option></select>
+      </div>
+      <div class="cp-list" id="usersList"></div>
+    </section>
+
+    <section class="cp-section" id="posts" hidden>
+      <header class="cp-section-head"><h2>ಬರಹಗಳ ನಿರ್ವಹಣೆ</h2><button class="cp-refresh" id="refreshPosts" type="button">↻ ತಾಜಾ</button></header>
+      <div class="cp-filters">
+        <input class="cp-input" id="postSearch" type="search" placeholder="ಬರಹ ಅಥವಾ ಲೇಖಕರ ಹೆಸರು ಹುಡುಕಿ" autocomplete="off">
+        <select class="cp-select" id="postStatus"><option value="">ಎಲ್ಲಾ ಸ್ಥಿತಿಗಳು</option><option value="pending">ಪರಿಶೀಲನೆಗೆ ಬಾಕಿ</option><option value="published">ಪ್ರಕಟಿತ</option><option value="hide">ಮರೆಮಾಡಲಾಗಿದೆ</option><option value="draft">ಕರಡು</option><option value="archived">ಆರ್ಕೈವ್</option></select>
+      </div>
+      <div class="cp-list" id="postsList"></div>
+    </section>
+
+    <section class="cp-section" id="unassigned" hidden>
+      <header class="cp-section-head"><h2>ನಿರ್ವಾಹಕ ನಿರ್ವಹಣೆ</h2></header>
+      <div class="cp-admin-block"><h3>ಸಕ್ರಿಯ ನಿರ್ವಾಹಕರು</h3><div class="cp-list" id="adminList"></div><h3>ಸದಸ್ಯತ್ವವಿಲ್ಲದ ಖಾತೆಗಳು</h3><div class="cp-list" id="unassignedList"></div></div>
+    </section>
+  </div>
+</main>
+<div data-sk-footer></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(window){
+  'use strict';
+  var SUPABASE_URL='https://hukfpoxvtutvhjfdzcuh.supabase.co';
+  var SUPABASE_PUBLISHABLE_KEY='sb_publishable_6_9Fc319vRsSZSksFlhzSw_28-glehH';
+  window.SnehakootaSupabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:'pkce',experimental:{passkey:true}}});
+})(window);
+</script>
+<script src="account.js?v=4"></script>
+<script src="controlpanel/controlpanel-service.js?v=1"></script>
+<script src="controlpanel/controlpanel.js?v=1"></script>
+</body>
+</html>
