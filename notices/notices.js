@@ -17,7 +17,7 @@
   const typeMeta = {
     notice: { label: "ಸೂಚನೆ", icon: "●" },
     announcement: { label: "ಪ್ರಕಟಣೆ", icon: "📣" },
-    event: { label: "ಕಾರ್ಯಕ್ರಮ", icon: "▣" }
+    event: { label: "ಕೂಟ / ಕಾರ್ಯಕ್ರಮ", icon: "▣" }
   };
 
   function getElements() {
@@ -58,8 +58,9 @@
   function renderPreviewItem(update) {
     const meta = metaFor(update);
     const eventDate = update.type === "event" ? formatEventDate(update) : "";
+    const eventClass = update.type === "event" ? " sk-notice-preview-item--event" : "";
     return [
-      '<article class="sk-notice-preview-item" data-notice-id="', update.id, '">',
+      '<article class="sk-notice-preview-item', eventClass, '" data-notice-id="', update.id, '">',
         '<button class="sk-notice-preview-trigger" type="button" data-notice-open="', update.id, '" aria-label="Open ', escapeHtml(update.title), '">',
           '<span class="sk-notice-type sk-notice-type--', escapeHtml(update.type), '"><span class="sk-notice-type-icon" aria-hidden="true">', meta.icon, '</span><span>', escapeHtml(meta.label), '</span></span>',
           eventDate ? '<span class="sk-notice-preview-date">' + escapeHtml(eventDate) + '</span>' : '',
@@ -77,8 +78,11 @@
       ? '<div class="sk-notice-event-location">📍 ' + escapeHtml(update.event.locationName) + '</div>' : "";
     const eventInfo = eventDate
       ? '<div class="sk-notice-event-date">📅 ' + escapeHtml(eventDate) + '</div>' : "";
+    const eventMeaning = update.type === "event"
+      ? '<div class="sk-notice-event-meaning">ಮತ್ತೆ ಒಂದಾಗಿ ಭೇಟಿಯಾಗಲು, ಮಾತುಕತೆ–ಸಂತೋಷ ಹಂಚಿಕೊಳ್ಳಲು ಮತ್ತು ನಮ್ಮ ಮುಂದಿನ ಕೂಟವನ್ನು ರೂಪಿಸಿಕೊಳ್ಳಲು ಇಂತಹ ಕಾರ್ಯಕ್ರಮಗಳು ಒಂದು ನೆಪ.</div>' : "";
+    const eventClass = update.type === "event" ? " sk-notice-full-item--event" : "";
     return [
-      '<article class="sk-notice-full-item" data-notice-id="', update.id, '">',
+      '<article class="sk-notice-full-item', eventClass, '" data-notice-id="', update.id, '">',
         '<button class="sk-notice-full-trigger" type="button" aria-expanded="false" data-notice-toggle="', update.id, '">',
           '<span class="sk-notice-type sk-notice-type--', escapeHtml(update.type), '"><span class="sk-notice-type-icon" aria-hidden="true">', meta.icon, '</span><span>', escapeHtml(meta.label), '</span></span>',
           '<strong>', escapeHtml(update.title), '</strong>',
@@ -86,6 +90,7 @@
         '</button>',
         '<div class="sk-notice-full-detail" hidden>',
           update.content ? '<p>' + escapeHtml(update.content).replace(/\n/g, "<br>") + '</p>' : '',
+          eventMeaning,
           eventInfo,
           location,
           update.linkedBarahaPostId ? '<span class="sk-notice-linked-note">Related community story available</span>' : '',
