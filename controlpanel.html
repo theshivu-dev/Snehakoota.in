@@ -11,13 +11,11 @@
 <link rel="stylesheet" href="theme.css?v=5">
 <link rel="stylesheet" href="navigation.css?v=9">
 <link rel="stylesheet" href="footer.css">
-<link rel="stylesheet" href="account.css?v=4">
 <link rel="stylesheet" href="controlpanel/controlpanel.css?v=1">
 <script src="navigation.js?v=9" defer></script>
 <script src="footer.js" defer></script>
 </head>
 <body>
-<div id="sk-account-root"></div>
 <div class="cp-gate" id="gate" hidden><div class="cp-gate-card"></div></div>
 <main class="control-panel-page" id="app" hidden>
   <div class="cp-shell">
@@ -70,7 +68,6 @@
   window.SnehakootaSupabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:'pkce',experimental:{passkey:true}}});
 })(window);
 </script>
-<script src="account.js?v=4"></script>
 <script src="controlpanel/controlpanel-service.js?v=1"></script>
 <script src="controlpanel/controlpanel.js?v=1"></script>
 </body>
