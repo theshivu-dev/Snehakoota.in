@@ -5,6 +5,59 @@
 (function(){
   'use strict';
 
+  /* Keep one browser Supabase client available to shared components.
+     Account creates the client on ordinary pages; Control Panel can provide
+     one before Account loads. No second auth/session system is introduced. */
+  if (window.supabase && typeof window.supabase.createClient === 'function' && !window.__SK_SUPABASE_CLIENT_BRIDGED){
+    var originalCreateClient=window.supabase.createClient.bind(window.supabase);
+    window.supabase.createClient=function(){
+      var client=originalCreateClient.apply(null,arguments);
+      if (!window.SnehakootaSupabaseClient) window.SnehakootaSupabaseClient=client;
+      return client;
+    };
+    window.__SK_SUPABASE_CLIENT_BRIDGED=true;
+  }
+
+  function installAccountManagementEntry(){
+    if (!window.SnehakootaSupabaseClient) return;
+
+    async function syncEntry(){
+      var body=document.getElementById('skaBody');
+      if (!body || !window.SK_AUTH || !window.SK_AUTH.signedIn) return removeEntry();
+
+      try{
+        var result=await window.SnehakootaSupabaseClient.rpc('controlpanel_get_context');
+        var context=result && result.data ? result.data : null;
+        if (!context || context.canAccess !== true) return removeEntry();
+
+        if (body.querySelector('#skaManageSite')) return;
+        var invite=body.querySelector('#skaInviteFriend');
+        var row=document.createElement('a');
+        row.id='skaManageSite';
+        row.className='ska-action-row';
+        row.href='controlpanel.html';
+        row.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M3 12h18"></path><circle cx="12" cy="12" r="8.5"></circle></svg><span><strong>ನಿರ್ವಹಣೆ</strong><small>ಸದಸ್ಯರು ಮತ್ತು ಸಮುದಾಯವನ್ನು ನೋಡಿಕೊಳ್ಳಿ</small></span>';
+        if (invite && invite.parentNode) invite.parentNode.insertBefore(row,invite.nextSibling);
+        else body.insertBefore(row,body.firstChild);
+      }catch(error){
+        console.warn('SnehaKoota management entry could not be resolved.',error);
+        removeEntry();
+      }
+    }
+
+    function removeEntry(){
+      var existing=document.getElementById('skaManageSite');
+      if (existing) existing.remove();
+    }
+
+    document.addEventListener('sk:auth-state',function(){ syncEntry(); });
+    document.addEventListener('click',function(event){
+      var closeTarget=event.target.closest && event.target.closest('#skaClose,#skaBackdrop');
+      if (closeTarget) window.setTimeout(syncEntry,0);
+    });
+    window.setTimeout(syncEntry,0);
+  }
+
   /* Shared NAV binding state: OFF means no 7-dot strip and no reserved binding width. */
   var NAV_BINDING_ENABLED = false;
 
@@ -124,7 +177,6 @@
   }
 
   function isolatePageChrome(){
-    /* Samparka's vertical dots are page-progress controls, not global NAV. */
     var edge = document.querySelector('.edge-strip');
     if (edge){
       edge.querySelectorAll('.dot-btn').forEach(function(btn){
@@ -156,7 +208,6 @@
       });
     }
 
-    /* Samparka's top brand is page chrome, not a NAV row. */
     var brand = document.querySelector('.topbar .brand');
     if (brand){
       brand.style.setProperty('text-decoration','none','important');
@@ -211,13 +262,6 @@
     });
   }
 
-  /* =========================================================
-     UNIVERSAL SHARED NAVIGATION
-     ---------------------------------------------------------
-     A page that loads navigation.css + navigation.js may use the
-     canonical shared NAV without embedding NAV markup itself.
-     Existing [data-sk-nav-root] markup is reused unchanged.
-     ========================================================= */
   function ensureSharedNavigation(){
     var existing=document.querySelector('[data-sk-nav-root]');
     if (existing) return existing;
@@ -252,19 +296,6 @@
     return root;
   }
 
-  /* =========================================================
-     STAGE 4D-2A — INDEX TRUE SHARED-NAV MIGRATION
-     ---------------------------------------------------------
-     Index previously contained a second, legacy copy of the NAV.
-     It was being styled by shared CSS, but it was NOT the shared NAV
-     component. That is why its trigger/position could drift from the
-     Story/Samparka implementation and why the binding dots were not
-     reliably the same component.
-
-     We now replace the legacy Index NAV DOM with the exact same shared
-     [data-sk-nav-root] structure used by Story and Samparka. The home
-     page content/game remains untouched.
-     ========================================================= */
   function initLegacyIndex(){
     if (document.querySelector('[data-sk-nav-root]')) return;
 
@@ -276,12 +307,7 @@
 
     if (!opener || !closer || !backdrop || !panel) return;
 
-    /* Remove the legacy page-level strip entirely. It is not site NAV. */
     if (edge) edge.remove();
-
-    /* Remove the legacy trigger/panel/backdrop. The inline Index script
-       may already have attached listeners, but removing these nodes also
-       removes those handlers with them. */
     var legacyNodes=[opener,panel,backdrop];
     legacyNodes.forEach(function(node){ if (node && node.parentNode) node.parentNode.removeChild(node); });
 
@@ -317,20 +343,14 @@
 
   function boot(){
     isolatePageChrome();
-
-    /* Preserve the existing Index legacy adapter until that markup is
-       deliberately removed in the later migration step. */
     if (document.querySelector('[data-sk-nav-root]')){
       init(document.querySelector('[data-sk-nav-root]'));
-      return;
-    }
-
-    if (document.querySelector('button.bookmark-tab') && document.querySelector('.side-panel') && document.querySelector('.backdrop')){
+    } else if (document.querySelector('button.bookmark-tab') && document.querySelector('.side-panel') && document.querySelector('.backdrop')){
       initLegacyIndex();
-      return;
+    } else {
+      init(ensureSharedNavigation());
     }
-
-    init(ensureSharedNavigation());
+    installAccountManagementEntry();
   }
 
   if (document.readyState==='loading'){
