@@ -34,3 +34,61 @@
   height:1rem;
   flex:0 0 1rem;
 }
+
+/* =========================================================
+   EVENT IDENTITY
+   ---------------------------------------------------------
+   Events are the first visual expression of Snehakoota's
+   gathering/meeting spirit. Keep the treatment warm and
+   noticeable without turning the Notice Board into a new UI.
+   ========================================================= */
+
+.sk-notice-preview-item--event .sk-notice-preview-trigger {
+  background:rgba(196,137,62,.09);
+  border-color:rgba(196,137,62,.24);
+  box-shadow:inset 3px 0 0 rgba(196,137,62,.62);
+}
+
+.sk-notice-preview-item--event .sk-notice-preview-trigger:hover,
+.sk-notice-preview-item--event .sk-notice-preview-trigger:focus-visible {
+  background:rgba(196,137,62,.14);
+  box-shadow:inset 3px 0 0 rgba(196,137,62,.72), 0 8px 20px rgba(43,33,24,.07);
+}
+
+.sk-notice-type--event .sk-notice-type-icon {
+  background:rgba(196,137,62,.16);
+  color:#9a6428;
+}
+
+.sk-notice-full-item--event {
+  background:rgba(196,137,62,.045);
+  border-color:rgba(196,137,62,.25);
+  box-shadow:inset 3px 0 0 rgba(196,137,62,.62);
+}
+
+.sk-notice-full-item--event .sk-notice-full-trigger {
+  background:rgba(196,137,62,.055);
+}
+
+.sk-notice-full-item--event .sk-notice-full-trigger:hover,
+.sk-notice-full-item--event .sk-notice-full-trigger:focus-visible {
+  background:rgba(196,137,62,.10);
+  outline:none;
+}
+
+.sk-notice-event-meaning {
+  margin:.05rem 0 .8rem;
+  padding:.55rem .7rem;
+  border-left:2px solid rgba(196,137,62,.48);
+  color:var(--ink-soft);
+  font-family:'Noto Sans Kannada', sans-serif;
+  font-size:.82rem;
+  line-height:1.65;
+}
+
+@media (max-width:700px) {
+  .sk-notice-preview-item--event .sk-notice-preview-trigger,
+  .sk-notice-full-item--event {
+    box-shadow:inset 3px 0 0 rgba(196,137,62,.62);
+  }
+}
