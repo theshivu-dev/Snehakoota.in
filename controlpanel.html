@@ -12,13 +12,13 @@
 <link rel="stylesheet" href="navigation.css?v=9">
 <link rel="stylesheet" href="account.css?v=6">
 <link rel="stylesheet" href="footer.css">
-<link rel="stylesheet" href="controlpanel/controlpanel.css?v=2">
+<link rel="stylesheet" href="controlpanel/controlpanel.css?v=3">
 <script src="navigation.js?v=9" defer></script>
 <script src="footer.js" defer></script>
 </head>
 <body>
 <div id="sk-account-root"></div>
-<div class="cp-gate" id="gate" hidden><div class="cp-gate-card"></div></div>
+<div class="cp-gate" id="gate"><div class="cp-gate-card"><p>ನಿರ್ವಹಣಾ ಪುಟವನ್ನು ಸಿದ್ಧಪಡಿಸಲಾಗುತ್ತಿದೆ…</p></div></div>
 <main class="control-panel-page" id="app" hidden>
   <div class="cp-shell">
     <header class="cp-hero">
@@ -37,7 +37,6 @@
       <button class="cp-tab" id="sectionAdmins" type="button" hidden>ನಿರ್ವಾಹಕರು</button>
     </nav>
     <div class="cp-message" id="message" aria-live="polite"></div>
-
     <section class="cp-section" id="users">
       <header class="cp-section-head"><h2>ಸದಸ್ಯರು</h2><button class="cp-refresh" id="refreshUsers" type="button">↻ ತಾಜಾ</button></header>
       <div class="cp-filters">
@@ -47,7 +46,6 @@
       </div>
       <div class="cp-list" id="usersList"></div>
     </section>
-
     <section class="cp-section" id="posts" hidden>
       <header class="cp-section-head"><h2>ಬರಹಗಳ ನಿರ್ವಹಣೆ</h2><button class="cp-refresh" id="refreshPosts" type="button">↻ ತಾಜಾ</button></header>
       <div class="cp-filters">
@@ -56,7 +54,6 @@
       </div>
       <div class="cp-list" id="postsList"></div>
     </section>
-
     <section class="cp-section" id="unassigned" hidden>
       <header class="cp-section-head"><h2>ನಿರ್ವಾಹಕ ನಿರ್ವಹಣೆ</h2></header>
       <div class="cp-admin-block"><h3>ಸಕ್ರಿಯ ನಿರ್ವಾಹಕರು</h3><div class="cp-list" id="adminList"></div><h3>ಸದಸ್ಯತ್ವವಿಲ್ಲದ ಖಾತೆಗಳು</h3><div class="cp-list" id="unassignedList"></div></div>
