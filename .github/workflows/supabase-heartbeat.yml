@@ -1,7 +1,6 @@
 name: Supabase heartbeat
 
 on:
-  # Daily checks reduce the chance of inactivity; scheduled runs may be delayed by GitHub.
   schedule:
     - cron: "17 4 * * *"
   workflow_dispatch:
@@ -13,7 +12,6 @@ jobs:
   heartbeat:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-
     steps:
       - name: Keep Snehakoota Supabase active
         env:
@@ -22,19 +20,11 @@ jobs:
           EXPECTED_PROJECT_REF: hukfpoxvtutvhjfdzcuh
         run: |
           set -euo pipefail
-          if [ "$PROJECT_REF" != "$EXPECTED_PROJECT_REF" ]; then
-            echo "::error::Snehakoota project-ref secret does not match the expected project."
-            exit 1
-          fi
-          curl --fail-with-body --silent --show-error \
-            --retry 5 --retry-all-errors --retry-delay 10 --retry-max-time 180 \
-            --connect-timeout 15 --max-time 45 \
-            -X POST \
-            "https://${PROJECT_REF}.supabase.co/rest/v1/rpc/supabase_heartbeat" \
-            -H "apikey: ${ANON_KEY}" \
-            -H "Authorization: Bearer ${ANON_KEY}" \
-            -H "Content-Type: application/json" \
-            --data '{}'
+          test "$PROJECT_REF" = "$EXPECTED_PROJECT_REF" || { echo "::error::Snehakoota project ref mismatch"; exit 1; }
+          curl --fail-with-body --silent --show-error --retry 5 --retry-all-errors --retry-delay 10 --retry-max-time 180 --connect-timeout 15 --max-time 45 \
+            -X POST "https://${PROJECT_REF}.supabase.co/rest/v1/rpc/supabase_heartbeat" \
+            -H "apikey: ${ANON_KEY}" -H "Authorization: Bearer ${ANON_KEY}" -H "Content-Type: application/json" \
+            --data '{"p_github_run_id":'"${GITHUB_RUN_ID}"',"p_github_run_attempt":'"${GITHUB_RUN_ATTEMPT}"'}'
 
       - name: Keep OneHaveri Supabase active
         if: always()
@@ -44,16 +34,8 @@ jobs:
           EXPECTED_PROJECT_REF: zdgbtjelxhriggjavecp
         run: |
           set -euo pipefail
-          if [ "$PROJECT_REF" != "$EXPECTED_PROJECT_REF" ]; then
-            echo "::error::OneHaveri project-ref secret does not match the expected project."
-            exit 1
-          fi
-          curl --fail-with-body --silent --show-error \
-            --retry 5 --retry-all-errors --retry-delay 10 --retry-max-time 180 \
-            --connect-timeout 15 --max-time 45 \
-            -X POST \
-            "https://${PROJECT_REF}.supabase.co/rest/v1/rpc/supabase_heartbeat" \
-            -H "apikey: ${ANON_KEY}" \
-            -H "Authorization: Bearer ${ANON_KEY}" \
-            -H "Content-Type: application/json" \
-            --data '{}'
+          test "$PROJECT_REF" = "$EXPECTED_PROJECT_REF" || { echo "::error::OneHaveri project ref mismatch"; exit 1; }
+          curl --fail-with-body --silent --show-error --retry 5 --retry-all-errors --retry-delay 10 --retry-max-time 180 --connect-timeout 15 --max-time 45 \
+            -X POST "https://${PROJECT_REF}.supabase.co/rest/v1/rpc/supabase_heartbeat" \
+            -H "apikey: ${ANON_KEY}" -H "Authorization: Bearer ${ANON_KEY}" -H "Content-Type: application/json" \
+            --data '{"p_github_run_id":'"${GITHUB_RUN_ID}"',"p_github_run_attempt":'"${GITHUB_RUN_ATTEMPT}"'}'
